@@ -10,7 +10,6 @@ import {
   Target,
   BarChart3,
   Clock,
-  DollarSign,
   Percent,
   AlertTriangle,
   Crown,
@@ -19,7 +18,6 @@ import {
   MessageSquare,
   FileText,
   Activity,
-  TrendingUpIcon,
   Zap
 } from 'lucide-react';
 
@@ -75,6 +73,16 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
   const formatAnalysisForDisplay = (text: string) => {
     // Split analysis into sections for better readability
     const sections = text.split(/\n\n+/);
+    
+    // If there's no text, show a placeholder
+    if (!text || text.trim() === '') {
+      return (
+        <div className="text-gray-400 italic">
+          No analysis available. Generate a new signal to see results.
+        </div>
+      );
+    }
+    
     return sections.map((section, index) => {
       // Check if section is a header (contains specific keywords)
       const isHeader = /^(SIGNAL SUMMARY|MARKET ANALYSIS|RECOMMENDATION|CONCLUSION|RISK ASSESSMENT|TECHNICAL ANALYSIS|FUNDAMENTAL ANALYSIS):/i.test(section);

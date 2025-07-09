@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../contexts/LanguageContext';
-import { getSchools, saveRecommendation, canUserGenerateRecommendation } from '../services/firestore';
+import { getSchools, saveRecommendation, canUserGenerateRecommendation, getUserRecommendations } from '../services/firestore';
 import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { generateTradingSignalWithRealData } from '../services/gpt';
 import { fetchMultiTimeframeData, generateMockMultiTimeframeData, TRADING_PAIRS, testApiConnection, loadApiKeys } from '../services/marketData';
@@ -56,12 +56,14 @@ const Dashboard: React.FC = () => {
     used_today: 0,
     recommendation_limit: 1
   });
+  const [loadingLatestAnalysis, setLoadingLatestAnalysis] = useState(false);
   
   const analysisRef = useRef<HTMLDivElement>(null);
   const generatorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadSchools();
+    loadLatestAnalysis();
     
     if (user?.plan === 'elite') {
       loadTelegramConfig();
@@ -202,6 +204,48 @@ const Dashboard: React.FC = () => {
       setError(errorMessage);
     } finally {
       setDataLoading(false);
+    }
+  };
+
+  // Load the user's latest analysis
+  const loadLatestAnalysis = async () => {
+    if (!user) return;
+    
+    try {
+      setLoadingLatestAnalysis(true);
+      console.log('📊 Loading latest analysis...');
+      
+      // Get the most recent recommendation (limit to 1)
+      const recommendations = await getUserRecommendations(user.uid, 1);
+      
+      if (recommendations.length > 0) {
+        const latestRec = recommendations[0];
+        console.log('✅ Found latest analysis:', latestRec.id);
+        
+        // Set the analysis data
+        setLastRecommendation(latestRec.response);
+        setLastSignal(latestRec.signal);
+        setShowAnalysisSection(true);
+        
+        // Find the school that was used
+        if (latestRec.school && schools.length > 0) {
+          const matchingSchool = schools.find(s => s.name === latestRec.school);
+          if (matchingSchool) {
+            setSelectedSchool(matchingSchool.id);
+          }
+        }
+        
+        // If market data is available in the recommendation, use it
+        if (latestRec.candlestick_data) {
+          setMarketData(latestRec.candlestick_data);
+        }
+      } else {
+        console.log('ℹ️ No previous analysis found');
+      }
+    } catch (error) {
+      console.error('❌ Error loading latest analysis:', error);
+    } finally {
+      setLoadingLatestAnalysis(false);
     }
   };
 
@@ -901,20 +945,29 @@ ${jsonData}`;
         {/* Analysis Results Section */}
         {showAnalysisSection && (
           <div ref={analysisRef} id="analysis-section" className="mt-12">
-            <div className={`transition-all duration-500 ${analysisVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-4'}`}>
+            <div className={`transition-all duration-500 ${analysisVisible || loadingLatestAnalysis ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-4'}`}>
               <div className="flex items-center space-x-3 mb-6">
                 <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-10 w-1 rounded-full"></div>
-                <h2 className="text-2xl font-bold text-white">Analysis Results</h2>
+                <h2 className="text-2xl font-bold text-white">
+                  {loadingLatestAnalysis ? 'Loading Latest Analysis...' : 'Analysis Results'}
+                </h2>
               </div>
               
-              <AnalysisDisplay
-                analysis={lastRecommendation}
-                signal={lastSignal}
-                school={schools.find(s => s.id === selectedSchool)?.name || 'Unknown'}
-                timestamp={new Date()}
-                onSendToTelegram={user?.plan === 'elite' && telegramConfig ? handleSendToTelegram : undefined}
-                prompt={createFullPrompt()}
-              />
+              {loadingLatestAnalysis ? (
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 p-8 flex items-center justify-center">
+                  <Loader className="h-8 w-8 text-blue-400 animate-spin mr-3" />
+                  <span className="text-gray-300">Loading your latest analysis...</span>
+                </div>
+              ) : (
+                <AnalysisDisplay
+                  analysis={lastRecommendation}
+                  signal={lastSignal}
+                  school={schools.find(s => s.id === selectedSchool)?.name || 'Unknown'}
+                  timestamp={new Date()}
+                  onSendToTelegram={user?.plan === 'elite' && telegramConfig ? handleSendToTelegram : undefined}
+                  prompt={createFullPrompt()}
+                />
+              )}
             </div>
           </div>
         )}
