@@ -78,6 +78,16 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
     
     // Function to check if a section is about ICT Smart Money Logic
     const isICTSection = (text: string) => {
+      return /ict|smart money|institutional|order flow/i.test(text);
+    };
+    
+    // Function to check if a section is about Invalidation criteria
+    const isInvalidationSection = (text: string) => {
+      return /invalidation|no-trade criteria/i.test(text);
+    };
+    
+    // Function to check if a section is about ICT Smart Money Logic
+    const isICTSection = (text: string) => {
       return text.toLowerCase().includes('ict smart money') || 
              text.toLowerCase().includes('smart money logic') ||
              text.toLowerCase().includes('institutional order flow');
@@ -140,11 +150,53 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
     
     return sections.map((section, index) => {
       // Check if section is a header (contains specific keywords)
-      const isHeader = /^(SIGNAL SUMMARY|MARKET ANALYSIS|RECOMMENDATION|CONCLUSION|RISK ASSESSMENT|TECHNICAL ANALYSIS|FUNDAMENTAL ANALYSIS|MULTI-TIMEFRAME CONTEXT|EXECUTION TIMEFRAMES|TRADE SETUP|JUSTIFICATION|INVALIDATION):/i.test(section);
+      const isHeader = /^(SIGNAL SUMMARY|MARKET ANALYSIS|RECOMMENDATION|CONCLUSION|RISK ASSESSMENT|TECHNICAL ANALYSIS|FUNDAMENTAL ANALYSIS|MULTI-TIMEFRAME CONTEXT|EXECUTION TIMEFRAMES|TRADE SETUP|JUSTIFICATION|INVALIDATION|MARKET STRUCTURE|ICT SMART MONEY|SMART MONEY LOGIC):/i.test(section);
       
       if (isHeader) {
         const [title, ...content] = section.split(':');
-        return <div key={index}>{formatSectionTitle(title, content.join(':'))}</div>;
+        
+        // Special styling for ICT Smart Money Logic section
+        if (isICTSection(title)) {
+          return (
+            <div key={index} className="mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold text-blue-400 mb-4 flex items-center space-x-2 border-b border-blue-400/30 pb-3">
+                <Zap className="h-6 w-6 md:h-7 md:w-7 text-blue-400" />
+                <span>{title.trim()}</span>
+              </h2>
+              <div className="text-gray-200 leading-relaxed text-sm md:text-base bg-blue-500/5 p-5 rounded-xl border border-blue-500/20">
+                {content.join(':').trim()}
+              </div>
+            </div>
+          );
+        }
+        
+        // Special styling for Invalidation section
+        if (isInvalidationSection(title)) {
+          return (
+            <div key={index} className="mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold text-red-400 mb-4 flex items-center space-x-2 border-b border-red-400/20 pb-3">
+                <AlertTriangle className="h-6 w-6 md:h-7 md:w-7 text-red-400" />
+                <span>{title.trim()}</span>
+              </h2>
+              <div className="text-gray-200 leading-relaxed text-sm md:text-base bg-red-500/5 p-5 rounded-xl border border-red-500/10">
+                {content.join(':').trim()}
+              </div>
+            </div>
+          );
+        }
+        
+        // Default styling for other sections
+        return (
+          <div key={index} className="mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-blue-400 mb-4 flex items-center space-x-2 border-b border-blue-400/20 pb-3">
+              <BarChart3 className="h-6 w-6 md:h-7 md:w-7 text-blue-400" />
+              <span>{title.trim()}</span>
+            </h2>
+            <div className="text-gray-200 leading-relaxed text-sm md:text-base">
+              {content.join(':').trim()}
+            </div>
+          </div>
+        );
       }
       
       // Check for sub-headers (numbered sections or bullet points)
@@ -227,6 +279,73 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
           {section.trim().split('\n').map((line, i) => {
             // Bold any text between ** or that starts with "Invalidation:"
             if (line.includes('**') || line.toLowerCase().includes('invalidation:') || line.toLowerCase().includes('ict smart money')) {
+              return (
+                <p key={i} className="mb-2 font-bold text-white">
+                  {line.trim().replace(/\*\*/g, '')}
+                </p>
+              );
+      // Check for ICT Smart Money Logic sections
+      if (isICTSection(section)) {
+        return (
+          <div key={index} className="mb-6 bg-blue-500/10 p-5 rounded-xl border border-blue-500/20 shadow-lg">
+            <h3 className="text-xl font-bold text-blue-400 mb-3 border-b border-blue-500/30 pb-2">
+              ICT SMART MONEY LOGIC
+            </h3>
+            <div className="text-gray-200 leading-relaxed text-sm md:text-base">
+              {section.trim().split('\n').map((line, i) => (
+                <p key={i} className="mb-2">{line.trim()}</p>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      // Special styling for Invalidation sections
+      if (isInvalidationSection(section)) {
+        return (
+          <div key={index} className="mb-6 bg-red-500/5 p-5 rounded-xl border border-red-500/10 shadow-lg">
+            <h3 className="text-xl font-bold text-red-400 mb-3 border-b border-red-400/20 pb-2">
+              INVALIDATION CRITERIA
+            </h3>
+            <div className="text-gray-200 leading-relaxed text-sm md:text-base">
+              {section.trim().split('\n').map((line, i) => {
+                // Bold and color the invalidation criteria
+                if (line.includes('❌')) {
+                  return (
+                    <p key={i} className="mb-2 font-bold text-red-400">
+                      {line.trim()}
+                    </p>
+                  );
+                }
+                return <p key={i} className="mb-2">{line.trim()}</p>;
+              })}
+            </div>
+          </div>
+        );
+      }
+      
+      // Check for Market Structure & Bias sections
+      if (/market structure|bias/i.test(section)) {
+        return (
+          <div key={index} className="mb-6 bg-green-500/5 p-5 rounded-xl border border-green-500/10 shadow-lg">
+            <h3 className="text-xl font-bold text-green-400 mb-3 border-b border-green-400/20 pb-2">
+              MARKET STRUCTURE & BIAS
+            </h3>
+            <div className="text-gray-200 leading-relaxed text-sm md:text-base">
+              {section.trim().split('\n').map((line, i) => (
+                <p key={i} className="mb-2">{line.trim()}</p>
+              ))}
+            </div>
+          </div>
+        );
+      }
+      
+      // Default styling for regular paragraphs
+      return (
+        <div key={index} className="mb-5 text-gray-300 leading-relaxed text-sm md:text-base">
+          {section.trim().split('\n').map((line, i) => {
+            // Bold any text between ** or that starts with "Invalidation:"
+            if (line.includes('**') || line.toLowerCase().includes('invalidation:')) {
               return (
                 <p key={i} className="mb-2 font-bold text-white">
                   {line.trim().replace(/\*\*/g, '')}

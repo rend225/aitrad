@@ -5,6 +5,7 @@
 /* Custom CSS Variables */
 :root {
   --blue-500-rgb: 59, 130, 246;
+  --blue-400-rgb: 96, 165, 250;
   --blue-600-rgb: 37, 99, 235;
   --purple-500-rgb: 168, 85, 247;
   --gray-500-rgb: 107, 114, 128;
@@ -165,7 +166,7 @@ a:focus {
 /* Custom styling for analysis sections */
 .prose h1, .prose h2, .prose h3 {
   color: theme('colors.blue.400'); 
-  font-weight: 700;
+  font-weight: 800;
   margin-top: 1.5em;
   margin-bottom: 0.75em;
 }
@@ -173,31 +174,43 @@ a:focus {
 .prose h1 {
   font-size: 1.75rem;
   line-height: 2rem;
-  border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+  border-bottom: 1px solid rgba(var(--blue-400-rgb), 0.3);
   padding-bottom: 0.5rem;
+  text-shadow: 0 0 15px rgba(var(--blue-400-rgb), 0.2);
 }
 
 .prose h2 {
   font-size: 1.5rem;
   line-height: 1.75rem;
+  text-shadow: 0 0 10px rgba(var(--blue-400-rgb), 0.15);
 }
 
 .prose h3 {
   font-size: 1.25rem;
   line-height: 1.5rem;
   color: theme('colors.purple.400');
+  text-shadow: 0 0 8px rgba(168, 85, 247, 0.15);
 }
 
 /* ICT Smart Money Logic styling */
-.prose h2:has(span:contains("ICT")),
-.prose h2:has(span:contains("SMART MONEY")),
-.prose h3:has(span:contains("ICT")),
-.prose h3:has(span:contains("SMART MONEY")) {
+.prose h2:has(span:contains("ICT")) {
   color: theme('colors.blue.400');
   font-size: 1.75rem;
   line-height: 2.25rem;
-  border-bottom-color: rgba(96, 165, 250, 0.3);
-  text-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
+  border-bottom: 2px solid rgba(var(--blue-400-rgb), 0.4);
+  text-shadow: 0 0 20px rgba(var(--blue-400-rgb), 0.4);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.prose h3:has(span:contains("ICT")),
+.prose h3:has(span:contains("SMART MONEY")) {
+  color: theme('colors.blue.400');
+  font-size: 1.5rem;
+  line-height: 2rem;
+  border-bottom: 1px solid rgba(var(--blue-400-rgb), 0.3);
+  text-shadow: 0 0 15px rgba(var(--blue-400-rgb), 0.3);
+  padding-bottom: 0.5rem;
 }
 
 .ict-section {
@@ -212,13 +225,15 @@ a:focus {
 /* Special styling for invalidation sections */
 .prose h2:has(span:contains("INVALIDATION")), 
 .prose h2:has(span:contains("NO-TRADE")) {
-  color: theme('colors.red.400');
-  border-bottom-color: rgba(248, 113, 113, 0.2);
+  color: theme('colors.red.500');
+  border-bottom: 2px solid rgba(239, 68, 68, 0.3);
+  text-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
 }
 
 .prose strong {
   color: theme('colors.white');
-  font-weight: 600;
+  font-weight: 700;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
 }
 
 .prose ul, .prose ol {
@@ -235,7 +250,7 @@ a:focus {
 .prose blockquote {
   border-left: 3px solid theme('colors.blue.500');
   padding-left: 1em;
-  font-style: italic;
+  font-style: normal;
   color: theme('colors.gray.300');
   margin: 1em 0;
 }
@@ -260,11 +275,32 @@ a:focus {
 
 /* Invalidation criteria styling */
 .invalidation-criteria {
-  color: theme('colors.red.400');
+  color: theme('colors.red.500');
   font-weight: 600;
   background-color: rgba(248, 113, 113, 0.05);
   padding: 0.5rem;
   border-radius: 0.375rem;
   margin-bottom: 0.5rem;
   border-left: 3px solid theme('colors.red.400');
+}
+
+/* Market Structure & Bias styling */
+.prose h2:has(span:contains("MARKET STRUCTURE")),
+.prose h3:has(span:contains("MARKET STRUCTURE")),
+.prose h2:has(span:contains("BIAS")),
+.prose h3:has(span:contains("BIAS")) {
+  color: theme('colors.green.400');
+  border-bottom: 1px solid rgba(74, 222, 128, 0.3);
+  text-shadow: 0 0 15px rgba(74, 222, 128, 0.2);
+}
+
+/* Signal Summary styling */
+.prose h2:has(span:contains("SIGNAL SUMMARY")),
+.prose h3:has(span:contains("SIGNAL SUMMARY")) {
+  color: theme('colors.yellow.400');
+  font-size: 1.75rem;
+  line-height: 2.25rem;
+  border-bottom: 2px solid rgba(250, 204, 21, 0.3);
+  text-shadow: 0 0 15px rgba(250, 204, 21, 0.2);
+  padding-bottom: 0.75rem;
 }
