@@ -855,18 +855,20 @@ ${jsonData}`;
         {/* Analysis Display */}
         <div className="mt-8" ref={analysisRef}>
           {(lastRecommendation || lastSignal) && (
-            <h2 className="text-2xl font-bold text-white mb-4 flex items-center space-x-2">
-              <BarChart3 className="h-6 w-6 text-blue-400" />
-              <span>Analysis Results</span>
-            </h2>
-            <AnalysisDisplay
-              analysis={lastRecommendation}
-              signal={lastSignal}
-              school={schools.find(s => s.id === selectedSchool)?.name || 'Unknown'}
-              timestamp={new Date()}
-              onSendToTelegram={user?.plan === 'elite' && telegramConfig ? handleSendToTelegram : undefined}
-              prompt={createFullPrompt()}
-            />
+            <>
+              <h2 className="text-2xl font-bold text-white mb-4 flex items-center space-x-2">
+                <BarChart3 className="h-6 w-6 text-blue-400" />
+                <span>Analysis Results</span>
+              </h2>
+              <AnalysisDisplay
+                analysis={lastRecommendation}
+                signal={lastSignal}
+                school={schools.find(s => s.id === selectedSchool)?.name || 'Unknown'}
+                timestamp={new Date()}
+                onSendToTelegram={user?.plan === 'elite' && telegramConfig ? handleSendToTelegram : undefined}
+                prompt={createFullPrompt()}
+              />
+            </>
           )}
         </div>
       </div>
