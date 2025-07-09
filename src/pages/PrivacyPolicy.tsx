@@ -1,9 +1,9 @@
 import React from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useTranslation } from '../contexts/TranslationContext';
 import { Shield, Eye, Lock, Database, Globe, Mail } from 'lucide-react';
 
 const PrivacyPolicy: React.FC = () => {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">

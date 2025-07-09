@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useTranslation } from '../contexts/TranslationContext';
 import { getSchools, saveRecommendation, canUserGenerateRecommendation } from '../services/firestore';
 import { doc, getDoc, onSnapshot, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { generateTradingSignalWithRealData } from '../services/gpt';
@@ -41,7 +41,7 @@ import {
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL } = useTranslation();
   const [schools, setSchools] = useState<School[]>([]);
   const [selectedSchool, setSelectedSchool] = useState('');
   const [selectedPair, setSelectedPair] = useState('XAUUSD');
