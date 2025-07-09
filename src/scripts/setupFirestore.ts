@@ -19,21 +19,6 @@ const plansData = [
   {
     id: 'basic',
     name: 'Basic',
-    price: 10.50,
-    recommendations_per_day: 50,
-    features: [
-      '50 analyses per month',
-      'Basic analysis',
-      'Email support',
-      'Market data access',
-      'Historical signals'
-    ],
-    paypal_plan_id: 'P-BASIC50ANALYSES',
-    popular: false
-  },
-  {
-    id: 'basic',
-    name: 'Basic',
     price: 9,
     recommendations_per_day: 50,
     features: [
@@ -58,8 +43,6 @@ const plansData = [
       'Historical data',
       'Multiple trading schools',
       'Custom risk parameters'
-      'Multiple trading schools',
-      'Custom risk parameters'
     ],
     paypal_plan_id: 'P-PRO100ANALYSES',
     popular: true
@@ -75,8 +58,6 @@ const plansData = [
       '24/7 support',
       'Custom strategies',
       'API access',
-      'Telegram integration',
-      'MetaTrader integration'
       'Telegram integration',
       'MetaTrader integration'
     ],
@@ -139,7 +120,6 @@ export const setupPlans = async () => {
     console.log('✅ Basic Plan ($9/month) - PayPal Ready');
     console.log('✅ Pro Plan ($19/month) - PayPal Ready');
     console.log('✅ Elite Plan ($29/month) - PayPal Ready');
-    console.log('✅ Elite Plan ($29/month) - PayPal Ready');
     console.log('');
     console.log('🎯 PayPal Configuration:');
     console.log('• Secure payment processing');
@@ -183,8 +163,6 @@ export const setupAllFirestoreData = async () => {
     console.log('📊 FINAL CONFIGURATION:');
     console.log('✅ Free Plan: $0/month - No payment needed');
     console.log('✅ Basic Plan: $9/month - PayPal Integration Ready');
-    console.log('✅ Pro Plan: $19/month - PayPal Integration Ready');
-    console.log('✅ Elite Plan: $29/month - PayPal Integration Ready');
     console.log('✅ Pro Plan: $19/month - PayPal Integration Ready');
     console.log('✅ Elite Plan: $29/month - PayPal Integration Ready');
     console.log('✅ All trading schools configured');
