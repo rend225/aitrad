@@ -377,47 +377,99 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
   const riskReward = calculateRiskReward();
 
   // Format analysis for display by parsing sections
-  const formatAnalysisForDisplay = (analysis: string) => {
-    if (!analysis) return null;
+  const formatAnalysisForDisplay = (text: string) => {
+    if (!text) return null;
     
     // Split by the separator used in the analysis
-    const sections = analysis.split('━━━━━━━━━━━━━━━━━━━━━━').filter(section => section.trim());
+    const sections = text.split('━━━━━━━━━━━━━━━━━━━━━━').filter(section => section.trim());
     
-    return sections.map((section, index) => {
-      const trimmedSection = section.trim();
-      if (!trimmedSection) return null;
-      
-      // Try to extract title from first line
-      const lines = trimmedSection.split('\n');
-      const firstLine = lines[0].trim();
-      
-      // Check if this looks like a titled section
-      if (firstLine.includes('📌') || firstLine.includes('🔶') || firstLine.includes('📊') || 
-          firstLine.includes('📈') || firstLine.includes('🎯') || firstLine.includes('🧠') || 
-          firstLine.includes('⚠') || firstLine.toUpperCase().includes('ICT') ||
-          firstLine.toUpperCase().includes('INVALIDATION') || 
-          firstLine.toUpperCase().includes('MARKET STRUCTURE') ||
-          firstLine.toUpperCase().includes('SIGNAL SUMMARY')) {
+    if (sections.length > 0) {
+      return sections.map((section, index) => {
+        const trimmedSection = section.trim();
+        if (!trimmedSection) return null;
         
-        const title = firstLine.replace(/[📌🔶📊📈🎯🧠⚠]/g, '').trim();
-        const content = lines.slice(1).join('\n').trim();
+        // Try to extract title from first line
+        const lines = trimmedSection.split('\n');
+        const firstLine = lines[0].trim();
         
-        return formatSectionTitle(title, content);
-      }
+        // Check if this looks like a titled section
+        if (firstLine.includes('📌') || firstLine.includes('🔶') || firstLine.includes('📊') || 
+            firstLine.includes('📈') || firstLine.includes('🎯') || firstLine.includes('🧠') || 
+            firstLine.includes('⚠') || firstLine.toUpperCase().includes('ICT') ||
+            firstLine.toUpperCase().includes('INVALIDATION') || 
+            firstLine.toUpperCase().includes('MARKET STRUCTURE') ||
+            firstLine.toUpperCase().includes('SIGNAL SUMMARY')) {
+          
+          const title = firstLine.replace(/[📌🔶📊📈🎯🧠⚠]/g, '').trim();
+          const content = lines.slice(1).join('\n').trim();
+          
+          return formatSectionTitle(title, content);
+        }
+        
+        // Check for ICT section
+        if (trimmedSection.toUpperCase().includes('ICT') || trimmedSection.toUpperCase().includes('SMART MONEY')) {
+          return formatICTSection(trimmedSection, index);
+        }
+        
+        // Check for invalidation section
+        if (trimmedSection.toUpperCase().includes('INVALIDATION') || trimmedSection.toUpperCase().includes('NO-TRADE')) {
+          return formatInvalidationSection(trimmedSection, index);
+        }
+        
+        // Default section formatting
+        return formatDefaultSection(trimmedSection, index);
+      }).filter(Boolean);
+    } else {
+      // Fallback for text without separators - split by double newlines
+      const fallbackSections = text.split(/\n\n+/).filter(section => section.trim());
       
-      // Check for ICT section
-      if (trimmedSection.toUpperCase().includes('ICT') || trimmedSection.toUpperCase().includes('SMART MONEY')) {
-        return formatICTSection(trimmedSection, index);
-      }
-      
-      // Check for invalidation section
-      if (trimmedSection.toUpperCase().includes('INVALIDATION') || trimmedSection.toUpperCase().includes('NO-TRADE')) {
-        return formatInvalidationSection(trimmedSection, index);
-      }
-      
-      // Default section formatting
-      return formatDefaultSection(trimmedSection, index);
-    }).filter(Boolean);
+      return fallbackSections.map((section, index) => {
+        // Check if section is a header (contains specific keywords)
+        const isHeader = /^(SIGNAL SUMMARY|MARKET ANALYSIS|RECOMMENDATION|CONCLUSION|RISK ASSESSMENT|TECHNICAL ANALYSIS|FUNDAMENTAL ANALYSIS):/i.test(section);
+        
+        if (isHeader) {
+          const [title, ...content] = section.split(':');
+          return (
+            <div key={index} className="mb-6">
+              <h2 className="text-xl md:text-2xl font-bold text-blue-400 mb-3 flex items-center space-x-2 border-b border-blue-400/20 pb-2">
+                <BarChart3 className="h-5 w-5 md:h-6 md:w-6" />
+                <span>{title.trim()}</span>
+              </h2>
+              <div className="text-gray-300 leading-relaxed text-sm md:text-base">
+                {content.join(':').trim()}
+              </div>
+            </div>
+          );
+        }
+        
+        // Check for sub-headers (numbered sections or bullet points)
+        const isSubHeader = /^(\d+\.|•|\-)\s*[A-Z][^.]*:/.test(section.trim());
+        
+        if (isSubHeader) {
+          const lines = section.split('\n');
+          const headerLine = lines[0];
+          const contentLines = lines.slice(1);
+          
+          return (
+            <div key={index} className="mb-4">
+              <h3 className="text-lg md:text-xl font-semibold text-white mb-2 flex items-center space-x-2">
+                <Activity className="h-4 w-4 md:h-5 md:w-5 text-purple-400" />
+                <span>{headerLine.trim()}</span>
+              </h3>
+              <div className="text-gray-300 leading-relaxed ml-6 text-sm md:text-base">
+                {contentLines.join('\n').trim()}
+              </div>
+            </div>
+          );
+        }
+        
+        return (
+          <div key={index} className="mb-4 text-gray-300 leading-relaxed text-sm md:text-base">
+            {section.trim()}
+          </div>
+        );
+      });
+    }
   };
 
   return (
