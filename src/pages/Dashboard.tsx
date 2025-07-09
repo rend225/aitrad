@@ -377,17 +377,10 @@ ${jsonData}`;
       setLastRecommendation(result.analysis);
       setLastSignal(result.signal);
       
-      console.log('Analysis saved successfully:', {
+      console.log('✅ Analysis saved successfully:', {
         analysis: result.analysis.substring(0, 100) + '...',
         signal: result.signal
       });
-
-      // Scroll to analysis section after it's rendered
-      setTimeout(() => {
-        if (analysisRef.current) {
-          analysisRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 500);
     } catch (error: any) {
       console.error('Error generating signal:', error);
       
@@ -419,6 +412,15 @@ ${jsonData}`;
       throw new Error(`Failed to send to Telegram: ${error.message}`);
     }
   };
+
+  // Scroll to analysis section after generation
+  useEffect(() => {
+    if (lastRecommendation && analysisRef.current) {
+      setTimeout(() => {
+        analysisRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  }, [lastRecommendation]);
 
   const getPlanColor = (plan: string) => {
     switch (plan) {
@@ -851,8 +853,8 @@ ${jsonData}`;
         </div>
 
         {/* Analysis Display */}
-        {(lastRecommendation || lastSignal) && (
-          <div className="mt-8" ref={analysisRef}>
+        <div className="mt-8" ref={analysisRef}>
+          {(lastRecommendation || lastSignal) && (
             <h2 className="text-2xl font-bold text-white mb-4 flex items-center space-x-2">
               <BarChart3 className="h-6 w-6 text-blue-400" />
               <span>Analysis Results</span>
@@ -863,9 +865,10 @@ ${jsonData}`;
               school={schools.find(s => s.id === selectedSchool)?.name || 'Unknown'}
               timestamp={new Date()}
               onSendToTelegram={user?.plan === 'elite' && telegramConfig ? handleSendToTelegram : undefined}
+              prompt={createFullPrompt()}
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
