@@ -200,11 +200,11 @@ const Plans: React.FC = () => {
   };
 
   const getFeatureIcon = (feature: string) => {
-    if (feature.includes('signal')) return <TrendingUp className="h-4 w-4" />;
+    if (feature.includes('signal') || feature.includes('analyses')) return <TrendingUp className="h-4 w-4" />;
     if (feature.includes('analysis')) return <BarChart3 className="h-4 w-4" />;
     if (feature.includes('support')) return <Headphones className="h-4 w-4" />;
     if (feature.includes('data') || feature.includes('Historical')) return <Database className="h-4 w-4" />;
-    if (feature.includes('API')) return <Smartphone className="h-4 w-4" />;
+    if (feature.includes('API') || feature.includes('MetaTrader') || feature.includes('Telegram')) return <Smartphone className="h-4 w-4" />;
     return <CheckCircle className="h-4 w-4" />;
   };
 
@@ -464,7 +464,7 @@ const Plans: React.FC = () => {
                     <div className="flex items-center justify-center space-x-2 text-gray-300">
                       <Activity className="h-4 w-4 text-blue-400" />
                       <span className="font-medium">
-                        {plan.recommendations_per_day} signal{plan.recommendations_per_day !== 1 ? 's' : ''} per month
+                        {plan.recommendations_per_day} analyses per month
                       </span>
                     </div>
                   </div>
@@ -717,7 +717,7 @@ const Plans: React.FC = () => {
               {expandedFAQ === 'faq-1' && (
                 <div className="px-6 pb-4">
                   <p className="text-gray-300 leading-relaxed">
-                    Our Free plan includes 1 signal per day with basic analysis. The Basic plan offers 50 analyses per month with basic analysis features. The Pro plan offers 120 analyses per month with advanced analysis and priority support. The Elite plan provides 200 analyses per month, VIP analysis, 24/7 support, custom strategies, Telegram integration, MetaTrader integration, and API access for automated trading.
+                    Our Free plan includes basic features with limited analyses. The Basic plan offers 50 analyses per month with basic analysis features. The Pro plan offers 100 analyses per month with advanced analysis and priority support. The Elite plan provides 200 analyses per month, VIP analysis, 24/7 support, custom strategies, Telegram integration, MetaTrader integration, and API access for automated trading.
                   </p>
                 </div>
               )}
