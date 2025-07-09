@@ -207,7 +207,7 @@ const TermsOfService: React.FC = () => {
               </p>
               <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
                 <p className="text-blue-400 text-sm">
-                  <strong>Learn More:</strong> Please review our <a href="/privacy" className=\"underline hover:text-blue-300">Privacy Policy</a> for detailed information about how we handle your data.
+                  <strong>Learn More:</strong> Please review our <a href="/privacy" className="underline hover:text-blue-300">Privacy Policy</a> for detailed information about how we handle your data.
                 </p>
               </div>
             </section>
