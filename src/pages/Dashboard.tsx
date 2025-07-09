@@ -5,7 +5,7 @@ import { getSchools, saveRecommendation, canUserGenerateRecommendation } from '.
 import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { generateTradingSignalWithRealData } from '../services/gpt';
 import { fetchMultiTimeframeData, generateMockMultiTimeframeData, TRADING_PAIRS, testApiConnection, loadApiKeys } from '../services/marketData';
-import { sendTelegramMessage, formatSignalForTelegram } from '../services/telegram';
+import { sendTelegramMessage } from '../services/telegram';
 import { db } from '../config/firebase';
 import { School } from '../types';
 import AnalysisDisplay from '../components/AnalysisDisplay';
@@ -88,6 +88,15 @@ const Dashboard: React.FC = () => {
     return () => unsubscribe();
   }, [user]);
 
+  // Scroll to analysis section after generation
+  useEffect(() => {
+    if (lastRecommendation && analysisRef.current) {
+      setTimeout(() => {
+        analysisRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  }, [lastRecommendation]);
+
   const loadSchools = async () => {
     try {
       console.log('Loading trading schools...');
@@ -145,7 +154,8 @@ const Dashboard: React.FC = () => {
       // Ensure API keys are loaded before fetching
       if (apiStatus === 'unknown' || apiStatus === 'error') {
         console.log('🔄 API not ready, initializing...');
-        await initializeMarketData();
+        await loadApiKeys();
+        await checkApiConnection();
       }
       
       const data = await fetchMultiTimeframeData(selectedPair, candleCount);
@@ -412,15 +422,6 @@ ${jsonData}`;
       throw new Error(`Failed to send to Telegram: ${error.message}`);
     }
   };
-
-  // Scroll to analysis section after generation
-  useEffect(() => {
-    if (lastRecommendation && analysisRef.current) {
-      setTimeout(() => {
-        analysisRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    }
-  }, [lastRecommendation]);
 
   const getPlanColor = (plan: string) => {
     switch (plan) {
