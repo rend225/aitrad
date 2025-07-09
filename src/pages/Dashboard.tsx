@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../contexts/LanguageContext';
-import { getSchools, saveRecommendation, canUserGenerateRecommendation, incrementUserUsage } from '../services/firestore';
+import { getSchools, saveRecommendation, canUserGenerateRecommendation } from '../services/firestore';
 import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { generateTradingSignalWithRealData } from '../services/gpt';
 import { fetchMultiTimeframeData, generateMockMultiTimeframeData, TRADING_PAIRS, testApiConnection, loadApiKeys } from '../services/marketData';
@@ -56,6 +56,7 @@ const Dashboard: React.FC = () => {
   const [apiStatus, setApiStatus] = useState<'unknown' | 'connected' | 'error'>('unknown');
   const [telegramConfig, setTelegramConfig] = useState<any>(null);
   const [copiedPrompt, setCopiedPrompt] = useState(false); 
+  const [analysisVisible, setAnalysisVisible] = useState(false);
   const [userStats, setUserStats] = useState({
     used_today: 0,
     recommendation_limit: 1
@@ -65,6 +66,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     loadSchools();
     initializeApiAndData();
+    
     if (user?.plan === 'elite') {
       loadTelegramConfig();
     }
@@ -97,9 +99,10 @@ const Dashboard: React.FC = () => {
   // Scroll to analysis section after generation
   useEffect(() => {
     if (lastRecommendation && analysisRef.current) {
+      setAnalysisVisible(true);
       setTimeout(() => {
         analysisRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
+      }, 300);
     }
   }, [lastRecommendation]);
 
@@ -380,7 +383,7 @@ ${jsonData}`;
       // First save the recommendation to Firestore
       // This doesn't automatically increment usage anymore
       await saveRecommendation({
-        userId: user.uid,
+        userId: user.uid, 
         school: school.name,
         prompt: school.prompt,
         response: result.analysis,
@@ -388,9 +391,6 @@ ${jsonData}`;
         timestamp: new Date().toISOString(),
         signal: result.signal
       });
-      
-      // Manually increment usage
-      await incrementUserUsage(user.uid);
       
       // Update state with the results
       setLastRecommendation(result.analysis);
@@ -426,6 +426,7 @@ ${jsonData}`;
   // Function to scroll to analysis section
   const scrollToAnalysis = () => {
     if (analysisRef.current) {
+      setAnalysisVisible(true);
       setTimeout(() => {
         analysisRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 300);
@@ -875,27 +876,23 @@ ${jsonData}`;
         </div>
 
         {/* Analysis Display */}
-        <div 
-          className={`mt-8 transition-opacity duration-300 ${lastRecommendation ? 'opacity-100' : 'opacity-0'}`} 
-          ref={analysisRef}
-        >
-          {lastRecommendation && lastSignal && (
-            <> 
-              <div className="mb-4 flex items-center space-x-2">
-                <h2 className="text-2xl font-bold text-white flex items-center space-x-2">
-                  <BarChart3 className="h-6 w-6 text-blue-400" />
-                  <span>Analysis Results</span>
-                </h2>
-              </div>
-              <AnalysisDisplay 
-                analysis={lastRecommendation} 
-                signal={lastSignal} 
-                school={schools.find(s => s.id === selectedSchool)?.name || 'Unknown'} 
-                timestamp={new Date()} 
-                onSendToTelegram={user?.plan === 'elite' && telegramConfig ? handleSendToTelegram : undefined} 
-                prompt={createFullPrompt()} 
+        <div ref={analysisRef} id="analysis-section">
+          {(lastRecommendation || lastSignal) && (
+            <div className={`mt-8 transition-opacity duration-500 ${analysisVisible ? 'opacity-100' : 'opacity-0'}`}>
+              <h2 className="text-2xl font-bold text-white mb-4 flex items-center space-x-2">
+                <BarChart3 className="h-6 w-6 text-blue-400" />
+                <span>Analysis Results</span>
+              </h2>
+              
+              <AnalysisDisplay
+                analysis={lastRecommendation}
+                signal={lastSignal}
+                school={schools.find(s => s.id === selectedSchool)?.name || 'Unknown'}
+                timestamp={new Date()}
+                onSendToTelegram={user?.plan === 'elite' && telegramConfig ? handleSendToTelegram : undefined}
+                prompt={createFullPrompt()}
               />
-            </>
+            </div>
           )}
         </div>
       </div>
