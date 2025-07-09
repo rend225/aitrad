@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation as useI18nTranslation } from 'react-i18next';
 
 interface TranslationContextType {
   language: string;
@@ -16,7 +16,7 @@ interface TranslationProviderProps {
 }
 
 export const TranslationProvider: React.FC<TranslationProviderProps> = ({ children }) => {
-  const { i18n } = useTranslation();
+  const { i18n } = useI18nTranslation();
   const [isTranslating, setIsTranslating] = useState(false);
   const [isRTL, setIsRTL] = useState(false);
 
