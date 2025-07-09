@@ -42,6 +42,7 @@ import {
 import ChatAdmin from '../components/ChatAdmin';
 import DailyResetManager from '../components/DailyResetManager';
 import ApiKeyManager from '../components/ApiKeyManager';
+import PlanManager from '../components/PlanManager';
 import SEOManager from '../components/SEOManager';
 
 const AdminDashboard: React.FC = () => {
@@ -936,6 +937,10 @@ const AdminDashboard: React.FC = () => {
 
         {activeTab === 'api' && (
           <ApiKeyManager />
+        )}
+
+        {activeTab === 'plans' && (
+          <PlanManager />
         )}
 
         {activeTab === 'reset' && (
