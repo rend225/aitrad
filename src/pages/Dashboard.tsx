@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../contexts/LanguageContext';
-import { getSchools, saveRecommendation, canUserGenerateRecommendation, getUserRecommendations } from '../services/firestore';
+import { 
+  getSchools, 
+  saveRecommendation, 
+  canUserGenerateRecommendation, 
+  getUserRecommendations 
+} from '../services/firestore';
 import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { generateTradingSignalWithRealData } from '../services/gpt';
 import { fetchMultiTimeframeData, generateMockMultiTimeframeData, TRADING_PAIRS, testApiConnection, loadApiKeys } from '../services/marketData';
@@ -53,7 +58,7 @@ const Dashboard: React.FC = () => {
   const [analysisVisible, setAnalysisVisible] = useState(false);
   const [showAnalysisSection, setShowAnalysisSection] = useState(false);
   const [userStats, setUserStats] = useState({
-    used_today: 0,
+    used_today: 0, 
     recommendation_limit: 1
   });
   const [loadingLatestAnalysis, setLoadingLatestAnalysis] = useState(false);
@@ -64,7 +69,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     loadSchools();
     loadLatestAnalysis();
-    
+
     if (user?.plan === 'elite') {
       loadTelegramConfig();
     }
@@ -210,7 +215,7 @@ const Dashboard: React.FC = () => {
   // Load the user's latest analysis
   const loadLatestAnalysis = async () => {
     if (!user) return;
-    
+
     try {
       setLoadingLatestAnalysis(true);
       console.log('📊 Loading latest analysis...');
@@ -221,7 +226,7 @@ const Dashboard: React.FC = () => {
       if (recommendations.length > 0) {
         const latestRec = recommendations[0];
         console.log('✅ Found latest analysis:', latestRec.id);
-        
+
         // Set the analysis data
         setLastRecommendation(latestRec.response);
         setLastSignal(latestRec.signal);
@@ -234,7 +239,7 @@ const Dashboard: React.FC = () => {
             setSelectedSchool(matchingSchool.id);
           }
         }
-        
+
         // If market data is available in the recommendation, use it
         if (latestRec.candlestick_data) {
           setMarketData(latestRec.candlestick_data);
@@ -535,15 +540,15 @@ ${jsonData}`;
   return (
     <div className="min-h-screen py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
-        <div className="mb-8">
+        {/* Header Section with Gradient Border */}
+        <div className="mb-10 pb-6 border-b border-gradient-to-r from-blue-500/30 to-purple-500/30">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-2 flex items-center space-x-3">
-                <Activity className="h-8 w-8 text-blue-400" />
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-3 flex items-center space-x-3">
+                <Activity className="h-9 w-9 text-blue-400" />
                 <span>AI Signal Generator</span>
               </h1>
-              <p className="text-gray-300">
+              <p className="text-gray-300 text-lg">
                 Generate professional trading signals powered by advanced AI analysis
               </p>
             </div>
@@ -567,11 +572,11 @@ ${jsonData}`;
         {/* Main Content */}
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Signal Generator Card */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-8">
             {/* Step 1: Market Data */}
-            <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-2xl p-6 border border-white/10 shadow-xl">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-white flex items-center space-x-2">
+            <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-2xl p-8 border border-white/10 shadow-xl">
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-teal-400 bg-clip-text text-transparent flex items-center space-x-2">
                   <Target className="h-5 w-5 text-blue-400" />
                   <span>Step 1: Select Market Data</span>
                 </h2>
@@ -696,8 +701,8 @@ ${jsonData}`;
             </div>
             
             {/* Step 2: Generate Signal */}
-            <div ref={generatorRef} className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-2xl p-6 border border-white/10 shadow-xl">
-              <h2 className="text-xl font-bold text-white flex items-center space-x-2 mb-6">
+            <div ref={generatorRef} className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-2xl p-8 border border-white/10 shadow-xl">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent flex items-center space-x-2 mb-8">
                 <Zap className="h-5 w-5 text-purple-400" />
                 <span>Step 2: Generate AI Signal</span>
               </h2>
@@ -944,18 +949,18 @@ ${jsonData}`;
         
         {/* Analysis Results Section */}
         {showAnalysisSection && (
-          <div ref={analysisRef} id="analysis-section" className="mt-12">
+          <div ref={analysisRef} id="analysis-section" className="mt-16">
             <div className={`transition-all duration-500 ${analysisVisible || loadingLatestAnalysis ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-4'}`}>
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-10 w-1 rounded-full"></div>
-                <h2 className="text-2xl font-bold text-white">
+              <div className="flex items-center space-x-4 mb-8">
+                <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-12 w-1.5 rounded-full"></div>
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
                   {loadingLatestAnalysis ? 'Loading Latest Analysis...' : 'Analysis Results'}
                 </h2>
               </div>
               
               {loadingLatestAnalysis ? (
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 p-8 flex items-center justify-center">
-                  <Loader className="h-8 w-8 text-blue-400 animate-spin mr-3" />
+                <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl border border-white/20 p-12 flex items-center justify-center shadow-xl">
+                  <Loader className="h-10 w-10 text-blue-400 animate-spin mr-4" />
                   <span className="text-gray-300">Loading your latest analysis...</span>
                 </div>
               ) : (

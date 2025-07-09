@@ -188,14 +188,15 @@ const SignalHistory: React.FC = () => {
   return (
     <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
+        {/* Header with Gradient */}
+        <div className="mb-10 pb-6 border-b border-gradient-to-r from-blue-500/30 to-purple-500/30">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-2">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-3 flex items-center space-x-3">
+                <BarChart3 className="h-9 w-9 text-blue-400" />
                 Signal History
               </h1>
-              <p className="text-gray-300">
+              <p className="text-gray-300 text-lg">
                 Quick overview of your AI-generated trading signals
               </p>
             </div>
@@ -233,18 +234,18 @@ const SignalHistory: React.FC = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid md:grid-cols-5 gap-6 mb-8">
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+        <div className="grid md:grid-cols-5 gap-6 mb-10">
+          <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-6 border border-white/10 shadow-xl">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-300 text-sm">Total Signals</p>
-                <p className="text-2xl font-bold text-white">{stats.withSignals}</p>
+                <p className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">{stats.withSignals}</p>
               </div>
               <Activity className="h-8 w-8 text-blue-400" />
             </div>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+          <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-6 border border-white/10 shadow-xl">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-300 text-sm">Buy Signals</p>
@@ -254,7 +255,7 @@ const SignalHistory: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+          <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-6 border border-white/10 shadow-xl">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-300 text-sm">Sell Signals</p>
@@ -264,7 +265,7 @@ const SignalHistory: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+          <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-6 border border-white/10 shadow-xl">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-300 text-sm">Hold Signals</p>
@@ -274,7 +275,7 @@ const SignalHistory: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+          <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-6 border border-white/10 shadow-xl">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-300 text-sm">Success Rate</p>
@@ -289,7 +290,7 @@ const SignalHistory: React.FC = () => {
 
         {/* Filters */}
         {showFilters && (
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 mb-8">
+          <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-6 border border-white/10 shadow-xl mb-8">
             <div className="grid md:grid-cols-4 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -363,7 +364,7 @@ const SignalHistory: React.FC = () => {
 
         {/* Results */}
         {filteredRecommendations.length === 0 ? (
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-12 border border-white/20 text-center">
+          <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-12 border border-white/10 shadow-xl text-center">
             {recommendations.length === 0 ? (
               <>
                 <BarChart3 className="h-16 w-16 text-gray-400 mx-auto mb-4" />
@@ -424,18 +425,18 @@ const SignalHistory: React.FC = () => {
                 return (
                   <div
                     key={rec.id}
-                    className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/15 transition-all"
+                    className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl border border-white/10 shadow-xl hover:bg-white/5 transition-all"
                   >
-                    <div className="p-6">
-                      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
+                    <div className="p-7">
+                      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-5">
                         <div className="flex items-center space-x-4 mb-4 lg:mb-0">
-                          <div className={`px-3 py-1 rounded-full text-sm font-medium border flex items-center space-x-1 ${getSignalTypeColor(signal.type)}`}>
+                          <div className={`px-4 py-2 rounded-full text-sm font-bold border flex items-center space-x-2 ${getSignalTypeColor(signal.type)} shadow-lg`}>
                             {getSignalTypeIcon(signal.type)}
                             <span>{signal.type.toUpperCase()}</span>
                           </div>
                           
                           <div>
-                            <h3 className="text-lg font-semibold text-white">
+                            <h3 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                               {signal.pair}
                             </h3>
                             <div className="flex items-center space-x-2 text-sm text-gray-300">
@@ -458,46 +459,46 @@ const SignalHistory: React.FC = () => {
                       </div>
 
                       {/* Signal Data Grid */}
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-5">
                         {signal.entry && (
-                          <div className="bg-black/20 rounded-lg p-3">
-                            <p className="text-gray-400 text-xs">Entry</p>
-                            <p className="text-white font-bold">{signal.entry}</p>
+                          <div className="bg-black/30 rounded-lg p-3 shadow-inner border border-white/5">
+                            <p className="text-gray-400 text-xs font-medium">Entry</p>
+                            <p className="text-white font-bold text-lg">{signal.entry}</p>
                           </div>
                         )}
                         
                         {signal.stopLoss && (
-                          <div className="bg-black/20 rounded-lg p-3">
-                            <p className="text-gray-400 text-xs">Stop Loss</p>
-                            <p className="text-red-400 font-bold">{signal.stopLoss}</p>
+                          <div className="bg-black/30 rounded-lg p-3 shadow-inner border border-white/5">
+                            <p className="text-gray-400 text-xs font-medium">Stop Loss</p>
+                            <p className="text-red-400 font-bold text-lg">{signal.stopLoss}</p>
                           </div>
                         )}
                         
                         {signal.takeProfit1 && (
-                          <div className="bg-black/20 rounded-lg p-3">
-                            <p className="text-gray-400 text-xs">TP1</p>
-                            <p className="text-green-400 font-bold">{signal.takeProfit1}</p>
+                          <div className="bg-black/30 rounded-lg p-3 shadow-inner border border-white/5">
+                            <p className="text-gray-400 text-xs font-medium">TP1</p>
+                            <p className="text-green-400 font-bold text-lg">{signal.takeProfit1}</p>
                           </div>
                         )}
                         
                         {signal.takeProfit2 && (
-                          <div className="bg-black/20 rounded-lg p-3">
-                            <p className="text-gray-400 text-xs">TP2</p>
-                            <p className="text-green-400 font-bold">{signal.takeProfit2}</p>
+                          <div className="bg-black/30 rounded-lg p-3 shadow-inner border border-white/5">
+                            <p className="text-gray-400 text-xs font-medium">TP2</p>
+                            <p className="text-green-400 font-bold text-lg">{signal.takeProfit2}</p>
                           </div>
                         )}
                         
                         {signal.probability && (
-                          <div className="bg-black/20 rounded-lg p-3">
-                            <p className="text-gray-400 text-xs">Probability</p>
-                            <p className="text-blue-400 font-bold">{signal.probability}%</p>
+                          <div className="bg-black/30 rounded-lg p-3 shadow-inner border border-white/5">
+                            <p className="text-gray-400 text-xs font-medium">Probability</p>
+                            <p className="text-blue-400 font-bold text-lg">{signal.probability}%</p>
                           </div>
                         )}
                         
                         {signal.entry && signal.stopLoss && (
-                          <div className="bg-black/20 rounded-lg p-3">
-                            <p className="text-gray-400 text-xs">Risk</p>
-                            <p className="text-orange-400 font-bold">
+                          <div className="bg-black/30 rounded-lg p-3 shadow-inner border border-white/5">
+                            <p className="text-gray-400 text-xs font-medium">Risk</p>
+                            <p className="text-orange-400 font-bold text-lg">
                               {Math.abs(signal.entry - signal.stopLoss).toFixed(2)}
                             </p>
                           </div>
@@ -506,11 +507,11 @@ const SignalHistory: React.FC = () => {
 
                       {/* Full Analysis (Expandable) */}
                       {isExpanded && (
-                        <div className="bg-black/20 rounded-lg p-4">
-                          <h4 className="text-sm font-medium text-gray-300 mb-2">
-                            Full Analysis:
+                        <div className="bg-black/30 rounded-xl p-5 shadow-inner border border-white/5 mt-4">
+                          <h4 className="text-base font-bold text-blue-400 mb-3 border-b border-blue-500/20 pb-2">
+                            FULL ANALYSIS
                           </h4>
-                          <div className="text-gray-100 text-sm leading-relaxed whitespace-pre-wrap">
+                          <div className="text-gray-200 text-sm leading-relaxed whitespace-pre-wrap">
                             {rec.response}
                           </div>
                         </div>

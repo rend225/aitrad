@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom CSS Variables */
+:root {
+  --blue-500-rgb: 59, 130, 246;
+  --purple-500-rgb: 168, 85, 247;
+  --gray-500-rgb: 107, 114, 128;
+}
+
 /* Custom utility for line clamping */
 @layer utilities {
   .line-clamp-3 {
@@ -10,6 +17,11 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+}
+
+/* Gradient border utility */
+.border-gradient-to-r {
+  border-image: linear-gradient(to right, rgba(59, 130, 246, 0.3), rgba(168, 85, 247, 0.3)) 1;
 }
 
 /* RTL Support */
@@ -121,7 +133,9 @@ a:focus {
 /* Better spacing for Arabic text */
 [dir="rtl"] .text-lg,
 [dir="rtl"] .text-xl,
-[dir="rtl"] .text-2xl {
+[dir="rtl"] .text-2xl,
+[dir="rtl"] .text-3xl,
+[dir="rtl"] .text-4xl {
   line-height: 1.6;
 }
 
@@ -145,4 +159,72 @@ a:focus {
 
 [dir="rtl"] .justify-end {
   justify-content: flex-start;
+}
+
+/* Custom styling for analysis sections */
+.prose h1, .prose h2, .prose h3 {
+  color: theme('colors.blue.400');
+  font-weight: 700;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+}
+
+.prose h1 {
+  font-size: 1.75rem;
+  line-height: 2rem;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+  padding-bottom: 0.5rem;
+}
+
+.prose h2 {
+  font-size: 1.5rem;
+  line-height: 1.75rem;
+}
+
+.prose h3 {
+  font-size: 1.25rem;
+  line-height: 1.5rem;
+  color: theme('colors.purple.400');
+}
+
+.prose strong {
+  color: theme('colors.white');
+  font-weight: 600;
+}
+
+.prose ul, .prose ol {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+  padding-left: 1.5em;
+}
+
+.prose li {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+.prose blockquote {
+  border-left: 3px solid theme('colors.blue.500');
+  padding-left: 1em;
+  font-style: italic;
+  color: theme('colors.gray.300');
+  margin: 1em 0;
+}
+
+.prose code {
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 0.2em 0.4em;
+  border-radius: 0.25em;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
+/* Custom styling for signal cards */
+.signal-card {
+  transition: all 0.3s ease;
+}
+
+.signal-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
 }

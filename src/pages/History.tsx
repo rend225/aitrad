@@ -187,14 +187,15 @@ const History: React.FC = () => {
   return (
     <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
+        {/* Header with Gradient */}
+        <div className="mb-10 pb-6 border-b border-gradient-to-r from-blue-500/30 to-purple-500/30">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-2">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-3 flex items-center space-x-3">
+                <Clock className="h-9 w-9 text-blue-400" />
                 Trading History
               </h1>
-              <p className="text-gray-300">
+              <p className="text-gray-300 text-lg">
                 Review and analyze your AI-generated trading signals
               </p>
             </div>
@@ -232,18 +233,18 @@ const History: React.FC = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+        <div className="grid md:grid-cols-4 gap-6 mb-10">
+          <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-6 border border-white/10 shadow-xl">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-300 text-sm">Total Signals</p>
-                <p className="text-2xl font-bold text-white">{stats.total}</p>
+                <p className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">{stats.total}</p>
               </div>
               <Activity className="h-8 w-8 text-blue-400" />
             </div>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+          <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-6 border border-white/10 shadow-xl">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-300 text-sm">Buy Signals</p>
@@ -253,7 +254,7 @@ const History: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+          <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-6 border border-white/10 shadow-xl">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-300 text-sm">Sell Signals</p>
@@ -263,7 +264,7 @@ const History: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+          <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-6 border border-white/10 shadow-xl">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-300 text-sm">Hold Signals</p>
@@ -276,7 +277,7 @@ const History: React.FC = () => {
 
         {/* Filters */}
         {showFilters && (
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 mb-8">
+          <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-6 border border-white/10 shadow-xl mb-8">
             <div className="grid md:grid-cols-3 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -334,7 +335,7 @@ const History: React.FC = () => {
 
         {/* Results */}
         {filteredRecommendations.length === 0 ? (
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-12 border border-white/20 text-center">
+          <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-12 border border-white/10 shadow-xl text-center">
             {recommendations.length === 0 ? (
               <>
                 <BarChart3 className="h-16 w-16 text-gray-400 mx-auto mb-4" />
@@ -386,18 +387,15 @@ const History: React.FC = () => {
               const isExpanded = expandedCards.has(rec.id);
               
               return (
-                <div
-                  key={rec.id}
-                  className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/15 transition-all"
-                >
-                  <div className="p-6">
-                    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-4">
+                <div key={rec.id} className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl border border-white/10 shadow-xl hover:bg-white/5 transition-all">
+                  <div className="p-7">
+                    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-5">
                       <div className="flex items-center space-x-4 mb-4 lg:mb-0">
-                        <div className="bg-blue-500/20 p-3 rounded-lg">
-                          <TrendingUp className="h-6 w-6 text-blue-400" />
+                        <div className="bg-blue-500/20 p-3 rounded-xl shadow-inner">
+                          <TrendingUp className="h-7 w-7 text-blue-400" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-semibold text-white">
+                          <h3 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                             {rec.school} Analysis
                           </h3>
                           <div className="flex items-center space-x-2 text-sm text-gray-300">
@@ -410,7 +408,7 @@ const History: React.FC = () => {
                       </div>
                       
                       <div className="flex items-center space-x-3">
-                        <div className={`px-3 py-1 rounded-full text-sm font-medium border flex items-center space-x-1 ${getSignalTypeColor(signalType)}`}>
+                        <div className={`px-4 py-2 rounded-full text-sm font-bold border flex items-center space-x-2 ${getSignalTypeColor(signalType)} shadow-lg`}>
                           {getSignalTypeIcon(signalType)}
                           <span>{signalType.toUpperCase()}</span>
                         </div>
@@ -424,18 +422,18 @@ const History: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="bg-black/20 rounded-lg p-4">
-                      <h4 className="text-sm font-medium text-gray-300 mb-2">
-                        AI Recommendation:
+                    <div className="bg-black/30 rounded-xl p-5 shadow-inner border border-white/5">
+                      <h4 className="text-base font-bold text-blue-400 mb-3 border-b border-blue-500/20 pb-2">
+                        AI RECOMMENDATION
                       </h4>
-                      <div className={`text-gray-100 ${isExpanded ? 'whitespace-pre-wrap' : 'line-clamp-3'}`}>
+                      <div className={`text-gray-200 ${isExpanded ? 'whitespace-pre-wrap' : 'line-clamp-3'}`}>
                         {rec.response}
                       </div>
                       
                       {!isExpanded && rec.response.length > 200 && (
                         <button
                           onClick={() => toggleCardExpansion(rec.id)}
-                          className="text-blue-400 hover:text-blue-300 text-sm mt-2 flex items-center space-x-1"
+                          className="text-blue-400 hover:text-blue-300 text-sm mt-3 flex items-center space-x-1 font-medium"
                         >
                           <span>Show more</span>
                           <Eye className="h-3 w-3" />
@@ -445,7 +443,7 @@ const History: React.FC = () => {
 
                     {rec.confidence && (
                       <div className="flex items-center space-x-2 mt-4">
-                        <span className="text-sm text-gray-300">Confidence:</span>
+                        <span className="text-sm text-gray-300 font-medium">Confidence:</span>
                         <div className="flex-1 bg-gray-700 rounded-full h-2 max-w-xs">
                           <div
                             className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"

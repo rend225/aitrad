@@ -19,7 +19,7 @@ import {
   FileText,
   Activity,
   Zap
-} from 'lucide-react';
+} from 'lucide-react'; 
 
 interface AnalysisDisplayProps {
   analysis: string;
@@ -73,7 +73,7 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
   const formatAnalysisForDisplay = (text: string) => {
     // Split analysis into sections for better readability
     const sections = text.split(/\n\n+/);
-    
+
     // If there's no text, show a placeholder
     if (!text || text.trim() === '') {
       return (
@@ -85,17 +85,17 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
     
     return sections.map((section, index) => {
       // Check if section is a header (contains specific keywords)
-      const isHeader = /^(SIGNAL SUMMARY|MARKET ANALYSIS|RECOMMENDATION|CONCLUSION|RISK ASSESSMENT|TECHNICAL ANALYSIS|FUNDAMENTAL ANALYSIS):/i.test(section);
+      const isHeader = /^(SIGNAL SUMMARY|MARKET ANALYSIS|RECOMMENDATION|CONCLUSION|RISK ASSESSMENT|TECHNICAL ANALYSIS|FUNDAMENTAL ANALYSIS|MULTI-TIMEFRAME CONTEXT|EXECUTION TIMEFRAMES|TRADE SETUP|JUSTIFICATION|INVALIDATION):/i.test(section);
       
       if (isHeader) {
         const [title, ...content] = section.split(':');
         return (
-          <div key={index} className="mb-6">
-            <h2 className="text-xl md:text-2xl font-bold text-blue-400 mb-3 flex items-center space-x-2 border-b border-blue-400/20 pb-2">
-              <BarChart3 className="h-5 w-5 md:h-6 md:w-6" />
-              <span>{title.trim()}</span>
+          <div key={index} className="mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4 flex items-center space-x-2 border-b border-blue-400/20 pb-3">
+              <BarChart3 className="h-6 w-6 md:h-7 md:w-7 text-blue-400" />
+              <span>{title.trim().toUpperCase()}</span>
             </h2>
-            <div className="text-gray-300 leading-relaxed text-sm md:text-base">
+            <div className="text-gray-200 leading-relaxed text-sm md:text-base">
               {content.join(':').trim()}
             </div>
           </div>
@@ -104,19 +104,19 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
       
       // Check for sub-headers (numbered sections or bullet points)
       const isSubHeader = /^(\d+\.|•|\-)\s*[A-Z][^.]*:/.test(section.trim());
-      
+
       if (isSubHeader) {
         const lines = section.split('\n');
         const headerLine = lines[0];
         const contentLines = lines.slice(1);
         
         return (
-          <div key={index} className="mb-4">
-            <h3 className="text-lg md:text-xl font-semibold text-white mb-2 flex items-center space-x-2">
-              <Activity className="h-4 w-4 md:h-5 md:w-5 text-purple-400" />
+          <div key={index} className="mb-6">
+            <h3 className="text-lg md:text-xl font-bold text-purple-400 mb-3 flex items-center space-x-2">
+              <Activity className="h-5 w-5 md:h-6 md:w-6 text-purple-400" />
               <span>{headerLine.trim()}</span>
             </h3>
-            <div className="text-gray-300 leading-relaxed ml-6 text-sm md:text-base">
+            <div className="text-gray-200 leading-relaxed ml-6 text-sm md:text-base bg-purple-500/5 p-4 rounded-lg border border-purple-500/10">
               {contentLines.join('\n').trim()}
             </div>
           </div>
@@ -124,7 +124,7 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
       }
       
       return (
-        <div key={index} className="mb-4 text-gray-300 leading-relaxed text-sm md:text-base">
+        <div key={index} className="mb-5 text-gray-300 leading-relaxed text-sm md:text-base">
           {section.trim()}
         </div>
       );
@@ -224,16 +224,16 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
   return (
     <div className="space-y-4 md:space-y-6">
       {/* Signal Summary Card */}
-      {signal && (
-        <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 p-4 md:p-6">
-          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-4 md:mb-6">
+      {signal && signal.pair && (
+        <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-xl border border-white/20 p-6 md:p-8 shadow-xl">
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-6 md:mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 mb-4 lg:mb-0">
-              <div className={`px-3 py-2 rounded-full text-sm font-medium border flex items-center justify-center space-x-2 ${getSignalTypeColor(signal.type)} w-fit`}>
+              <div className={`px-4 py-2 rounded-full text-sm font-bold border flex items-center justify-center space-x-2 ${getSignalTypeColor(signal.type)} w-fit shadow-lg`}>
                 {getSignalTypeIcon(signal.type)}
                 <span className="uppercase font-bold">{signal.type}</span>
               </div>
               <div className="text-center sm:text-left">
-                <h1 className="text-2xl md:text-3xl font-bold text-white">{signal.pair}</h1>
+                <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">{signal.pair}</h1>
                 <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 text-sm text-gray-300 mt-1">
                   <div className="flex items-center justify-center sm:justify-start space-x-2">
                     <Clock className="h-4 w-4" />
@@ -247,69 +247,69 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
             
             {signal.probability && (
               <div className="text-center lg:text-right">
-                <div className="text-3xl md:text-4xl font-bold text-blue-400">{signal.probability}%</div>
-                <div className="text-gray-400 text-sm">Confidence</div>
+                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">{signal.probability}%</div>
+                <div className="text-gray-400 text-sm font-medium">Confidence</div>
               </div>
             )}
           </div>
 
           {/* Signal Metrics Grid - Responsive */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 mb-4 md:mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5 mb-6 md:mb-8">
             {signal.entry && (
-              <div className="bg-black/20 rounded-lg p-3 md:p-4 text-center">
-                <div className="text-gray-400 text-xs uppercase tracking-wide mb-1">Entry Price</div>
-                <div className="text-white font-bold text-sm md:text-lg">{signal.entry}</div>
+              <div className="bg-black/30 rounded-xl p-4 md:p-5 text-center shadow-inner border border-white/5">
+                <div className="text-gray-400 text-xs uppercase tracking-wide font-medium mb-2">Entry Price</div>
+                <div className="text-white font-bold text-lg md:text-xl">{signal.entry}</div>
               </div>
             )}
             
             {signal.stopLoss && (
-              <div className="bg-black/20 rounded-lg p-3 md:p-4 text-center">
-                <div className="text-gray-400 text-xs uppercase tracking-wide mb-1">Stop Loss</div>
-                <div className="text-red-400 font-bold text-sm md:text-lg">{signal.stopLoss}</div>
+              <div className="bg-black/30 rounded-xl p-4 md:p-5 text-center shadow-inner border border-white/5">
+                <div className="text-gray-400 text-xs uppercase tracking-wide font-medium mb-2">Stop Loss</div>
+                <div className="text-red-400 font-bold text-lg md:text-xl">{signal.stopLoss}</div>
               </div>
             )}
             
             {signal.takeProfit1 && (
-              <div className="bg-black/20 rounded-lg p-3 md:p-4 text-center">
-                <div className="text-gray-400 text-xs uppercase tracking-wide mb-1">Take Profit 1</div>
-                <div className="text-green-400 font-bold text-sm md:text-lg">{signal.takeProfit1}</div>
+              <div className="bg-black/30 rounded-xl p-4 md:p-5 text-center shadow-inner border border-white/5">
+                <div className="text-gray-400 text-xs uppercase tracking-wide font-medium mb-2">Take Profit 1</div>
+                <div className="text-green-400 font-bold text-lg md:text-xl">{signal.takeProfit1}</div>
               </div>
             )}
             
             {signal.takeProfit2 && (
-              <div className="bg-black/20 rounded-lg p-3 md:p-4 text-center">
-                <div className="text-gray-400 text-xs uppercase tracking-wide mb-1">Take Profit 2</div>
-                <div className="text-green-400 font-bold text-sm md:text-lg">{signal.takeProfit2}</div>
+              <div className="bg-black/30 rounded-xl p-4 md:p-5 text-center shadow-inner border border-white/5">
+                <div className="text-gray-400 text-xs uppercase tracking-wide font-medium mb-2">Take Profit 2</div>
+                <div className="text-green-400 font-bold text-lg md:text-xl">{signal.takeProfit2}</div>
               </div>
             )}
             
             {riskReward && (
-              <div className="bg-black/20 rounded-lg p-3 md:p-4 text-center col-span-2 sm:col-span-1">
-                <div className="text-gray-400 text-xs uppercase tracking-wide mb-1">Risk:Reward</div>
-                <div className="text-purple-400 font-bold text-sm md:text-lg">1:{riskReward.ratio}</div>
+              <div className="bg-black/30 rounded-xl p-4 md:p-5 text-center shadow-inner border border-white/5 col-span-2 sm:col-span-1">
+                <div className="text-gray-400 text-xs uppercase tracking-wide font-medium mb-2">Risk:Reward</div>
+                <div className="text-purple-400 font-bold text-lg md:text-xl">1:{riskReward.ratio}</div>
               </div>
             )}
           </div>
 
           {/* Risk Assessment */}
           {riskReward && (
-            <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4">
-              <div className="flex items-center space-x-2 mb-2">
-                <AlertTriangle className="h-4 w-4 text-purple-400" />
-                <span className="text-purple-400 font-semibold">Risk Assessment</span>
+            <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-5 shadow-lg">
+              <div className="flex items-center space-x-2 mb-3">
+                <AlertTriangle className="h-5 w-5 text-purple-400" />
+                <span className="text-purple-400 font-bold">Risk Assessment</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-                <div className="text-center sm:text-left">
-                  <span className="text-gray-400">Risk: </span>
-                  <span className="text-red-400 font-semibold">{riskReward.risk} pips</span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-black/20 rounded-lg p-3 text-center">
+                  <span className="text-gray-400 text-sm block mb-1">Risk</span>
+                  <span className="text-red-400 font-bold">{riskReward.risk} pips</span>
                 </div>
-                <div className="text-center sm:text-left">
-                  <span className="text-gray-400">Reward: </span>
-                  <span className="text-green-400 font-semibold">{riskReward.reward} pips</span>
+                <div className="bg-black/20 rounded-lg p-3 text-center">
+                  <span className="text-gray-400 text-sm block mb-1">Reward</span>
+                  <span className="text-green-400 font-bold">{riskReward.reward} pips</span>
                 </div>
-                <div className="text-center sm:text-left">
-                  <span className="text-gray-400">R:R Ratio: </span>
-                  <span className="text-purple-400 font-semibold">1:{riskReward.ratio}</span>
+                <div className="bg-black/20 rounded-lg p-3 text-center">
+                  <span className="text-gray-400 text-sm block mb-1">R:R Ratio</span>
+                  <span className="text-purple-400 font-bold">1:{riskReward.ratio}</span>
                 </div>
               </div>
             </div>
@@ -318,11 +318,11 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
       )}
 
       {/* Professional Analysis Display */}
-      <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 p-4 md:p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 md:mb-6 space-y-3 sm:space-y-0">
-          <div className="flex items-center space-x-3">
-            <BarChart3 className="h-6 w-6 text-blue-400" />
-            <h1 className="text-xl md:text-2xl font-bold text-white">Professional Analysis</h1>
+      <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-xl border border-white/20 p-6 md:p-8 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 md:mb-8 space-y-3 sm:space-y-0">
+          <div className="flex items-center space-x-3 border-b border-blue-500/30 pb-2 w-full sm:w-auto">
+            <BarChart3 className="h-7 w-7 text-blue-400" />
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Professional Analysis</h1>
           </div>
           
           <div className="flex flex-wrap items-center gap-2 md:gap-3">
@@ -401,14 +401,14 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
         </div>
 
         {/* Analysis Content with Professional Typography */}
-        <div className="bg-black/20 rounded-lg p-4 md:p-6">
-          <div className="prose prose-invert max-w-none">
+        <div className="bg-black/30 rounded-xl p-5 md:p-7 shadow-inner border border-white/5">
+          <div className="prose prose-invert max-w-none prose-headings:text-blue-400 prose-strong:text-white">
             {formatAnalysisForDisplay(analysis)}
           </div>
         </div>
 
         {/* Analysis Metadata */}
-        <div className="mt-4 md:mt-6 pt-4 border-t border-white/20">
+        <div className="mt-6 md:mt-8 pt-4 border-t border-white/20">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm text-gray-400">
             <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
               <div className="flex items-center space-x-2">
@@ -430,18 +430,18 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
       </div>
 
       {/* Telegram Setup Notice for Elite Users */}
-      {user?.plan === 'elite' && !onSendToTelegram && (
-        <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-4 md:p-6">
+      {user?.plan === 'elite' && !onSendToTelegram && analysis && (
+        <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl p-5 md:p-7 shadow-lg">
           <div className="flex items-start space-x-3">
-            <Crown className="h-6 w-6 text-purple-400 mt-1 flex-shrink-0" />
+            <Crown className="h-7 w-7 text-purple-400 mt-1 flex-shrink-0" />
             <div className="flex-1">
-              <h3 className="text-purple-400 font-semibold mb-2">Elite Feature: Telegram Integration</h3>
-              <p className="text-gray-300 text-sm mb-4">
+              <h3 className="text-xl font-bold text-purple-400 mb-3">Elite Feature: Telegram Integration</h3>
+              <p className="text-gray-300 mb-4">
                 As an Elite user, you can send analysis directly to your Telegram channel. Configure your Telegram settings to enable this feature.
               </p>
               <a
                 href="/settings"
-                className="inline-flex items-center space-x-2 text-purple-400 hover:text-purple-300 text-sm font-medium"
+                className="inline-flex items-center space-x-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 px-4 py-2 rounded-lg transition-colors font-medium"
               >
                 <Settings className="h-4 w-4" />
                 <span>Configure Telegram Settings</span>
@@ -453,11 +453,11 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
       )}
 
       {/* Disclaimer */}
-      <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
+      <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-5 shadow-lg">
         <div className="flex items-start space-x-2">
-          <AlertTriangle className="h-4 w-4 text-yellow-400 mt-0.5 flex-shrink-0" />
-          <div className="text-yellow-300 text-xs">
-            <p className="font-semibold mb-1">Risk Disclaimer:</p>
+          <AlertTriangle className="h-5 w-5 text-yellow-400 mt-0.5 flex-shrink-0" />
+          <div className="text-yellow-300 text-sm">
+            <p className="font-bold mb-2">Risk Disclaimer:</p>
             <p>This analysis is for educational purposes only and should not be considered as financial advice. Trading involves substantial risk of loss. Always conduct your own research and consider consulting with qualified financial professionals before making trading decisions.</p>
           </div>
         </div>
