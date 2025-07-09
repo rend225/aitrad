@@ -9,6 +9,10 @@ service cloud.firestore {
     
     // Users can read/write their own data
     // Admins can read all user data
+    match /users {
+      allow read: if isAdmin(request.auth.uid);
+    }
+    
     match /users/{userId} {
       allow read, write: if request.auth.uid == userId;
       allow read: if isAdmin(request.auth.uid);
