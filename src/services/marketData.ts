@@ -318,6 +318,7 @@ export const fetchMultiTimeframeData = async (
   try {
     // Load API keys if not already loaded
     if (apiKeys.length === 0) {
+      console.log('🔄 API keys not loaded for multi-timeframe fetch, loading now...');
       await loadApiKeys();
     }
     

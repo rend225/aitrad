@@ -141,6 +141,13 @@ const Dashboard: React.FC = () => {
     
     try {
       console.log(`Fetching market data for ${selectedPair}...`);
+      
+      // Ensure API keys are loaded before fetching
+      if (apiStatus === 'unknown' || apiStatus === 'error') {
+        console.log('🔄 API not ready, initializing...');
+        await initializeMarketData();
+      }
+      
       const data = await fetchMultiTimeframeData(selectedPair, candleCount);
       console.log('Market data fetched successfully:', {
         symbol: data.symbol,
