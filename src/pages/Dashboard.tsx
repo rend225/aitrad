@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getSchools, saveRecommendation, canUserGenerateRecommendation } from '../services/firestore';
-import { doc, getDoc, onSnapshot } from 'firebase/firestore'; 
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { generateTradingSignalWithRealData } from '../services/gpt';
 import { fetchMultiTimeframeData, generateMockMultiTimeframeData, TRADING_PAIRS, testApiConnection, loadApiKeys } from '../services/marketData';
 import { sendTelegramMessage } from '../services/telegram';
@@ -20,27 +20,21 @@ import {
   RefreshCw,
   Activity,
   Target,
-  DollarSign,
-  TrendingDown,
-  Minus,
   ChevronDown,
-  Globe,
   Loader,
   Wifi,
   WifiOff,
   CheckCircle,
-  XCircle,
   Copy,
   Check,
   FileText,
   Shield,
-  Users,
-  Database
+  ArrowDown
 } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
-  const { t, isRTL } = useLanguage();
+  const { t } = useLanguage();
   const [schools, setSchools] = useState<School[]>([]);
   const [selectedSchool, setSelectedSchool] = useState('');
   const [selectedPair, setSelectedPair] = useState('XAUUSD');
@@ -55,13 +49,15 @@ const Dashboard: React.FC = () => {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [apiStatus, setApiStatus] = useState<'unknown' | 'connected' | 'error'>('unknown');
   const [telegramConfig, setTelegramConfig] = useState<any>(null);
-  const [copiedPrompt, setCopiedPrompt] = useState(false); 
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
   const [analysisVisible, setAnalysisVisible] = useState(false);
   const [userStats, setUserStats] = useState({
     used_today: 0,
     recommendation_limit: 1
   });
+  
   const analysisRef = useRef<HTMLDivElement>(null);
+  const generatorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadSchools();
@@ -125,7 +121,7 @@ const Dashboard: React.FC = () => {
             botToken: userData.telegram.botToken,
             chatId: userData.telegram.chatId
           });
-          console.log('Telegram configuration loaded successfully');
+          console.log('✅ Telegram configuration loaded successfully');
         }
       }
     } catch (error) {
@@ -139,9 +135,11 @@ const Dashboard: React.FC = () => {
       const isConnected = await testApiConnection();
       console.log(`✅ API connection status: ${isConnected ? 'connected' : 'error'}`);
       setApiStatus(isConnected ? 'connected' : 'error');
+      return isConnected;
     } catch (error) {
       console.error('Error checking API connection:', error);
       setApiStatus('error');
+      return false;
     }
   };
 
@@ -151,23 +149,19 @@ const Dashboard: React.FC = () => {
     
     try {
       console.log(`📊 Fetching market data for ${selectedPair}...`);
-
+      
       // Only load API keys when explicitly fetching market data
-      if (apiKeys.length === 0) {
-        console.log('🔄 Loading API keys for the first time...');
-        await loadApiKeys();
-      }
+      console.log('🔄 Loading API keys...');
+      await loadApiKeys();
       
       // Check API connection only when fetching data
-      if (apiStatus !== 'connected') {
-        await checkApiConnection();
-      }
+      await checkApiConnection();
       
       const data = await fetchMultiTimeframeData(selectedPair, candleCount);
-      console.log('Market data fetched successfully:', {
+      console.log('✅ Market data fetched successfully:', {
         symbol: data.symbol,
         timeframes: {
-          '5min': data.timeframes['5min']?.length, 
+          '5min': data.timeframes['5min']?.length,
           '15min': data.timeframes['15min']?.length,
           '1h': data.timeframes['1h']?.length,
           '4h': data.timeframes['4h']?.length
@@ -177,8 +171,14 @@ const Dashboard: React.FC = () => {
       setMarketData(data);
       setError('');
       setApiStatus('connected');
+      
+      // Scroll to generator section
+      setTimeout(() => {
+        generatorRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
+      
     } catch (error: any) {
-      console.error('Error fetching market data:', error);
+      console.error('❌ Error fetching market data:', error);
       setApiStatus('error');
       
       // Provide more specific error messages
@@ -186,7 +186,7 @@ const Dashboard: React.FC = () => {
       if (errorMessage.includes('API key')) {
         errorMessage = t('error.apiNotConfigured');
       } else if (errorMessage.includes('rate limit')) {
-        errorMessage = t('error.rateLimitReached'); 
+        errorMessage = t('error.rateLimitReached');
       } else if (errorMessage.includes('symbol')) {
         errorMessage = t('error.symbolNotFound');
       } else {
@@ -326,7 +326,7 @@ ${jsonData}`;
     // Check if user can generate recommendation
     try {
       console.log('Checking if user can generate recommendation...');
-      const canGenerate = await canUserGenerateRecommendation(user.uid); 
+      const canGenerate = await canUserGenerateRecommendation(user.uid);
       if (!canGenerate) {
         setError(t('signal.dailyLimitReached'));
         return;
@@ -356,7 +356,7 @@ ${jsonData}`;
 
       console.log('🧠 Generating signal with market data...');
       console.log('Selected school:', school.name);
-      console.log('Selected pair:', selectedPair); 
+      console.log('Selected pair:', selectedPair);
       console.log('AI Provider:', aiProvider);
       
       const result = await generateTradingSignalWithRealData({
@@ -373,13 +373,12 @@ ${jsonData}`;
 
       // Show a notification if we had to fallback to a different provider
       if (result.usedProvider && result.usedProvider !== aiProvider) {
-        setError(`Note: Switched to ${result.usedProvider === 'openrouter' ? 'OpenRouter (GPT-4)' : 'Gemini'} due to quota limits on the selected provider.`); 
+        setError(`Note: Switched to ${result.usedProvider === 'openrouter' ? 'OpenRouter (GPT-4)' : 'Gemini'} due to quota limits on the selected provider.`);
       }
 
       // First save the recommendation to Firestore
-      // This doesn't automatically increment usage anymore
       await saveRecommendation({
-        userId: user.uid, 
+        userId: user.uid,
         school: school.name,
         prompt: school.prompt,
         response: result.analysis,
@@ -462,7 +461,7 @@ ${jsonData}`;
     switch (apiStatus) {
       case 'connected':
         return <Wifi className="h-4 w-4 text-green-400" />;
-      case 'error': 
+      case 'error':
         return <WifiOff className="h-4 w-4 text-red-400" />;
       default:
         return <Loader className="h-4 w-4 text-gray-400 animate-spin" />;
@@ -483,105 +482,78 @@ ${jsonData}`;
   const selectedPairInfo = TRADING_PAIRS.find(p => p.symbol === selectedPair);
   const hasReachedDailyLimit = userStats.used_today >= userStats.recommendation_limit;
 
-  if (!user) return null; 
+  if (!user) return null;
 
   return (
-    <div className="min-h-screen py-4 sm:py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">
-            {t('dashboard.title')}
-          </h1>
-          <p className="text-gray-300 text-sm sm:text-base lg:text-lg">
-            {t('dashboard.subtitle')}
-          </p>
-        </div>
-
-        {/* API Status Banner */}
-        <div className="mb-4 sm:mb-6">
-          <div className={`flex items-center space-x-2 px-4 py-2 rounded-lg border text-sm ${
-            apiStatus === 'connected' 
-              ? 'bg-green-500/10 border-green-500/20 text-green-400'
-              : apiStatus === 'error'
-              ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' 
-              : 'bg-gray-500/10 border-gray-500/20 text-gray-400' 
-          }`}>
-            {getApiStatusIcon()}
-            <span className="font-medium">{getApiStatusText()}</span>
-            {apiStatus === 'error' && (
-              <span className="text-xs">• {t('api.demoDataUsed')}</span>
-            )}
-            <button
-              onClick={checkApiConnection}
-              className="ml-auto text-xs hover:underline"
-            >
-              {t('api.retry')}
-            </button>
-          </div>
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
-          {/* Stats Cards - Mobile Responsive */}
-          <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-300 text-sm">{t('dashboard.currentPlan')}</p>
-                  <div className={`flex items-center space-x-2 ${getPlanColor(user.plan)}`}>
-                    {getPlanIcon(user.plan)}
-                    <span className="text-lg sm:text-xl font-bold capitalize">{user.plan}</span>
-                  </div>
-                </div>
-                <BarChart3 className="h-6 w-6 sm:h-8 sm:w-8 text-blue-400" />
-              </div>
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-white mb-2 flex items-center space-x-3">
+                <Activity className="h-8 w-8 text-blue-400" />
+                <span>AI Signal Generator</span>
+              </h1>
+              <p className="text-gray-300">
+                Generate professional trading signals powered by advanced AI analysis
+              </p>
             </div>
-
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-300 text-sm">{t('dashboard.signalsToday')}</p>
-                  <p className="text-lg sm:text-2xl font-bold text-white">
-                    {userStats.used_today} / {userStats.recommendation_limit}
-                  </p>
-                </div>
-                <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-green-400" />
+            
+            <div className="flex flex-wrap items-center gap-3">
+              {/* User Plan Badge */}
+              <div className={`flex items-center space-x-2 px-3 py-1.5 rounded-full ${getPlanColor(user.plan)} bg-opacity-10 border border-opacity-20`} style={{backgroundColor: `rgba(var(--${user.plan === 'elite' ? 'purple' : user.plan === 'pro' ? 'blue' : 'gray'}-500-rgb), 0.1)`, borderColor: `rgba(var(--${user.plan === 'elite' ? 'purple' : user.plan === 'pro' ? 'blue' : 'gray'}-500-rgb), 0.2)`}}>
+                {getPlanIcon(user.plan)}
+                <span className="font-medium capitalize">{user.plan} Plan</span>
               </div>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-300 text-sm">{t('dashboard.remaining')}</p>
-                  <p className="text-lg sm:text-2xl font-bold text-white">
-                    {userStats.recommendation_limit - userStats.used_today}
-                  </p>
-                </div>
-                <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-purple-400" />
+              
+              {/* Usage Counter */}
+              <div className="flex items-center space-x-2 px-3 py-1.5 bg-white/10 rounded-full border border-white/20">
+                <Clock className="h-4 w-4 text-green-400" />
+                <span className="text-white font-medium">{userStats.used_today} / {userStats.recommendation_limit}</span>
               </div>
             </div>
           </div>
-
-          {/* Signal Generator - Mobile Responsive */}
-          <div className="lg:col-span-2">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 lg:p-8 border border-white/20">
-              <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 flex items-center space-x-2">
-                <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-blue-400" />
-                <span>{t('signal.title')}</span>
-              </h2> 
-
-              <div className="space-y-4 sm:space-y-6"> 
+        </div>
+        
+        {/* Main Content */}
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Signal Generator Card */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Step 1: Market Data */}
+            <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-2xl p-6 border border-white/10 shadow-xl">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-white flex items-center space-x-2">
+                  <Target className="h-5 w-5 text-blue-400" />
+                  <span>Step 1: Select Market Data</span>
+                </h2>
+                
+                {/* API Status Indicator */}
+                <div className={`flex items-center space-x-2 px-3 py-1 rounded-full text-xs ${
+                  apiStatus === 'connected' 
+                    ? 'bg-green-500/10 border border-green-500/20 text-green-400'
+                    : apiStatus === 'error'
+                    ? 'bg-yellow-500/10 border border-yellow-500/20 text-yellow-400'
+                    : 'bg-gray-500/10 border border-gray-500/20 text-gray-400'
+                }`}>
+                  {getApiStatusIcon()}
+                  <span>{getApiStatusText()}</span>
+                </div>
+              </div>
+              
+              <div className="space-y-5">
                 {/* Trading Pair Selection */}
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    {t('signal.tradingPair')}
+                    Trading Pair
                   </label>
                   <select
                     value={selectedPair}
                     onChange={(e) => {
                       setSelectedPair(e.target.value);
-                      setMarketData(null); 
-                    }} 
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                      setMarketData(null);
+                    }}
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                   >
                     {TRADING_PAIRS.map((pair) => (
                       <option key={pair.symbol} value={pair.symbol} className="bg-gray-800">
@@ -595,16 +567,103 @@ ${jsonData}`;
                     </p>
                   )}
                 </div>
-
+                
+                {/* Candle Count Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Data Points
+                  </label>
+                  <select
+                    value={candleCount}
+                    onChange={(e) => setCandleCount(Number(e.target.value))}
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  >
+                    <option value={30} className="bg-gray-800">30 Candles</option>
+                    <option value={50} className="bg-gray-800">50 Candles</option>
+                    <option value={100} className="bg-gray-800">100 Candles</option>
+                  </select>
+                </div>
+                
+                {/* Fetch Data Button */}
+                <button
+                  onClick={fetchMarketData}
+                  disabled={dataLoading || hasReachedDailyLimit}
+                  className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white py-4 px-6 rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                >
+                  {dataLoading ? (
+                    <>
+                      <Loader className="h-5 w-5 animate-spin" />
+                      <span>Fetching Market Data...</span>
+                    </>
+                  ) : hasReachedDailyLimit ? (
+                    <>
+                      <AlertCircle className="h-5 w-5" />
+                      <span>Daily Limit Reached</span>
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="h-5 w-5" />
+                      <span>Fetch Market Data</span>
+                    </>
+                  )}
+                </button>
+                
+                {/* Market Data Status */}
+                {marketData && (
+                  <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4 flex items-start space-x-3">
+                    <CheckCircle className="h-5 w-5 text-green-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-green-400 font-medium">Market Data Ready</p>
+                      <p className="text-green-300 text-sm mt-1">
+                        {selectedPair} • {candleCount} candles • 4 timeframes
+                      </p>
+                      <div className="grid grid-cols-4 gap-2 mt-2">
+                        <div className="bg-black/20 rounded px-2 py-1 text-xs text-center">
+                          <span className="text-gray-400">5min:</span> <span className="text-white">{marketData.timeframes['5min']?.length || 0}</span>
+                        </div>
+                        <div className="bg-black/20 rounded px-2 py-1 text-xs text-center">
+                          <span className="text-gray-400">15min:</span> <span className="text-white">{marketData.timeframes['15min']?.length || 0}</span>
+                        </div>
+                        <div className="bg-black/20 rounded px-2 py-1 text-xs text-center">
+                          <span className="text-gray-400">1h:</span> <span className="text-white">{marketData.timeframes['1h']?.length || 0}</span>
+                        </div>
+                        <div className="bg-black/20 rounded px-2 py-1 text-xs text-center">
+                          <span className="text-gray-400">4h:</span> <span className="text-white">{marketData.timeframes['4h']?.length || 0}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {error && (
+                  <div className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 px-4 py-3 rounded-xl flex items-start space-x-3">
+                    <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="font-medium">Notice</p>
+                      <p className="text-sm">{error}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Step 2: Generate Signal */}
+            <div ref={generatorRef} className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-2xl p-6 border border-white/10 shadow-xl">
+              <h2 className="text-xl font-bold text-white flex items-center space-x-2 mb-6">
+                <Zap className="h-5 w-5 text-purple-400" />
+                <span>Step 2: Generate AI Signal</span>
+              </h2>
+              
+              <div className="space-y-5">
                 {/* Trading School Selection */}
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    {t('signal.tradingSchool')}
+                    Trading Methodology
                   </label>
                   <select
                     value={selectedSchool}
                     onChange={(e) => setSelectedSchool(e.target.value)}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                   >
                     {schools.map((school) => (
                       <option key={school.id} value={school.id} className="bg-gray-800">
@@ -613,272 +672,236 @@ ${jsonData}`;
                     ))}
                   </select>
                 </div>
-
+                
                 {/* Advanced Settings */}
                 <div>
                   <button
                     onClick={() => setShowAdvanced(!showAdvanced)}
-                    className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors text-sm sm:text-base"
+                    className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors text-sm"
                   >
                     <Settings className="h-4 w-4" />
-                    <span>{t('signal.advancedSettings')}</span>
+                    <span>Advanced Settings</span>
                     <ChevronDown className={`h-4 w-4 transition-transform ${showAdvanced ? 'rotate-180' : ''}`} />
                   </button>
                   
                   {showAdvanced && (
                     <div className="mt-4 p-4 bg-black/20 rounded-lg space-y-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2">
-                            {t('signal.candleCount')}
-                          </label>
-                          <select
-                            value={candleCount}
-                            onChange={(e) => setCandleCount(Number(e.target.value))}
-                            className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          >
-                            <option value={30} className="bg-gray-800">30 Candles</option>
-                            <option value={50} className="bg-gray-800">50 Candles</option>
-                            <option value={100} className="bg-gray-800">100 Candles</option>
-                          </select>
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2">
-                            {t('signal.aiProvider')}
-                          </label>
-                          <select
-                            value={aiProvider}
-                            onChange={(e) => setAiProvider(e.target.value as 'openrouter' | 'gemini')}
-                            className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          >
-                            <option value="openrouter" className="bg-gray-800">OpenRouter (GPT-4)</option>
-                            <option value="gemini" className="bg-gray-800">Google Gemini</option>
-                          </select>
-                        </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          AI Provider
+                        </label>
+                        <select
+                          value={aiProvider}
+                          onChange={(e) => setAiProvider(e.target.value as 'openrouter' | 'gemini')}
+                          className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="openrouter" className="bg-gray-800">OpenRouter (GPT-4)</option>
+                          <option value="gemini" className="bg-gray-800">Google Gemini</option>
+                        </select>
                       </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Market Data Status */}
-                {marketData && (
-                  <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
-                      <div className="flex items-center space-x-2">
-                        <CheckCircle className="h-4 w-4 text-green-400" />
-                        <span className="text-green-400 font-medium">{t('signal.marketDataReady')}</span>
-                        {apiStatus === 'error' && (
-                          <span className="text-yellow-400 text-xs">({t('signal.demoData')})</span>
-                        )}
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        {/* Copy Full Prompt Button - Only visible to admins */} 
-                        {user.isAdmin && ( 
+                      
+                      {/* Admin-only: Copy Prompt Button */}
+                      {user.isAdmin && (
+                        <div>
                           <button
                             onClick={copyFullPromptToClipboard}
                             disabled={!marketData || !selectedSchool}
-                            className="flex items-center space-x-1 px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded text-xs font-medium transition-all disabled:opacity-50"
+                            className="flex items-center space-x-2 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-medium transition-all disabled:opacity-50"
                           >
                             {copiedPrompt ? (
                               <>
-                                <Check className="h-3 w-3" />
-                                <span>Copied!</span>
+                                <Check className="h-4 w-4" />
+                                <span>Prompt Copied!</span>
                               </>
                             ) : (
                               <>
-                                <FileText className="h-3 w-3" />
-                                <span>Copy Prompt</span>
+                                <FileText className="h-4 w-4" />
+                                <span>Copy Full Prompt</span>
                               </>
                             )}
                           </button>
-                        )}
-                        
-                        <button
-                          onClick={fetchMarketData}
-                          disabled={dataLoading} 
-                          className="text-green-400 hover:text-green-300 p-1 rounded transition-colors" 
-                        >
-                          <RefreshCw className={`h-4 w-4 ${dataLoading ? 'animate-spin' : ''}`} />
-                        </button>
-                      </div>
-                    </div>
-                    <p className="text-green-300 text-sm mt-1">
-                      {selectedPair} • {candleCount} candles • 4 timeframes
-                    </p>
-                  </div>
-                )}
-
-                {error && (
-                  <div className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 px-4 py-3 rounded-lg flex items-start space-x-2">
-                    <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="font-medium">Notice</p>
-                      <p className="text-sm">{error}</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Action Buttons */}
-                <div className="space-y-3">
-                  {!marketData && (
-                    <button
-                      onClick={fetchMarketData}
-                      disabled={dataLoading || hasReachedDailyLimit}
-                      className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-3 sm:py-4 px-6 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm sm:text-base"
-                    >
-                      {dataLoading ? (
-                        <>
-                          <Loader className="h-5 w-5 animate-spin" />
-                          <span>{t('signal.fetchingData')}</span>
-                        </>
-                      ) : hasReachedDailyLimit ? (
-                        <>
-                          <AlertCircle className="h-5 w-5" />
-                          <span>Daily Limit Reached</span>
-                        </>
-                      ) : (
-                        <>
-                          <RefreshCw className="h-5 w-5" />
-                          <span>1. {t('signal.fetchMarketData')}</span>
-                        </>
+                        </div>
                       )}
-                    </button>
+                    </div>
                   )}
-
-                  <button
-                    onClick={generateSignal}
-                    disabled={loading || !marketData || hasReachedDailyLimit}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 sm:py-4 px-6 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm sm:text-base" 
-                  > 
-                    {loading ? (
-                      <>
-                        <Loader className="h-5 w-5 animate-spin" />
-                        <span>{t('signal.analyzingMarket')}</span>
-                      </>
-                    ) : hasReachedDailyLimit ? (
-                      <>
-                        <AlertCircle className="h-5 w-5" />
-                        <span>Daily Limit Reached</span>
-                      </>
-                    ) : (
-                      <>
-                        <Zap className="h-5 w-5" />
-                        <span>{marketData ? '2. ' : ''}{t('signal.generateSignal')}</span>
-                      </>
-                    )}
-                  </button>
                 </div>
+                
+                {/* Generate Button */}
+                <button
+                  onClick={generateSignal}
+                  disabled={loading || !marketData || hasReachedDailyLimit}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 px-6 rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                >
+                  {loading ? (
+                    <>
+                      <Loader className="h-5 w-5 animate-spin" />
+                      <span>Analyzing Market Data...</span>
+                    </>
+                  ) : hasReachedDailyLimit ? (
+                    <>
+                      <AlertCircle className="h-5 w-5" />
+                      <span>Daily Limit Reached</span>
+                    </>
+                  ) : !marketData ? (
+                    <>
+                      <AlertCircle className="h-5 w-5" />
+                      <span>Fetch Market Data First</span>
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="h-5 w-5" />
+                      <span>Generate Trading Signal</span>
+                    </>
+                  )}
+                </button>
+                
+                {/* Scroll to Analysis Indicator */}
+                {lastRecommendation && (
+                  <div className="text-center">
+                    <button 
+                      onClick={scrollToAnalysis}
+                      className="inline-flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition-colors"
+                    >
+                      <span>View Analysis Results</span>
+                      <ArrowDown className="h-4 w-4 animate-bounce" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
-
-          {/* Sidebar - Mobile Responsive */}
+          
+          {/* Sidebar */}
           <div className="space-y-6">
-            {/* Upgrade Prompt */}
-            <div className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-blue-500/30">
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-3">
-                {t('dashboard.needMoreSignals')}
+            {/* User Stats Card */}
+            <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-2xl p-6 border border-white/10 shadow-xl">
+              <h3 className="text-lg font-bold text-white mb-4 flex items-center space-x-2">
+                <BarChart3 className="h-5 w-5 text-blue-400" />
+                <span>Your Trading Stats</span>
               </h3>
-              <p className="text-gray-300 mb-4 text-sm">
-                {t('dashboard.upgradeDesc')}
-              </p>
-              <a
-                href="/plans"
-                className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all text-sm sm:text-base"
-              >
-                {t('dashboard.viewPlans')}
-              </a>
-            </div>
-
-            {/* Quick Stats */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
-              <h3 className="text-lg font-semibold text-white mb-3">
-                Quick Stats
-              </h3>
-              <div className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-300">{t('stats.accountType')}:</span>
-                  <span className={`font-semibold capitalize ${getPlanColor(user.plan)}`}>
-                    {user.plan}
-                  </span>
+              
+              <div className="space-y-4">
+                {/* Usage Progress */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-gray-300 text-sm">Daily Signal Usage</span>
+                    <span className="text-white font-medium">{userStats.used_today} / {userStats.recommendation_limit}</span>
+                  </div>
+                  <div className="w-full bg-gray-700 rounded-full h-2.5">
+                    <div 
+                      className="bg-gradient-to-r from-blue-500 to-purple-500 h-2.5 rounded-full" 
+                      style={{ width: `${Math.min(100, (userStats.used_today / userStats.recommendation_limit) * 100)}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {userStats.recommendation_limit - userStats.used_today} signals remaining today
+                  </p>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-300">{t('stats.dailyLimit')}:</span>
-                  <span className="text-white font-semibold">
-                    {userStats.recommendation_limit}
-                  </span>
+                
+                {/* Plan Details */}
+                <div className="bg-black/20 rounded-xl p-4">
+                  <div className="flex items-center space-x-2 mb-3">
+                    {getPlanIcon(user.plan)}
+                    <h4 className={`font-medium capitalize ${getPlanColor(user.plan)}`}>{user.plan} Plan</h4>
+                  </div>
+                  
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-center justify-between">
+                      <span className="text-gray-400">Daily Signals:</span>
+                      <span className="text-white font-medium">{userStats.recommendation_limit}</span>
+                    </li>
+                    <li className="flex items-center justify-between">
+                      <span className="text-gray-400">Used Today:</span>
+                      <span className="text-white font-medium">{userStats.used_today}</span>
+                    </li>
+                    <li className="flex items-center justify-between">
+                      <span className="text-gray-400">Remaining:</span>
+                      <span className="text-white font-medium">{userStats.recommendation_limit - userStats.used_today}</span>
+                    </li>
+                  </ul>
+                  
+                  {user.plan !== 'elite' && (
+                    <a
+                      href="/plans"
+                      className="mt-4 block text-center bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-all"
+                    >
+                      Upgrade Plan
+                    </a>
+                  )}
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-300">{t('stats.usedToday')}:</span>
-                  <span className="text-white font-semibold">
-                    {userStats.used_today}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-300">{t('stats.selectedPair')}:</span>
-                  <span className="text-white font-semibold">
-                    {selectedPair}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-300">{t('stats.dataSource')}:</span>
-                  <span className={`font-semibold ${apiStatus === 'connected' ? 'text-green-400' : 'text-yellow-400'}`}>
-                    {apiStatus === 'connected' ? t('stats.live') : t('stats.demo')}
-                  </span>
-                </div>
+                
+                {/* Telegram Status (Elite only) */}
                 {user.plan === 'elite' && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-300">Telegram:</span>
-                    <span className={`font-semibold ${telegramConfig ? 'text-green-400' : 'text-gray-400'}`}>
-                      {telegramConfig ? 'Configured' : 'Not Set'}
-                    </span>
+                  <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Crown className="h-4 w-4 text-purple-400" />
+                      <h4 className="text-purple-400 font-medium">Elite Features</h4>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-300">Telegram Integration:</span>
+                      <span className={telegramConfig ? "text-green-400" : "text-gray-400"}>
+                        {telegramConfig ? "Configured" : "Not Set"}
+                      </span>
+                    </div>
+                    {!telegramConfig && (
+                      <a
+                        href="/settings"
+                        className="mt-2 text-xs text-purple-400 hover:text-purple-300 flex items-center space-x-1"
+                      >
+                        <Settings className="h-3 w-3" />
+                        <span>Configure in Settings</span>
+                      </a>
+                    )}
                   </div>
                 )}
               </div>
             </div>
-
-            {/* Market Data Info */}
-            {marketData && (
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
-                <h3 className="text-lg font-semibold text-white mb-3">
-                  Market Data
-                </h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">{t('market.symbol')}:</span>
-                    <span className="text-white font-semibold">{marketData.symbol}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">{t('market.candles5min')}:</span>
-                    <span className="text-white">{marketData.timeframes['5min']?.length || 0}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">{t('market.candles15min')}:</span>
-                    <span className="text-white">{marketData.timeframes['15min']?.length || 0}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">{t('market.candles1h')}:</span>
-                    <span className="text-white">{marketData.timeframes['1h']?.length || 0}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">{t('market.candles4h')}:</span>
-                    <span className="text-white">{marketData.timeframes['4h']?.length || 0}</span>
-                  </div>
+            
+            {/* Upgrade Card */}
+            {user.plan !== 'elite' && (
+              <div className="bg-gradient-to-br from-blue-900/50 to-purple-900/50 backdrop-blur-sm rounded-2xl p-6 border border-blue-500/20 shadow-xl">
+                <div className="text-center mb-4">
+                  <Crown className="h-10 w-10 text-yellow-400 mx-auto mb-3" />
+                  <h3 className="text-xl font-bold text-white mb-2">Upgrade to Elite</h3>
+                  <p className="text-gray-300 text-sm">
+                    Get 15 signals per day and exclusive features
+                  </p>
                 </div>
+                
+                <ul className="space-y-2 mb-5">
+                  <li className="flex items-center space-x-2 text-sm text-gray-300">
+                    <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
+                    <span>15 daily AI-powered signals</span>
+                  </li>
+                  <li className="flex items-center space-x-2 text-sm text-gray-300">
+                    <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
+                    <span>Telegram integration</span>
+                  </li>
+                  <li className="flex items-center space-x-2 text-sm text-gray-300">
+                    <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
+                    <span>VIP analysis & support</span>
+                  </li>
+                </ul>
+                
+                <a
+                  href="/plans"
+                  className="block text-center bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 px-6 rounded-xl font-semibold transition-all transform hover:scale-105"
+                >
+                  View Plans
+                </a>
               </div>
             )}
           </div>
         </div>
-
-        {/* Analysis Display */}
-        <div ref={analysisRef} id="analysis-section">
+        
+        {/* Analysis Results Section */}
+        <div ref={analysisRef} id="analysis-section" className="mt-12">
           {(lastRecommendation || lastSignal) && (
-            <div className={`mt-8 transition-opacity duration-500 ${analysisVisible ? 'opacity-100' : 'opacity-0'}`}>
-              <h2 className="text-2xl font-bold text-white mb-4 flex items-center space-x-2">
-                <BarChart3 className="h-6 w-6 text-blue-400" />
-                <span>Analysis Results</span>
-              </h2>
+            <div className={`transition-all duration-500 ${analysisVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-4'}`}>
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-10 w-1 rounded-full"></div>
+                <h2 className="text-2xl font-bold text-white">Analysis Results</h2>
+              </div>
               
               <AnalysisDisplay
                 analysis={lastRecommendation}
