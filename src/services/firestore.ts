@@ -223,28 +223,15 @@ export const saveRecommendation = async (recommendation: Omit<Recommendation, 'i
 };
 
 export const getUserRecommendations = async (userId: string, limitCount = 10) => {
-  // Query from the path: /recommendations/{userId}/recommendations
-  const q = query(
-    collection(db, 'recommendations', userId, 'recommendations'),
-    orderBy('timestamp', 'desc'),
-    limit(limitCount)
-  );
-  
   try {
+    // Query from the path: /recommendations/{userId}/recommendations
+    const q = query(
+      collection(db, 'recommendations', userId, 'recommendations'),
+      orderBy('timestamp', 'desc'),
+      limit(limitCount)
+    );
+    
     console.log(`📊 Fetching up to ${limitCount} recommendations for user ${userId}`);
-    const snapshot = await getDocs(q);
-    
-    if (snapshot.empty) {
-      console.log('ℹ️ No recommendations found for user');
-      return [];
-    }
-    
-    console.log(`✅ Found ${snapshot.docs.length} recommendations`);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Recommendation[];
-  } catch (error) {
-    console.error('❌ Error fetching user recommendations:', error);
-    throw error;
-  }
     const snapshot = await getDocs(q);
     
     if (snapshot.empty) {
