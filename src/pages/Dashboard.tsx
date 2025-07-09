@@ -127,6 +127,12 @@ const Dashboard: React.FC = () => {
   const checkApiConnection = async () => {
     try {
       console.log('Checking API connection...');
+      
+      // Ensure API keys are loaded first
+      if (apiKeys.length === 0 || !apiKeysLoaded) {
+        await loadApiKeys();
+      }
+      
       const isConnected = await testApiConnection();
       console.log('API connection status:', isConnected ? 'connected' : 'error');
       setApiStatus(isConnected ? 'connected' : 'error');
@@ -137,6 +143,10 @@ const Dashboard: React.FC = () => {
   };
 
   const fetchMarketData = async () => {
+    if (!apiKeysLoaded) {
+      await initializeMarketData();
+    }
+    
     setDataLoading(true);
     setError('');
     
@@ -192,7 +202,7 @@ const Dashboard: React.FC = () => {
 
   // Create the full prompt that would be sent to AI
   const createFullPrompt = (): string => {
-    if (!marketData || !selectedSchool) return '';
+    if (!marketData || !selectedSchool || schools.length === 0) return '';
     
     const school = schools.find(s => s.id === selectedSchool);
     if (!school) return '';

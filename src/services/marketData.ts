@@ -10,6 +10,27 @@ let apiKeysLoaded = false;
 // Initialize with the default key
 const DEFAULT_API_KEY = import.meta.env.VITE_TWELVE_DATA_API_KEY || "6a49114a1cf942fe994ac33328d6c2c8";
 
+// Function to initialize market data
+export const initializeMarketData = async () => {
+  try {
+    console.log('🔄 Initializing market data service...');
+    
+    // Load API keys if not already loaded
+    if (apiKeys.length === 0 || !apiKeysLoaded) {
+      await loadApiKeys();
+    }
+    
+    // Test API connection
+    const isConnected = await testApiConnection();
+    console.log(`✅ API connection test result: ${isConnected ? 'Connected' : 'Error'}`);
+    
+    return isConnected;
+  } catch (error) {
+    console.error('❌ Error initializing market data:', error);
+    return false;
+  }
+};
+
 export interface CandleData {
   datetime: string;
   open: number;
