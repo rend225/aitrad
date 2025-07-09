@@ -39,8 +39,6 @@ const plansData = [
     features: [
       '100 analyses per month',
       'Advanced analysis',
-      'Priority support',
-      'Historical data',
       'Multiple trading schools',
       'Custom risk parameters'
     ],

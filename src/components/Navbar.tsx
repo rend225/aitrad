@@ -8,7 +8,7 @@ import LanguageSelector from './LanguageSelector';
 
 const Navbar: React.FC = () => {
   const { user } = useAuth();
-  const { isRTL } = useTranslation();
+  const { isRTL, t } = useTranslation();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -260,16 +260,14 @@ const Navbar: React.FC = () => {
                     to="/login"
                     className="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors"
                     onClick={closeMobileMenu}
-                    onClick={closeMobileMenu}
-                    Login
+                  >
                     Login
                   </Link>
                   <Link
                     to="/register"
                     className="block bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-base font-medium transition-colors mx-3"
                     onClick={closeMobileMenu}
-                    onClick={closeMobileMenu}
-                    Get Started
+                  >
                     Get Started
                   </Link>
                 </>
