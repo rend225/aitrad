@@ -190,7 +190,7 @@ const Dashboard: React.FC = () => {
       // Ensure API keys are loaded before fetching
       if (apiStatus === 'unknown' || apiStatus === 'error') {
         console.log('🔄 API not ready, initializing...');
-        await initializeMarketData();
+        await loadApiKeys();
       }
       
       const data = await fetchMultiTimeframeData(selectedPair, candleCount);

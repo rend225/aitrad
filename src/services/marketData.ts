@@ -94,6 +94,7 @@ export const loadApiKeys = async (): Promise<string[]> => {
       console.log('ℹ️ Using default API key for market data');
     }
     
+    apiKeysLoaded = true;
     return apiKeys;
   } catch (error) {
     console.error('❌ Error loading API keys:', error);
@@ -101,6 +102,7 @@ export const loadApiKeys = async (): Promise<string[]> => {
     
     // Fallback to default key
     apiKeys = [DEFAULT_API_KEY];
+    apiKeysLoaded = true;
     return apiKeys;
   }
 };

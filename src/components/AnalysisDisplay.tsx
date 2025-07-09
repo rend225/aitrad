@@ -376,6 +376,50 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
 
   const riskReward = calculateRiskReward();
 
+  // Format analysis for display by parsing sections
+  const formatAnalysisForDisplay = (analysis: string) => {
+    if (!analysis) return null;
+    
+    // Split by the separator used in the analysis
+    const sections = analysis.split('━━━━━━━━━━━━━━━━━━━━━━').filter(section => section.trim());
+    
+    return sections.map((section, index) => {
+      const trimmedSection = section.trim();
+      if (!trimmedSection) return null;
+      
+      // Try to extract title from first line
+      const lines = trimmedSection.split('\n');
+      const firstLine = lines[0].trim();
+      
+      // Check if this looks like a titled section
+      if (firstLine.includes('📌') || firstLine.includes('🔶') || firstLine.includes('📊') || 
+          firstLine.includes('📈') || firstLine.includes('🎯') || firstLine.includes('🧠') || 
+          firstLine.includes('⚠') || firstLine.toUpperCase().includes('ICT') ||
+          firstLine.toUpperCase().includes('INVALIDATION') || 
+          firstLine.toUpperCase().includes('MARKET STRUCTURE') ||
+          firstLine.toUpperCase().includes('SIGNAL SUMMARY')) {
+        
+        const title = firstLine.replace(/[📌🔶📊📈🎯🧠⚠]/g, '').trim();
+        const content = lines.slice(1).join('\n').trim();
+        
+        return formatSectionTitle(title, content);
+      }
+      
+      // Check for ICT section
+      if (trimmedSection.toUpperCase().includes('ICT') || trimmedSection.toUpperCase().includes('SMART MONEY')) {
+        return formatICTSection(trimmedSection, index);
+      }
+      
+      // Check for invalidation section
+      if (trimmedSection.toUpperCase().includes('INVALIDATION') || trimmedSection.toUpperCase().includes('NO-TRADE')) {
+        return formatInvalidationSection(trimmedSection, index);
+      }
+      
+      // Default section formatting
+      return formatDefaultSection(trimmedSection, index);
+    }).filter(Boolean);
+  };
+
   return (
     <div className="space-y-6 md:space-y-8">
       {/* Signal Summary Card */}
