@@ -76,6 +76,37 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
     // Split analysis into sections for better readability
     const sections = text.split(/\n\n+/);
 
+    // Function to format section titles with custom styling
+    const formatSectionTitle = (title: string, content: string) => {
+      // Special styling for Invalidation section
+      if (title.toLowerCase().includes('invalidation') || title.toLowerCase().includes('no-trade')) {
+        return (
+          <div className="mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-red-400 to-orange-500 bg-clip-text text-transparent mb-4 flex items-center space-x-2 border-b border-red-400/20 pb-3">
+              <AlertTriangle className="h-6 w-6 md:h-7 md:w-7 text-red-400" />
+              <span>{title.trim().toUpperCase()}</span>
+            </h2>
+            <div className="text-gray-200 leading-relaxed text-sm md:text-base bg-red-500/5 p-5 rounded-xl border border-red-500/10">
+              {content.trim()}
+            </div>
+          </div>
+        );
+      }
+      
+      // Default styling for other sections
+      return (
+        <div className="mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4 flex items-center space-x-2 border-b border-blue-400/20 pb-3">
+            <BarChart3 className="h-6 w-6 md:h-7 md:w-7 text-blue-400" />
+            <span>{title.trim().toUpperCase()}</span>
+          </h2>
+          <div className="text-gray-200 leading-relaxed text-sm md:text-base">
+            {content.trim()}
+          </div>
+        </div>
+      );
+    };
+
     // If there's no text, show a placeholder
     if (!text || text.trim() === '') {
       return (
@@ -91,17 +122,7 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
       
       if (isHeader) {
         const [title, ...content] = section.split(':');
-        return (
-          <div key={index} className="mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4 flex items-center space-x-2 border-b border-blue-400/20 pb-3">
-              <BarChart3 className="h-6 w-6 md:h-7 md:w-7 text-blue-400" />
-              <span>{title.trim().toUpperCase()}</span>
-            </h2>
-            <div className="text-gray-200 leading-relaxed text-sm md:text-base">
-              {content.join(':').trim()}
-            </div>
-          </div>
-        );
+        return <div key={index}>{formatSectionTitle(title, content.join(':'))}</div>;
       }
       
       // Check for sub-headers (numbered sections or bullet points)
@@ -127,6 +148,29 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
       
       // Check for indicator sections
       const isIndicatorSection = /^🎯\s*Indicator Use|^📌\s*Strict Trading Rules|^🔶\s*Definition of a "Strong Zone"|^📊\s*Multi-Timeframe Context|^📈\s*Execution Timeframes|^🎯\s*Trade Setup|^🧠\s*Justification|^⚠\s*Invalidation|^✅\s*Final Output Format/i.test(section.trim());
+
+      // Special styling for Invalidation sections
+      const isInvalidationSection = /^⚠\s*Invalidation|No-Trade Criteria/i.test(section.trim());
+      
+      if (isInvalidationSection) {
+        return (
+          <div key={index} className="mb-6 bg-red-500/5 p-5 rounded-xl border border-red-500/10 shadow-lg">
+            <div className="text-gray-200 leading-relaxed text-sm md:text-base">
+              {section.trim().split('\n').map((line, i) => {
+                // Bold and color the invalidation criteria
+                if (line.includes('❌')) {
+                  return (
+                    <p key={i} className="mb-2 font-bold text-red-400">
+                      {line.trim()}
+                    </p>
+                  );
+                }
+                return <p key={i} className="mb-2">{line.trim()}</p>;
+              })}
+            </div>
+          </div>
+        );
+      }
       
       if (isIndicatorSection) {
         return (
@@ -140,7 +184,17 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
       
       return (
         <div key={index} className="mb-5 text-gray-300 leading-relaxed text-sm md:text-base">
-          {section.trim()}
+          {section.trim().split('\n').map((line, i) => {
+            // Bold any text between ** or that starts with "Invalidation:"
+            if (line.includes('**') || line.toLowerCase().includes('invalidation:')) {
+              return (
+                <p key={i} className="mb-2 font-bold text-white">
+                  {line.trim().replace(/\*\*/g, '')}
+                </p>
+              );
+            }
+            return <p key={i} className="mb-2">{line.trim()}</p>;
+          })}
         </div>
       );
     });
@@ -334,7 +388,7 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
       )}
 
       {/* Professional Analysis Display */}
-      <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-xl border border-white/20 p-6 md:p-8 shadow-xl">
+      <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-xl border border-white/20 p-6 md:p-8 shadow-xl overflow-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 md:mb-8 space-y-3 sm:space-y-0">
           <div className="flex items-center space-x-3 border-b border-blue-500/30 pb-2 w-full sm:w-auto">
             <BarChart3 className="h-7 w-7 text-blue-400" />
@@ -417,7 +471,7 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
         </div>
 
         {/* Analysis Content with Professional Typography */}
-        <div className="bg-black/30 rounded-xl p-5 md:p-7 shadow-inner border border-white/5">
+        <div className="bg-black/30 rounded-xl p-5 md:p-7 shadow-inner border border-white/5 overflow-auto max-h-[800px]">
           <div className="prose prose-invert max-w-none">
             {formatAnalysisForDisplay(analysis)}
           </div>

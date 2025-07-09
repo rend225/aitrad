@@ -163,7 +163,7 @@ a:focus {
 
 /* Custom styling for analysis sections */
 .prose h1, .prose h2, .prose h3 {
-  color: theme('colors.blue.400');
+  color: theme('colors.blue.400'); 
   font-weight: 700;
   margin-top: 1.5em;
   margin-bottom: 0.75em;
@@ -185,6 +185,13 @@ a:focus {
   font-size: 1.25rem;
   line-height: 1.5rem;
   color: theme('colors.purple.400');
+}
+
+/* Special styling for invalidation sections */
+.prose h2:has(span:contains("INVALIDATION")), 
+.prose h2:has(span:contains("NO-TRADE")) {
+  color: theme('colors.red.400');
+  border-bottom-color: rgba(248, 113, 113, 0.2);
 }
 
 .prose strong {
@@ -227,4 +234,15 @@ a:focus {
 .signal-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+/* Invalidation criteria styling */
+.invalidation-criteria {
+  color: theme('colors.red.400');
+  font-weight: 600;
+  background-color: rgba(248, 113, 113, 0.05);
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  margin-bottom: 0.5rem;
+  border-left: 3px solid theme('colors.red.400');
 }
