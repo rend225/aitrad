@@ -333,7 +333,7 @@ export const fetchMultiTimeframeData = async (
     const cleanSymbol = symbol.trim().toUpperCase();
     const apiSymbol = getApiSymbol(cleanSymbol);
     
-    console.log(`🔄 Fetching multi-timeframe data for ${apiSymbol} (${cleanSymbol})...`);
+    console.log(`📊 Fetching multi-timeframe data for ${apiSymbol} (${cleanSymbol})...`);
     
     // Define timeframe mappings for TwelveData API
     const timeframes = [
@@ -345,7 +345,7 @@ export const fetchMultiTimeframeData = async (
     
     // Fetch timeframes with proper delay to avoid rate limiting
     const timeframeData: any = {};
-    const errors: string[] = [];
+    let errors: string[] = [];
     
     for (let i = 0; i < timeframes.length; i++) {
       const tf = timeframes[i];

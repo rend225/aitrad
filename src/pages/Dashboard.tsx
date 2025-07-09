@@ -51,6 +51,7 @@ const Dashboard: React.FC = () => {
   const [telegramConfig, setTelegramConfig] = useState<any>(null);
   const [copiedPrompt, setCopiedPrompt] = useState(false);
   const [analysisVisible, setAnalysisVisible] = useState(false);
+  const [showAnalysisSection, setShowAnalysisSection] = useState(false);
   const [userStats, setUserStats] = useState({
     used_today: 0,
     recommendation_limit: 1
@@ -87,6 +88,7 @@ const Dashboard: React.FC = () => {
   // Scroll to analysis section after generation
   useEffect(() => {
     if (lastRecommendation && analysisRef.current) {
+      setShowAnalysisSection(true);
       setAnalysisVisible(true);
       setTimeout(() => {
         analysisRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -390,6 +392,7 @@ ${jsonData}`;
       // Update state with the results
       setLastRecommendation(result.analysis);
       setLastSignal(result.signal);
+      setShowAnalysisSection(true);
       
       console.log('✅ Analysis saved successfully:', {
         analysis: result.analysis.substring(0, 100) + '...',
@@ -421,6 +424,7 @@ ${jsonData}`;
   // Function to scroll to analysis section
   const scrollToAnalysis = () => {
     if (analysisRef.current) {
+      setShowAnalysisSection(true);
       setAnalysisVisible(true);
       setTimeout(() => {
         analysisRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -895,8 +899,8 @@ ${jsonData}`;
         </div>
         
         {/* Analysis Results Section */}
-        <div ref={analysisRef} id="analysis-section" className="mt-12">
-          {(lastRecommendation || lastSignal) && (
+        {showAnalysisSection && (
+          <div ref={analysisRef} id="analysis-section" className="mt-12">
             <div className={`transition-all duration-500 ${analysisVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-4'}`}>
               <div className="flex items-center space-x-3 mb-6">
                 <div className="bg-gradient-to-r from-blue-500 to-purple-500 h-10 w-1 rounded-full"></div>
@@ -912,8 +916,8 @@ ${jsonData}`;
                 prompt={createFullPrompt()}
               />
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
