@@ -1,45 +1,51 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Helper function to check if user is admin
+    function isAdmin(uid) {
+      let userDoc = get(/databases/$(database)/documents/users/$(uid));
+      return userDoc.exists() && userDoc.data.isAdmin == true;
+    }
+    
     // Users can read/write their own data
     // Admins can read all user data
     match /users/{userId} {
       allow read, write: if request.auth.uid == userId;
-      allow read: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      allow read: if isAdmin(request.auth.uid);
     }
     
     // Users can read/write their own recommendations
     match /recommendations/{userId}/{document=**} {
       allow read, write: if request.auth.uid == userId;
-      allow read: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      allow read: if isAdmin(request.auth.uid);
     }
     
     // Plans are publicly readable, admin writable
     match /plans/{document} {
       allow read: if true; // Public read access for pricing page
-      allow write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      allow write: if isAdmin(request.auth.uid);
     }
     
     match /schools/{document} {
       allow read: if request.auth != null;
-      allow write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      allow write: if isAdmin(request.auth.uid);
     }
     
     // Featured signals - public read, admin write
     match /featured_signals/{document} {
       allow read: if true; // Public read for homepage
-      allow write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      allow write: if isAdmin(request.auth.uid);
     }
     
     // Settings - public read for SEO, admin write
     match /settings/{document} {
       allow read: if true; // Public read for SEO settings
-      allow write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      allow write: if isAdmin(request.auth.uid);
     }
     
     // Admin-only access
     match /admin/{document=**} {
-      allow read, write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      allow read, write: if isAdmin(request.auth.uid);
     }
     
     // Chat system rules
@@ -49,7 +55,7 @@ service cloud.firestore {
       // Users can read/update/delete their own chats - made more robust
       allow read, update, delete: if request.auth.uid == resource.data.userId && resource.data.userId is string;
       // Admins can read/write all chats
-      allow read, write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      allow read, write: if isAdmin(request.auth.uid);
       
       // Chat messages
       match /messages/{messageId} {
@@ -57,7 +63,7 @@ service cloud.firestore {
         allow create: if get(/databases/$(database)/documents/chats/$(chatId)).data.userId == request.auth.uid;
         allow read, write: if get(/databases/$(database)/documents/chats/$(chatId)).data.userId == request.auth.uid;
         // Admins can read/write all messages
-        allow read, write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+        allow read, write: if isAdmin(request.auth.uid);
       }
     }
   }
