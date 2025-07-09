@@ -3,9 +3,9 @@ import { getSetting, updateSetting } from './firestore';
 
 // API key management
 let currentApiKeyIndex = 0;
-let apiKeys: string[] = [];
+export let apiKeys: string[] = [];
 // Flag to track if API keys have been loaded
-let apiKeysLoaded = false;
+export let apiKeysLoaded = false;
 
 // Initialize with the default key
 const DEFAULT_API_KEY = import.meta.env.VITE_TWELVE_DATA_API_KEY || "6a49114a1cf942fe994ac33328d6c2c8";
