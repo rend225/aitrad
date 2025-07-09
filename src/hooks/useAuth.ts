@@ -39,7 +39,7 @@ export const useAuth = () => {
                   email: userData.email || firebaseUser.email || '',
                   photoURL: userData.photoURL || firebaseUser.photoURL || '',
                   isAdmin: userData.isAdmin || false,
-                  plan: planType || 'basic',
+                  plan: planType || 'free',
                   used_today: userData.used_today || 0,
                   recommendation_limit: userData.recommendation_limit || 1
                 } as User);
