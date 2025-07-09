@@ -1,0 +1,63 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can read/write their own data
+    // Admins can read all user data
+    match /users/{userId} {
+      allow read, write: if request.auth.uid == userId;
+      allow read: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // Users can read/write their own recommendations
+    match /recommendations/{userId}/{document=**} {
+      allow read, write: if request.auth.uid == userId;
+    }
+    
+    // Plans are publicly readable, admin writable
+    match /plans/{document} {
+      allow read: if true; // Public read access for pricing page
+      allow write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    match /schools/{document} {
+      allow read: if request.auth != null;
+      allow write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // Featured signals - public read, admin write
+    match /featured_signals/{document} {
+      allow read: if true; // Public read for homepage
+      allow write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // Settings - public read for SEO, admin write
+    match /settings/{document} {
+      allow read: if true; // Public read for SEO settings
+      allow write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // Admin-only access
+    match /admin/{document=**} {
+      allow read, write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // Chat system rules
+    match /chats/{chatId} {
+      // Users can create new chats where they are the owner
+      allow create: if request.auth.uid == request.resource.data.userId;
+      // Users can read/update/delete their own chats - made more robust
+      allow read, update, delete: if request.auth.uid == resource.data.userId && resource.data.userId is string;
+      // Admins can read/write all chats
+      allow read, write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      
+      // Chat messages
+      match /messages/{messageId} {
+        // Users can create/read/write messages in their own chats
+        allow create: if get(/databases/$(database)/documents/chats/$(chatId)).data.userId == request.auth.uid;
+        allow read, write: if get(/databases/$(database)/documents/chats/$(chatId)).data.userId == request.auth.uid;
+        // Admins can read/write all messages
+        allow read, write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      }
+    }
+  }
+}
