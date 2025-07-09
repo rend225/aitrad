@@ -639,4 +639,5 @@ export const getApiKeyStatus = async (): Promise<{
 };
 
 // Initialize by loading API keys
-loadApiKeys();
+// Don't load API keys on import - wait for explicit call
+// This ensures API keys are only loaded when needed
