@@ -8,6 +8,9 @@ let apiKeys: string[] = [];
 // Initialize with the default key
 const DEFAULT_API_KEY = import.meta.env.VITE_TWELVE_DATA_API_KEY || "6a49114a1cf942fe994ac33328d6c2c8";
 
+// Flag to track if API keys have been loaded
+let apiKeysLoaded = false;
+
 export interface CandleData {
   datetime: string;
   open: number;
@@ -68,6 +71,12 @@ const getApiSymbol = (symbol: string): string => {
 // Load API keys from Firestore
 export const loadApiKeys = async (): Promise<string[]> => {
   try {
+    // Skip if already loaded
+    if (apiKeysLoaded && apiKeys.length > 0) {
+      console.log(`ℹ️ API keys already loaded (${apiKeys.length} keys)`);
+      return apiKeys;
+    }
+    
     const apiSettings = await getSetting('marketData');
     if (apiSettings && apiSettings.apiKeys && Array.isArray(apiSettings.apiKeys)) {
       apiKeys = apiSettings.apiKeys.filter(key => key && key.trim() !== '');
@@ -80,6 +89,7 @@ export const loadApiKeys = async (): Promise<string[]> => {
       console.log(`✅ Loaded ${apiKeys.length} API keys for market data`);
     } else {
       // If no keys in Firestore, use the default key
+      console.log('ℹ️ No API keys found in database, using default key');
       apiKeys = [DEFAULT_API_KEY];
       console.log('ℹ️ Using default API key for market data');
     }
@@ -87,6 +97,8 @@ export const loadApiKeys = async (): Promise<string[]> => {
     return apiKeys;
   } catch (error) {
     console.error('❌ Error loading API keys:', error);
+    console.log('ℹ️ Falling back to default API key');
+    
     // Fallback to default key
     apiKeys = [DEFAULT_API_KEY];
     return apiKeys;
@@ -95,6 +107,7 @@ export const loadApiKeys = async (): Promise<string[]> => {
 
 // Get the current API key
 export const getCurrentApiKey = (): string => {
+  // If no keys are loaded, return the default key without loading from database
   if (apiKeys.length === 0) {
     return DEFAULT_API_KEY;
   }
@@ -104,6 +117,7 @@ export const getCurrentApiKey = (): string => {
 // Rotate to the next API key - now used proactively, not just on errors
 export const rotateApiKey = (): string => {
   if (apiKeys.length <= 1) {
+    console.log('ℹ️ Only one API key available, no rotation needed');
     return getCurrentApiKey();
   }
   
@@ -126,6 +140,7 @@ export const addApiKey = async (newKey: string): Promise<boolean> => {
   
   try {
     // Add to local array
+    console.log(`🔄 Adding new API key to collection`);
     apiKeys.push(newKey);
     
     // Save to Firestore
@@ -147,6 +162,7 @@ export const removeApiKey = async (keyToRemove: string): Promise<boolean> => {
   
   try {
     // Remove from local array
+    console.log(`🔄 Removing API key from collection`);
     apiKeys = apiKeys.filter(key => key !== keyToRemove);
     
     // Reset index if needed
@@ -168,6 +184,7 @@ export const removeApiKey = async (keyToRemove: string): Promise<boolean> => {
 // Validate API key and symbol
 const validateApiParams = (symbol: string) => {
   if (apiKeys.length === 0) {
+    console.log('❌ No API keys available for market data');
     throw new Error('No TwelveData API keys configured');
   }
   
@@ -184,12 +201,7 @@ export const fetchCandlestickData = async (
   interval: string, 
   count: number,
   maxRetries: number = 3
-): Promise<CandleData[]> => {
-  // Load API keys if not already loaded
-  if (apiKeys.length === 0) {
-    await loadApiKeys();
-  }
-  
+): Promise<CandleData[]> => {  
   // Validate parameters
   validateApiParams(symbol);
   
@@ -199,7 +211,7 @@ export const fetchCandlestickData = async (
   // Rotate API key for each new request - sequential rotation
   const currentKey = rotateApiKey();
   
-  console.log(`🔄 Fetching ${interval} data for ${apiSymbol} (${symbol}) with API key ${currentApiKeyIndex + 1}/${apiKeys.length}...`);
+  console.log(`📈 Fetching ${interval} data for ${apiSymbol} (${symbol}) with API key ${currentApiKeyIndex + 1}/${apiKeys.length}...`);
   
   try {
     // Build URL with proper encoding
@@ -315,13 +327,7 @@ export const fetchMultiTimeframeData = async (
   symbol: string, 
   candleCount: number = 50
 ): Promise<MultiTimeframeData> => {
-  try {
-    // Load API keys if not already loaded
-    if (apiKeys.length === 0) {
-      console.log('🔄 API keys not loaded for multi-timeframe fetch, loading now...');
-      await loadApiKeys();
-    }
-    
+  try {    
     validateApiParams(symbol);
     
     const cleanSymbol = symbol.trim().toUpperCase();
@@ -460,11 +466,6 @@ export const generateMockMultiTimeframeData = (symbol: string): MultiTimeframeDa
 
 // Test API connection with better error handling
 export const testApiConnection = async (): Promise<boolean> => {
-  // Load API keys if not already loaded
-  if (apiKeys.length === 0) {
-    await loadApiKeys();
-  }
-  
   // If no valid API keys are available, return false immediately
   if (apiKeys.length === 0 || (apiKeys.length === 1 && (apiKeys[0] === 'your_api_key' || !apiKeys[0]))) {
     console.error('❌ No valid TwelveData API keys configured');
@@ -549,11 +550,6 @@ export const testApiConnection = async (): Promise<boolean> => {
 
 // Get API usage info (if available)
 export const getApiUsage = async (): Promise<any> => {
-  // Load API keys if not already loaded
-  if (apiKeys.length === 0) {
-    await loadApiKeys();
-  }
-  
   try {
     const currentKey = getCurrentApiKey();
     const response = await fetch(`https://api.twelvedata.com/usage?apikey=${currentKey}`);
@@ -572,11 +568,6 @@ export const getApiKeyStatus = async (): Promise<{
   activeKey: number;
   totalKeys: number;
 }> => {
-  // Load API keys if not already loaded
-  if (apiKeys.length === 0) {
-    await loadApiKeys();
-  }
-  
   const keyStatus = [];
   
   for (let i = 0; i < apiKeys.length; i++) {
@@ -637,7 +628,4 @@ export const getApiKeyStatus = async (): Promise<{
     totalKeys: apiKeys.length
   };
 };
-
-// Initialize by loading API keys
-// Don't load API keys on import - wait for explicit call
-// This ensures API keys are only loaded when needed
+// No automatic initialization - wait for explicit call
