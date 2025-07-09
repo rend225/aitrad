@@ -496,46 +496,51 @@ export const getAllRecommendations = async (limitCount = 50) => {
   try {
     console.log('Fetching all recommendations for admin...');
     
-    // Try to get a sample of recommendations from the root collection
-    // This is a workaround for the subcollection structure
-    try {
-      // First, try to get users to iterate through their recommendations
-      const users = await getAllUsers();
-      const allRecommendations: Recommendation[] = [];
+    // Get all users first
+    const users = await getAllUsers();
+    const allRecommendations: Recommendation[] = [];
+    
+    // Process users in smaller batches to avoid overwhelming Firestore
+    const batchSize = 3;
+    for (let i = 0; i < users.length && allRecommendations.length < limitCount; i += batchSize) {
+      const userBatch = users.slice(i, i + batchSize);
       
-      // Limit to first 5 users to avoid quota issues and permission errors
-      for (const user of users.slice(0, 5)) {
+      // Process batch in parallel
+      const batchPromises = userBatch.map(async (user) => {
         try {
-          const userRecs = await getUserRecommendations(user.uid, 3);
-          allRecommendations.push(...userRecs.map(rec => ({
+          // Use a smaller limit per user to get more diverse results
+          const userRecs = await getUserRecommendations(user.uid, Math.min(5, Math.ceil(limitCount / users.length) + 1));
+          return userRecs.map(rec => ({
             ...rec,
             userId: user.uid // Ensure userId is set
-          })));
+          }));
         } catch (error) {
           console.warn(`Skipping recommendations for user ${user.uid}:`, error.message);
-          // Continue with other users instead of failing completely
+          return [];
         }
-      }
+      });
       
-      // Sort by timestamp and limit
-      const sortedRecs = allRecommendations
-        .filter(rec => rec.timestamp) // Only include recs with timestamps
-        .sort((a, b) => {
-          const aTime = a.timestamp?.toDate?.() || new Date(0);
-          const bTime = b.timestamp?.toDate?.() || new Date(0);
-          return bTime.getTime() - aTime.getTime();
-        })
-        .slice(0, limitCount);
-      
-      console.log(`Successfully fetched ${sortedRecs.length} recommendations`);
-      return sortedRecs;
-      
-    } catch (error) {
-      console.warn('Could not fetch user recommendations, returning empty array:', error);
-      return [];
+      const batchResults = await Promise.all(batchPromises);
+      const batchRecommendations = batchResults.flat();
+      allRecommendations.push(...batchRecommendations);
     }
+    
+    // Sort by timestamp and limit
+    const sortedRecs = allRecommendations
+      .filter(rec => rec.timestamp) // Only include recs with timestamps
+      .sort((a, b) => {
+        const aTime = a.timestamp?.toDate?.() || new Date(0);
+        const bTime = b.timestamp?.toDate?.() || new Date(0);
+        return bTime.getTime() - aTime.getTime();
+      })
+      .slice(0, limitCount);
+    
+    console.log(`Successfully fetched ${sortedRecs.length} recommendations from ${users.length} users`);
+    return sortedRecs;
+    
   } catch (error) {
     console.error('Error fetching all recommendations:', error);
+    // Return empty array instead of throwing to prevent dashboard from breaking
     return [];
   }
 };
