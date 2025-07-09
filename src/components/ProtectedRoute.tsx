@@ -66,7 +66,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, adminOnly = f
     return <Navigate to="/login" replace />;
   }
 
-  // Check email verification for email/password users
+  // Check email verification for email/password users - updated for new plan structure
   if (user.provider === 'email' && emailVerified === false) {
     return (
       <div className="min-h-screen flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
@@ -97,7 +97,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, adminOnly = f
               <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
                 <div className="flex items-start space-x-2">
                   <AlertCircle className="h-4 w-4 text-yellow-400 mt-0.5 flex-shrink-0" />
-                  <div className="text-yellow-300 text-sm">
+                  <div className="text-yellow-300 text-xs">
                     <p className="font-medium mb-2">To access your dashboard:</p>
                     <ol className="space-y-1 text-xs">
                       <li>1. Check your email inbox for a verification message</li>
