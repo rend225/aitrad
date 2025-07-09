@@ -46,6 +46,8 @@ export interface PayPalPaymentResponse {
 export const PAYPAL_PLAN_IDS = {
   free: '',
   basic: 'P-BASIC50ANALYSES',
+  pro: 'P-PRO100ANALYSES',
+  elite: 'P-ELITE200ANALYSES'
   pro: 'P-PRO120ANALYSES',
   elite: 'P-ELITE200ANALYSES'
 };
