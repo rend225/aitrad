@@ -470,6 +470,50 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
         );
       });
     }
+        
+        if (isHeader) {
+          const [title, ...content] = section.split(':');
+          return (
+            <div key={index} className="mb-6">
+              <h2 className="text-xl md:text-2xl font-bold text-blue-400 mb-3 flex items-center space-x-2 border-b border-blue-400/20 pb-2">
+                <BarChart3 className="h-5 w-5 md:h-6 md:w-6" />
+                <span>{title.trim()}</span>
+              </h2>
+              <div className="text-gray-300 leading-relaxed text-sm md:text-base">
+                {content.join(':').trim()}
+              </div>
+            </div>
+          );
+        }
+        
+        // Check for sub-headers (numbered sections or bullet points)
+        const isSubHeader = /^(\d+\.|•|\-)\s*[A-Z][^.]*:/.test(section.trim());
+        
+        if (isSubHeader) {
+          const lines = section.split('\n');
+          const headerLine = lines[0];
+          const contentLines = lines.slice(1);
+          
+          return (
+            <div key={index} className="mb-4">
+              <h3 className="text-lg md:text-xl font-semibold text-white mb-2 flex items-center space-x-2">
+                <Activity className="h-4 w-4 md:h-5 md:w-5 text-purple-400" />
+                <span>{headerLine.trim()}</span>
+              </h3>
+              <div className="text-gray-300 leading-relaxed ml-6 text-sm md:text-base">
+                {contentLines.join('\n').trim()}
+              </div>
+            </div>
+          );
+        }
+        
+        return (
+          <div key={index} className="mb-4 text-gray-300 leading-relaxed text-sm md:text-base">
+            {section.trim()}
+          </div>
+        );
+      });
+    }
   };
 
   return (
