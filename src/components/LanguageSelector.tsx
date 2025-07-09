@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
-import { useLanguage, Language } from '../contexts/LanguageContext';
+import { useTranslation } from '../contexts/TranslationContext';
 import { Globe, ChevronDown } from 'lucide-react';
 
+type Language = 'en' | 'fr' | 'ar';
+
 const LanguageSelector: React.FC = () => {
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const languages: { code: Language; name: string; flag: string }[] = [
-    { code: 'en', name: t('language.english'), flag: '🇺🇸' },
-    { code: 'ar', name: t('language.arabic'), flag: '🇸🇦' },
-    { code: 'fr', name: t('language.french'), flag: '🇫🇷' },
-    { code: 'es', name: t('language.spanish'), flag: '🇪🇸' },
-    { code: 'de', name: t('language.german'), flag: '🇩🇪' },
-    { code: 'it', name: t('language.italian'), flag: '🇮🇹' },
-    { code: 'hi', name: t('language.hindi'), flag: '🇮🇳' },
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'ar', name: 'العربية', flag: '🇸🇦' },
+    { code: 'fr', name: 'Français', flag: '🇫🇷' },
   ];
 
   const currentLanguage = languages.find(lang => lang.code === language);

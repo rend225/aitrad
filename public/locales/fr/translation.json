@@ -1,0 +1,158 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "submit": "Soumettre",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "view": "Voir",
+    "download": "Télécharger",
+    "upload": "Téléverser",
+    "yes": "Oui",
+    "no": "Non",
+    "ok": "OK"
+  },
+  "nav": {
+    "home": "Accueil",
+    "dashboard": "Tableau de bord",
+    "signals": "Signaux",
+    "history": "Historique",
+    "settings": "Paramètres",
+    "admin": "Admin",
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "register": "S'inscrire",
+    "getStarted": "Commencer",
+    "plans": "Tarifs",
+    "about": "À propos"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "signIn": "Se connecter",
+    "signUp": "S'inscrire",
+    "createAccount": "Créer un compte",
+    "forgotPassword": "Mot de passe oublié ?",
+    "alreadyHaveAccount": "Vous avez déjà un compte ?",
+    "dontHaveAccount": "Vous n'avez pas de compte ?",
+    "signInHere": "Connectez-vous ici",
+    "signUpHere": "Inscrivez-vous ici",
+    "orSignInWith": "Ou connectez-vous avec",
+    "orCreateWith": "Ou créez un compte avec",
+    "login": {
+      "title": "Bienvenue",
+      "subtitle": "Connectez-vous à votre compte pour continuer"
+    },
+    "register": {
+      "title": "Créer un compte",
+      "subtitle": "Rejoignez des milliers de traders utilisant AI Trader"
+    }
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "subtitle": "Générez des signaux de trading et des analyses alimentés par l'IA",
+    "currentPlan": "Plan actuel",
+    "signalsToday": "Signaux aujourd'hui",
+    "remaining": "Restants",
+    "needMoreSignals": "Besoin de plus de signaux ?",
+    "upgradeDesc": "Améliorez votre plan pour obtenir plus de signaux quotidiens et des fonctionnalités avancées.",
+    "viewPlans": "Voir les plans"
+  },
+  "signal": {
+    "title": "Générer un signal",
+    "tradingPair": "Paire de trading",
+    "tradingSchool": "École de trading",
+    "advancedSettings": "Paramètres avancés",
+    "candleCount": "Nombre de bougies",
+    "aiProvider": "Fournisseur d'IA",
+    "fetchMarketData": "Récupérer les données du marché",
+    "generateSignal": "Générer un signal",
+    "fetchingData": "Récupération des données...",
+    "analyzingMarket": "Analyse du marché...",
+    "marketDataReady": "Données du marché prêtes",
+    "demoData": "Données de démonstration"
+  },
+  "stats": {
+    "accountType": "Type de compte",
+    "dailyLimit": "Limite quotidienne",
+    "usedToday": "Utilisés aujourd'hui",
+    "selectedPair": "Paire sélectionnée",
+    "dataSource": "Source de données",
+    "live": "Données en direct",
+    "demo": "Données de démo"
+  },
+  "market": {
+    "symbol": "Symbole",
+    "candles5min": "Bougies 5min",
+    "candles15min": "Bougies 15min",
+    "candles1h": "Bougies 1h",
+    "candles4h": "Bougies 4h"
+  },
+  "api": {
+    "connected": "API connectée",
+    "disconnected": "API déconnectée",
+    "checking": "Vérification de l'API...",
+    "demoDataUsed": "Utilisation des données de démo",
+    "retry": "Réessayer la connexion"
+  },
+  "error": {
+    "dailyLimitReached": "Limite quotidienne de signaux atteinte. Améliorez votre plan pour plus de signaux.",
+    "apiNotConfigured": "Clé API non configurée. Utilisation des données de démo à la place.",
+    "rateLimitReached": "Limite de taux API atteinte. Utilisation des données de démo à la place.",
+    "symbolNotFound": "Symbole non trouvé. Utilisation des données de démo à la place.",
+    "marketDataUnavailable": "Données de marché indisponibles. Utilisation des données de démo à la place."
+  },
+  "landing": {
+    "hero": {
+      "title": "Signaux de trading alimentés par l'IA",
+      "subtitle": "Obtenez des recommandations de trading intelligentes grâce à l'analyse avancée de l'IA. Prenez des décisions de trading plus judicieuses avec notre plateforme de génération de signaux de pointe.",
+      "startTrial": "Commencer l'essai gratuit"
+    },
+    "features": {
+      "title": "Fonctionnalités puissantes",
+      "subtitle": "Tout ce dont vous avez besoin pour prendre des décisions de trading éclairées",
+      "ai": {
+        "title": "Analyse alimentée par l'IA",
+        "desc": "Des algorithmes avancés analysent les données du marché pour générer des signaux de trading précis"
+      },
+      "secure": {
+        "title": "Sécurisé et fiable",
+        "desc": "Sécurité de niveau bancaire avec 99,9% de disponibilité et traitement sécurisé des paiements"
+      },
+      "schools": {
+        "title": "Multiples écoles de trading",
+        "desc": "Choisissez parmi différentes méthodologies de trading pour correspondre à votre stratégie"
+      }
+    },
+    "pricing": {
+      "title": "Tarification simple et transparente",
+      "subtitle": "Choisissez le plan qui correspond à vos besoins de trading",
+      "getStarted": "Commencer"
+    },
+    "cta": {
+      "title": "Prêt à transformer votre trading ?",
+      "subtitle": "Rejoignez des milliers de traders qui utilisent déjà AI Trader pour prendre des décisions de trading plus judicieuses.",
+      "startTrial": "Commencer l'essai gratuit"
+    }
+  },
+  "language": {
+    "english": "Anglais",
+    "french": "Français",
+    "arabic": "Arabe",
+    "spanish": "Espagnol",
+    "german": "Allemand",
+    "italian": "Italien",
+    "hindi": "Hindi"
+  }
+}

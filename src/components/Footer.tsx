@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useTranslation } from '../contexts/TranslationContext';
+import TranslatedText from './TranslatedText';
 import { 
   TrendingUp, 
   Mail, 
@@ -19,7 +20,7 @@ import {
 } from 'lucide-react';
 
 const Footer: React.FC = () => {
-  const { t } = useLanguage();
+  const { language } = useTranslation();
 
   const handleContactEmail = () => {
     window.location.href = 'mailto:support@aitrader.com?subject=Contact from AI Trader Website';
@@ -41,7 +42,9 @@ const Footer: React.FC = () => {
               <span className="text-xl font-bold text-white">AI Trader</span>
             </Link>
             <p className="text-gray-300 text-sm leading-relaxed">
-              Professional AI-powered trading signals platform trusted by thousands of traders worldwide. Get intelligent market analysis and trading recommendations.
+              <TranslatedText i18nKey="footer.description">
+                Professional AI-powered trading signals platform trusted by thousands of traders worldwide. Get intelligent market analysis and trading recommendations.
+              </TranslatedText>
             </p>
             <div className="flex space-x-4">
               <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400 transition-colors">

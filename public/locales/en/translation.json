@@ -1,0 +1,158 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "view": "View",
+    "download": "Download",
+    "upload": "Upload",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "signals": "Signals",
+    "history": "History",
+    "settings": "Settings",
+    "admin": "Admin",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "getStarted": "Get Started",
+    "plans": "Pricing",
+    "about": "About"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "createAccount": "Create Account",
+    "forgotPassword": "Forgot Password?",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "signInHere": "Sign in here",
+    "signUpHere": "Sign up here",
+    "orSignInWith": "Or sign in with",
+    "orCreateWith": "Or create account with",
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to your account to continue"
+    },
+    "register": {
+      "title": "Create an Account",
+      "subtitle": "Join thousands of traders using AI Trader"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Generate AI-powered trading signals and analysis",
+    "currentPlan": "Current Plan",
+    "signalsToday": "Signals Today",
+    "remaining": "Remaining",
+    "needMoreSignals": "Need More Signals?",
+    "upgradeDesc": "Upgrade your plan to get more daily signals and advanced features.",
+    "viewPlans": "View Plans"
+  },
+  "signal": {
+    "title": "Generate Signal",
+    "tradingPair": "Trading Pair",
+    "tradingSchool": "Trading School",
+    "advancedSettings": "Advanced Settings",
+    "candleCount": "Candle Count",
+    "aiProvider": "AI Provider",
+    "fetchMarketData": "Fetch Market Data",
+    "generateSignal": "Generate Signal",
+    "fetchingData": "Fetching Data...",
+    "analyzingMarket": "Analyzing Market...",
+    "marketDataReady": "Market Data Ready",
+    "demoData": "Demo Data"
+  },
+  "stats": {
+    "accountType": "Account Type",
+    "dailyLimit": "Daily Limit",
+    "usedToday": "Used Today",
+    "selectedPair": "Selected Pair",
+    "dataSource": "Data Source",
+    "live": "Live Data",
+    "demo": "Demo Data"
+  },
+  "market": {
+    "symbol": "Symbol",
+    "candles5min": "5min Candles",
+    "candles15min": "15min Candles",
+    "candles1h": "1h Candles",
+    "candles4h": "4h Candles"
+  },
+  "api": {
+    "connected": "API Connected",
+    "disconnected": "API Disconnected",
+    "checking": "Checking API...",
+    "demoDataUsed": "Using demo data",
+    "retry": "Retry Connection"
+  },
+  "error": {
+    "dailyLimitReached": "Daily signal limit reached. Upgrade your plan for more signals.",
+    "apiNotConfigured": "API key not configured. Using demo data instead.",
+    "rateLimitReached": "API rate limit reached. Using demo data instead.",
+    "symbolNotFound": "Symbol not found. Using demo data instead.",
+    "marketDataUnavailable": "Market data unavailable. Using demo data instead."
+  },
+  "landing": {
+    "hero": {
+      "title": "AI-Powered Trading Signals",
+      "subtitle": "Get intelligent trading recommendations powered by advanced AI analysis. Make smarter trading decisions with our cutting-edge signal generation platform.",
+      "startTrial": "Start Free Trial"
+    },
+    "features": {
+      "title": "Powerful Features",
+      "subtitle": "Everything you need to make informed trading decisions",
+      "ai": {
+        "title": "AI-Powered Analysis",
+        "desc": "Advanced algorithms analyze market data to generate accurate trading signals"
+      },
+      "secure": {
+        "title": "Secure & Reliable",
+        "desc": "Bank-level security with 99.9% uptime and secure payment processing"
+      },
+      "schools": {
+        "title": "Multiple Trading Schools",
+        "desc": "Choose from different trading methodologies to match your strategy"
+      }
+    },
+    "pricing": {
+      "title": "Simple, Transparent Pricing",
+      "subtitle": "Choose the plan that fits your trading needs",
+      "getStarted": "Get Started"
+    },
+    "cta": {
+      "title": "Ready to Transform Your Trading?",
+      "subtitle": "Join thousands of traders who are already using AI Trader to make smarter trading decisions.",
+      "startTrial": "Start Free Trial"
+    }
+  },
+  "language": {
+    "english": "English",
+    "french": "French",
+    "arabic": "Arabic",
+    "spanish": "Spanish",
+    "german": "German",
+    "italian": "Italian",
+    "hindi": "Hindi"
+  }
+}
