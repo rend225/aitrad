@@ -176,6 +176,7 @@ const Plans: React.FC = () => {
   const getPlanIcon = (planId: string) => {
     switch (planId) {
       case 'free': return <Shield className="h-8 w-8" />;
+      case 'basic': return <Activity className="h-8 w-8" />;
       case 'pro': return <Zap className="h-8 w-8" />;
       case 'elite': return <Crown className="h-8 w-8" />;
       default: return <Shield className="h-8 w-8" />;
@@ -185,6 +186,7 @@ const Plans: React.FC = () => {
   const getPlanGradient = (planId: string) => {
     switch (planId) {
       case 'free': return 'from-gray-500 to-gray-600';
+      case 'basic': return 'from-green-500 to-teal-600';
       case 'pro': return 'from-blue-500 to-purple-600';
       case 'elite': return 'from-purple-600 to-pink-600';
       default: return 'from-gray-500 to-gray-600';
@@ -406,13 +408,13 @@ const Plans: React.FC = () => {
         )}
 
         {/* Pricing Cards */}
-        <div className="grid lg:grid-cols-3 gap-8 mb-20 relative">
+        <div className="grid lg:grid-cols-4 gap-8 mb-20 relative">
           <div className="absolute inset-0 bg-gradient-to-b from-blue-600/5 to-purple-600/5 rounded-3xl -z-10 transform scale-105 blur-xl"></div>
           
           {plans.map((plan, index) => {
             const badge = getPlanBadge(plan);
             const isCurrentPlan = user?.plan === plan.id;
-            const isSupported = hasValidPayPalPlan(plan);
+            const isSupported = hasValidPayPalPlan(plan) || plan.id === 'free';
             
             return (
               <div
@@ -421,7 +423,7 @@ const Plans: React.FC = () => {
                   plan.popular 
                     ? 'border-blue-500 ring-2 ring-blue-500/50 shadow-2xl shadow-blue-500/20 z-10' 
                     : 'border-white/10 hover:border-white/20'
-                } ${index === 1 ? 'lg:scale-110' : ''}`}
+                } ${index === 2 ? 'lg:scale-110' : ''}`}
               >
                 {badge && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
@@ -462,7 +464,7 @@ const Plans: React.FC = () => {
                     <div className="flex items-center justify-center space-x-2 text-gray-300">
                       <Activity className="h-4 w-4 text-blue-400" />
                       <span className="font-medium">
-                        {plan.recommendations_per_day} signal{plan.recommendations_per_day !== 1 ? 's' : ''} per day
+                        {plan.recommendations_per_day} signal{plan.recommendations_per_day !== 1 ? 's' : ''} per month
                       </span>
                     </div>
                   </div>
@@ -489,30 +491,14 @@ const Plans: React.FC = () => {
                         <span>Your Current Plan</span>
                       </div>
                     </div>
-                  ) : plan.id === 'basic' ? (
-                    <button
-                      onClick={() => {
-                        if (!user) {
-                          window.location.href = '/login';
-                          return;
-                        }
-                        if (!isSupported || !paypalReady) {
-                          if (user?.isAdmin) {
-                            setShowSetupInstructions(true);
-                          } else {
-                            setPaymentError('Payment system is currently unavailable. Please try again later or contact support.');
-                          }
-                          return;
-                        }
-                        setSelectedPlan(plan);
-                        setPaymentError('');
-                        setPaymentSuccess('');
-                      }}
-                      className="w-full py-4 px-6 rounded-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg transition-all flex items-center justify-center space-x-2"
+                  ) : plan.id === 'free' ? (
+                    <Link
+                      to="/register"
+                      className="w-full py-4 px-6 rounded-xl font-semibold bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white shadow-lg transition-all flex items-center justify-center space-x-2"
                     >
-                      <span>Get Started</span>
+                      <span>Start Free</span>
                       <ArrowRight className="h-4 w-4" />
-                    </button>
+                    </Link>
                   ) : (
                     <>
                       {!selectedPlan || selectedPlan.id !== plan.id ? (
@@ -731,7 +717,7 @@ const Plans: React.FC = () => {
               {expandedFAQ === 'faq-1' && (
                 <div className="px-6 pb-4">
                   <p className="text-gray-300 leading-relaxed">
-                    Our Basic plan includes 50 analyses per month with basic analysis features. The Pro plan offers 120 analyses per month with advanced analysis and priority support. The Elite plan provides 200 analyses per month, VIP analysis, 24/7 support, custom strategies, Telegram integration, MetaTrader integration, and API access for automated trading.
+                    Our Free plan includes 1 signal per day with basic analysis. The Basic plan offers 50 analyses per month with basic analysis features. The Pro plan offers 120 analyses per month with advanced analysis and priority support. The Elite plan provides 200 analyses per month, VIP analysis, 24/7 support, custom strategies, Telegram integration, MetaTrader integration, and API access for automated trading.
                   </p>
                 </div>
               )}

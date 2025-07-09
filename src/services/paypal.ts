@@ -44,6 +44,7 @@ export interface PayPalPaymentResponse {
 
 // Default Plan IDs for reference (update these with your actual PayPal Plan IDs)
 export const PAYPAL_PLAN_IDS = {
+  free: '',
   basic: 'P-BASIC50ANALYSES',
   pro: 'P-PRO120ANALYSES',
   elite: 'P-ELITE200ANALYSES'

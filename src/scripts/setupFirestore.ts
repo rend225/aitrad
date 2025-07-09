@@ -4,6 +4,19 @@ import { db } from '../config/firebase';
 // Plans data - Updated for PayPal integration
 const plansData = [
   {
+    id: 'free',
+    name: 'Free',
+    price: 0,
+    recommendations_per_day: 1,
+    features: [
+      '1 signal per day',
+      'Basic analysis',
+      'Email support'
+    ],
+    paypal_plan_id: '',
+    popular: false
+  },
+  {
     id: 'basic',
     name: 'Basic',
     price: 10.50,
@@ -103,6 +116,7 @@ export const setupPlans = async () => {
     console.log('🎉 All plans setup completed!');
     console.log('');
     console.log('📊 PAYMENT SYSTEM STATUS (PayPal Integration):');
+    console.log('✅ Free Plan - Ready');
     console.log('✅ Basic Plan ($10.50/month) - PayPal Ready');
     console.log('✅ Pro Plan ($19/month) - PayPal Ready');
     console.log('✅ Elite Plan ($29/month) - PayPal Ready');
@@ -147,6 +161,7 @@ export const setupAllFirestoreData = async () => {
     console.log('✨ Firestore setup completed successfully!');
     console.log('');
     console.log('📊 FINAL CONFIGURATION:');
+    console.log('✅ Free Plan: $0/month - No payment needed');
     console.log('✅ Basic Plan: $10.50/month - PayPal Integration Ready');
     console.log('✅ Pro Plan: $19/month - PayPal Integration Ready');
     console.log('✅ Elite Plan: $29/month - PayPal Integration Ready');

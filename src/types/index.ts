@@ -6,7 +6,7 @@ export interface User {
   displayName?: string;
   photoURL?: string;
   provider?: string;
-  plan: 'basic' | 'pro' | 'elite';
+  plan: 'free' | 'basic' | 'pro' | 'elite';
   used_today: number;
   recommendation_limit: number;
   subscriptionId: string | null;
