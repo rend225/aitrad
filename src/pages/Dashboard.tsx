@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../contexts/LanguageContext';
-import { getSchools, saveRecommendation, canUserGenerateRecommendation } from '../services/firestore';
+import { getSchools, saveRecommendation, canUserGenerateRecommendation, getUserRecommendations } from '../services/firestore';
 import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { generateTradingSignalWithRealData } from '../services/gpt';
 import { fetchMultiTimeframeData, generateMockMultiTimeframeData, TRADING_PAIRS, testApiConnection, loadApiKeys } from '../services/marketData';
@@ -54,6 +54,7 @@ const Dashboard: React.FC = () => {
   const [marketData, setMarketData] = useState<any>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [apiStatus, setApiStatus] = useState<'unknown' | 'connected' | 'error'>('unknown');
+  const [loadingLatestAnalysis, setLoadingLatestAnalysis] = useState(false);
   const [telegramConfig, setTelegramConfig] = useState<any>(null);
   const [copiedPrompt, setCopiedPrompt] = useState(false);
   const [userStats, setUserStats] = useState({
@@ -65,11 +66,54 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     loadSchools();
     checkApiConnection();
-    loadApiKeys(); // Load API keys on component mount
+    loadApiKeys();
     if (user?.plan === 'elite') {
       loadTelegramConfig();
     }
+    
+    // Load latest analysis when component mounts
+    if (user) {
+      loadLatestAnalysis();
+    }
   }, [user]);
+
+  // Load the user's latest analysis
+  const loadLatestAnalysis = async () => {
+    if (!user) return;
+    
+    try {
+      setLoadingLatestAnalysis(true);
+      console.log('🔄 Loading latest analysis for user...');
+      
+      // Get the most recent recommendation (limit to 1)
+      const recommendations = await getUserRecommendations(user.uid, 1);
+      
+      if (recommendations.length > 0) {
+        const latestRec = recommendations[0];
+        console.log('✅ Found latest analysis:', latestRec.id);
+        
+        // Set the analysis and signal data
+        setLastRecommendation(latestRec.response);
+        setLastSignal(latestRec.signal);
+        
+        // If the recommendation has a school, select it
+        if (latestRec.school) {
+          const schoolObj = schools.find(s => s.name === latestRec.school);
+          if (schoolObj) {
+            setSelectedSchool(schoolObj.id);
+          }
+        }
+        
+        console.log('✅ Latest analysis loaded successfully');
+      } else {
+        console.log('ℹ️ No previous analysis found');
+      }
+    } catch (error) {
+      console.error('❌ Error loading latest analysis:', error);
+    } finally {
+      setLoadingLatestAnalysis(false);
+    }
+  };
 
   // Real-time user stats listener
   useEffect(() => {
@@ -504,7 +548,7 @@ ${jsonData}`;
         <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Stats Cards - Mobile Responsive */}
           <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
+            <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10 shadow-xl">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-300 text-sm">{t('dashboard.currentPlan')}</p>
@@ -517,11 +561,11 @@ ${jsonData}`;
               </div>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
+            <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10 shadow-xl">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-300 text-sm">{t('dashboard.signalsToday')}</p>
-                  <p className="text-lg sm:text-2xl font-bold text-white">
+                  <p className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                     {userStats.used_today} / {userStats.recommendation_limit}
                   </p>
                 </div>
@@ -529,11 +573,11 @@ ${jsonData}`;
               </div>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
+            <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10 shadow-xl">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-300 text-sm">{t('dashboard.remaining')}</p>
-                  <p className="text-lg sm:text-2xl font-bold text-white">
+                  <p className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                     {userStats.recommendation_limit - userStats.used_today}
                   </p>
                 </div>
@@ -544,8 +588,8 @@ ${jsonData}`;
 
           {/* Signal Generator - Mobile Responsive */}
           <div className="lg:col-span-2">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 lg:p-8 border border-white/20">
-              <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 flex items-center space-x-2">
+            <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-4 sm:p-6 lg:p-8 border border-white/10 shadow-xl">
+              <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4 sm:mb-6 flex items-center space-x-2 border-b border-blue-500/30 pb-3">
                 <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-blue-400" />
                 <span>{t('signal.title')}</span>
               </h2>
@@ -756,25 +800,33 @@ ${jsonData}`;
 
           {/* Sidebar - Mobile Responsive */}
           <div className="space-y-6">
+            {/* Loading Latest Analysis Indicator */}
+            {loadingLatestAnalysis && (
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+                <p className="text-blue-400 text-sm">Loading your latest analysis...</p>
+              </div>
+            )}
+            
             {/* Upgrade Prompt */}
-            <div className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-blue-500/30">
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-3">
+            <div className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 backdrop-blur-sm rounded-xl p-5 sm:p-7 border border-blue-500/30 shadow-lg">
+              <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-3">
                 {t('dashboard.needMoreSignals')}
               </h3>
-              <p className="text-gray-300 mb-4 text-sm">
+              <p className="text-gray-300 mb-5 text-sm">
                 {t('dashboard.upgradeDesc')}
               </p>
               <a
                 href="/plans"
-                className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all text-sm sm:text-base"
+                className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all text-sm sm:text-base shadow-lg hover:shadow-xl transform hover:translate-y-[-2px]"
               >
                 {t('dashboard.viewPlans')}
               </a>
             </div>
 
             {/* Quick Stats */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
-              <h3 className="text-lg font-semibold text-white mb-3">
+            <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-5 sm:p-7 border border-white/10 shadow-xl">
+              <h3 className="text-lg font-bold text-blue-400 mb-4 border-b border-blue-500/20 pb-2">
                 Quick Stats
               </h3>
               <div className="space-y-3">
@@ -821,8 +873,8 @@ ${jsonData}`;
 
             {/* Market Data Info */}
             {marketData && (
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
-                <h3 className="text-lg font-semibold text-white mb-3">
+              <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-5 sm:p-7 border border-white/10 shadow-xl">
+                <h3 className="text-lg font-bold text-blue-400 mb-4 border-b border-blue-500/20 pb-2">
                   Market Data
                 </h3>
                 <div className="space-y-2 text-sm">
@@ -855,11 +907,16 @@ ${jsonData}`;
         {/* Analysis Display */}
         <div className="mt-8" ref={analysisRef}>
           {(lastRecommendation || lastSignal) && (
-            <>
-              <h2 className="text-2xl font-bold text-white mb-4 flex items-center space-x-2">
-                <BarChart3 className="h-6 w-6 text-blue-400" />
-                <span>Analysis Results</span>
+            <div className="mb-6 pb-6 border-b border-gradient-to-r from-blue-500/30 to-purple-500/30">
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4 flex items-center space-x-3">
+                <BarChart3 className="h-8 w-8 text-blue-400" />
+                <span>Trading Analysis Results</span>
               </h2>
+              <p className="text-gray-300 text-lg">
+                Professional AI-powered trading signal for {signal?.pair || 'your selected asset'}
+              </p>
+            </div>
+            <>
               <AnalysisDisplay
                 analysis={lastRecommendation}
                 signal={lastSignal}

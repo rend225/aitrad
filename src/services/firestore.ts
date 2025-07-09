@@ -230,8 +230,21 @@ export const getUserRecommendations = async (userId: string, limitCount = 10) =>
     limit(limitCount)
   );
   
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Recommendation[];
+  try {
+    console.log(`📊 Fetching up to ${limitCount} recommendations for user ${userId}`);
+    const snapshot = await getDocs(q);
+    
+    if (snapshot.empty) {
+      console.log('ℹ️ No recommendations found for user');
+      return [];
+    }
+    
+    console.log(`✅ Found ${snapshot.docs.length} recommendations`);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Recommendation[];
+  } catch (error) {
+    console.error('❌ Error fetching user recommendations:', error);
+    throw error;
+  }
 };
 
 // Featured Signals - Admin curated examples for homepage
