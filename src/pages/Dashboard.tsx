@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getSchools, saveRecommendation, canUserGenerateRecommendation } from '../services/firestore';
-import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { generateTradingSignalWithRealData } from '../services/gpt';
 import { fetchMultiTimeframeData, generateMockMultiTimeframeData, TRADING_PAIRS, testApiConnection, loadApiKeys, apiKeys, apiKeysLoaded, initializeMarketData } from '../services/marketData';
 import { sendTelegramMessage, formatSignalForTelegram } from '../services/telegram';
@@ -66,7 +66,8 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     loadSchools();
     checkApiConnection();
-    loadApiKeys(); // Load API keys on component mount
+    loadApiKeys(); // Load API keys on component mount 
+    loadLatestAnalysis(); // Load the latest analysis when component mounts
     if (user?.plan === 'elite') {
       loadTelegramConfig();
     }
@@ -101,6 +102,44 @@ const Dashboard: React.FC = () => {
       }
     } catch (error) {
       console.error('Error loading schools:', error);
+    }
+  };
+
+  // Load the latest analysis for the user
+  const loadLatestAnalysis = async () => {
+    if (!user) return;
+    
+    try {
+      console.log('Loading latest analysis for user...');
+      
+      // Query the user's recommendations, ordered by timestamp (most recent first), limit to 1
+      const q = query(
+        collection(db, 'recommendations', user.uid, 'recommendations'),
+        orderBy('timestamp', 'desc'),
+        limit(1)
+      );
+      
+      const snapshot = await getDocs(q);
+      
+      if (!snapshot.empty) {
+        const latestRec = snapshot.docs[0].data();
+        console.log('Latest analysis found:', latestRec.timestamp.toDate());
+        
+        // Set the latest recommendation and signal
+        setLastRecommendation(latestRec.response);
+        setLastSignal(latestRec.signal);
+        
+        // Scroll to analysis section after it's rendered
+        setTimeout(() => {
+          if (analysisRef.current) {
+            analysisRef.current.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 500);
+      } else {
+        console.log('No previous analyses found for user');
+      }
+    } catch (error) {
+      console.error('Error loading latest analysis:', error);
     }
   };
 
@@ -895,9 +934,9 @@ ${jsonData}`;
         {/* Analysis Display */}
         {(lastRecommendation || lastSignal) && (
           <div className="mt-10" ref={analysisRef}>
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-6 flex items-center space-x-2">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-6 flex items-center space-x-2 border-b border-gradient-to-r from-blue-500/30 to-purple-500/30 pb-3">
               <BarChart3 className="h-7 w-7 text-blue-400" />
-              <span>Analysis Results</span>
+              <span>{lastSignal ? 'Latest Analysis' : 'Analysis Results'}</span>
             </h2>
             <AnalysisDisplay
               analysis={lastRecommendation}
