@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../contexts/LanguageContext';
-import { getSchools, saveRecommendation, canUserGenerateRecommendation } from '../services/firestore';
+import { getSchools, saveRecommendation, canUserGenerateRecommendation, incrementUserUsage } from '../services/firestore';
 import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { generateTradingSignalWithRealData } from '../services/gpt';
 import { fetchMultiTimeframeData, generateMockMultiTimeframeData, TRADING_PAIRS, testApiConnection, loadApiKeys } from '../services/marketData';
@@ -55,7 +55,7 @@ const Dashboard: React.FC = () => {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [apiStatus, setApiStatus] = useState<'unknown' | 'connected' | 'error'>('unknown');
   const [telegramConfig, setTelegramConfig] = useState<any>(null);
-  const [copiedPrompt, setCopiedPrompt] = useState(false);
+  const [copiedPrompt, setCopiedPrompt] = useState(false); 
   const [userStats, setUserStats] = useState({
     used_today: 0,
     recommendation_limit: 1
@@ -64,12 +64,18 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     loadSchools();
-    checkApiConnection();
-    loadApiKeys(); // Load API keys on component mount
+    initializeApiAndData();
     if (user?.plan === 'elite') {
       loadTelegramConfig();
     }
   }, [user]);
+
+  // Initialize API and load data
+  const initializeApiAndData = async () => {
+    console.log('🚀 Initializing API and data...');
+    await loadApiKeys(); // Load API keys first
+    await checkApiConnection(); // Then check connection
+  };
 
   // Real-time user stats listener
   useEffect(() => {
@@ -99,7 +105,7 @@ const Dashboard: React.FC = () => {
 
   const loadSchools = async () => {
     try {
-      console.log('Loading trading schools...');
+      console.log('📚 Loading trading schools...');
       const schoolsData = await getSchools();
       console.log('Schools loaded:', schoolsData.length);
       setSchools(schoolsData);
@@ -134,7 +140,7 @@ const Dashboard: React.FC = () => {
 
   const checkApiConnection = async () => {
     try {
-      console.log('Checking API connection...');
+      console.log('🔌 Checking API connection...');
       const isConnected = await testApiConnection();
       console.log('API connection status:', isConnected ? 'connected' : 'error');
       setApiStatus(isConnected ? 'connected' : 'error');
@@ -149,12 +155,12 @@ const Dashboard: React.FC = () => {
     setError('');
     
     try {
-      console.log(`Fetching market data for ${selectedPair}...`);
+      console.log(`📊 Fetching market data for ${selectedPair}...`);
       
       // Ensure API keys are loaded before fetching
       if (apiStatus === 'unknown' || apiStatus === 'error') {
         console.log('🔄 API not ready, initializing...');
-        await loadApiKeys();
+        await initializeApiAndData();
         await checkApiConnection();
       }
       
@@ -162,7 +168,7 @@ const Dashboard: React.FC = () => {
       console.log('Market data fetched successfully:', {
         symbol: data.symbol,
         timeframes: {
-          '5min': data.timeframes['5min']?.length,
+          '5min': data.timeframes['5min']?.length, 
           '15min': data.timeframes['15min']?.length,
           '1h': data.timeframes['1h']?.length,
           '4h': data.timeframes['4h']?.length
@@ -181,7 +187,7 @@ const Dashboard: React.FC = () => {
       if (errorMessage.includes('API key')) {
         errorMessage = t('error.apiNotConfigured');
       } else if (errorMessage.includes('rate limit')) {
-        errorMessage = t('error.rateLimitReached');
+        errorMessage = t('error.rateLimitReached'); 
       } else if (errorMessage.includes('symbol')) {
         errorMessage = t('error.symbolNotFound');
       } else {
@@ -189,7 +195,7 @@ const Dashboard: React.FC = () => {
       }
       
       // Fallback to mock data
-      console.log('Falling back to demo data...');
+      console.log('🔄 Falling back to demo data...');
       const mockData = generateMockMultiTimeframeData(selectedPair);
       setMarketData(mockData);
       setError(errorMessage);
@@ -321,7 +327,7 @@ ${jsonData}`;
     // Check if user can generate recommendation
     try {
       console.log('Checking if user can generate recommendation...');
-      const canGenerate = await canUserGenerateRecommendation(user.uid);
+      const canGenerate = await canUserGenerateRecommendation(user.uid); 
       if (!canGenerate) {
         setError(t('signal.dailyLimitReached'));
         return;
@@ -349,7 +355,7 @@ ${jsonData}`;
         throw new Error('Selected school not found');
       }
 
-      console.log('Generating signal with market data...');
+      console.log('🧠 Generating signal with market data...');
       console.log('Selected school:', school.name);
       console.log('Selected pair:', selectedPair);
       console.log('AI Provider:', aiProvider);
@@ -361,9 +367,9 @@ ${jsonData}`;
         provider: aiProvider
       });
 
-      console.log('Signal generation result:', result);
-      console.log('Analysis length:', result.analysis.length);
-      console.log('Signal data:', result.signal);
+      console.log('✅ Signal generation result:', result);
+      console.log('📝 Analysis length:', result.analysis.length);
+      console.log('📊 Signal data:', result.signal);
       console.log('Used provider:', result.usedProvider);
 
       // Show a notification if we had to fallback to a different provider
@@ -371,8 +377,8 @@ ${jsonData}`;
         setError(`Note: Switched to ${result.usedProvider === 'openrouter' ? 'OpenRouter (GPT-4)' : 'Gemini'} due to quota limits on the selected provider.`);
       }
 
-      // Save recommendation with structured signal data
-      // This will automatically increment user usage
+      // First save the recommendation to Firestore
+      // This doesn't automatically increment usage anymore
       await saveRecommendation({
         userId: user.uid,
         school: school.name,
@@ -383,6 +389,9 @@ ${jsonData}`;
         signal: result.signal
       });
       
+      // Manually increment usage
+      await incrementUserUsage(user.uid);
+      
       // Update state with the results
       setLastRecommendation(result.analysis);
       setLastSignal(result.signal);
@@ -391,6 +400,9 @@ ${jsonData}`;
         analysis: result.analysis.substring(0, 100) + '...',
         signal: result.signal
       });
+      
+      // Ensure we scroll to the analysis section
+      scrollToAnalysis();
     } catch (error: any) {
       console.error('Error generating signal:', error);
       
@@ -408,6 +420,15 @@ ${jsonData}`;
       setError(errorMessage);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Function to scroll to analysis section
+  const scrollToAnalysis = () => {
+    if (analysisRef.current) {
+      setTimeout(() => {
+        analysisRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
     }
   };
 
@@ -444,7 +465,7 @@ ${jsonData}`;
     switch (apiStatus) {
       case 'connected':
         return <Wifi className="h-4 w-4 text-green-400" />;
-      case 'error':
+      case 'error': 
         return <WifiOff className="h-4 w-4 text-red-400" />;
       default:
         return <Loader className="h-4 w-4 text-gray-400 animate-spin" />;
@@ -465,7 +486,7 @@ ${jsonData}`;
   const selectedPairInfo = TRADING_PAIRS.find(p => p.symbol === selectedPair);
   const hasReachedDailyLimit = userStats.used_today >= userStats.recommendation_limit;
 
-  if (!user) return null;
+  if (!user) return null; 
 
   return (
     <div className="min-h-screen py-4 sm:py-8 px-4 sm:px-6 lg:px-8">
@@ -485,7 +506,7 @@ ${jsonData}`;
             apiStatus === 'connected' 
               ? 'bg-green-500/10 border-green-500/20 text-green-400'
               : apiStatus === 'error'
-              ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400'
+              ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' 
               : 'bg-gray-500/10 border-gray-500/20 text-gray-400'
           }`}>
             {getApiStatusIcon()}
@@ -494,7 +515,7 @@ ${jsonData}`;
               <span className="text-xs">• {t('api.demoDataUsed')}</span>
             )}
             <button
-              onClick={checkApiConnection}
+              onClick={initializeApiAndData}
               className="ml-auto text-xs hover:underline"
             >
               {t('api.retry')}
@@ -502,7 +523,7 @@ ${jsonData}`;
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8"> 
           {/* Stats Cards - Mobile Responsive */}
           <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
@@ -551,7 +572,7 @@ ${jsonData}`;
                 <span>{t('signal.title')}</span>
               </h2>
 
-              <div className="space-y-4 sm:space-y-6">
+              <div className="space-y-4 sm:space-y-6"> 
                 {/* Trading Pair Selection */}
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -561,7 +582,7 @@ ${jsonData}`;
                     value={selectedPair}
                     onChange={(e) => {
                       setSelectedPair(e.target.value);
-                      setMarketData(null);
+                      setMarketData(null); 
                     }}
                     className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                   >
@@ -583,7 +604,7 @@ ${jsonData}`;
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     {t('signal.tradingSchool')}
                   </label>
-                  <select
+                  <select 
                     value={selectedSchool}
                     onChange={(e) => setSelectedSchool(e.target.value)}
                     className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
@@ -601,7 +622,7 @@ ${jsonData}`;
                   <button
                     onClick={() => setShowAdvanced(!showAdvanced)}
                     className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors text-sm sm:text-base"
-                  >
+                  > 
                     <Settings className="h-4 w-4" />
                     <span>{t('signal.advancedSettings')}</span>
                     <ChevronDown className={`h-4 w-4 transition-transform ${showAdvanced ? 'rotate-180' : ''}`} />
@@ -609,7 +630,7 @@ ${jsonData}`;
                   
                   {showAdvanced && (
                     <div className="mt-4 p-4 bg-black/20 rounded-lg space-y-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4"> 
                         <div>
                           <label className="block text-sm font-medium text-gray-300 mb-2">
                             {t('signal.candleCount')}
@@ -655,7 +676,7 @@ ${jsonData}`;
                         )}
                       </div>
                       <div className="flex items-center space-x-2">
-                        {/* Copy Full Prompt Button - Only visible to admins */}
+                        {/* Copy Full Prompt Button - Only visible to admins */} 
                         {user.isAdmin && (
                           <button
                             onClick={copyFullPromptToClipboard}
@@ -678,7 +699,7 @@ ${jsonData}`;
                         
                         <button
                           onClick={fetchMarketData}
-                          disabled={dataLoading}
+                          disabled={dataLoading} 
                           className="text-green-400 hover:text-green-300 p-1 rounded transition-colors"
                         >
                           <RefreshCw className={`h-4 w-4 ${dataLoading ? 'animate-spin' : ''}`} />
@@ -691,7 +712,7 @@ ${jsonData}`;
                   </div>
                 )}
 
-                {error && (
+                {error && ( 
                   <div className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 px-4 py-3 rounded-lg flex items-start space-x-2">
                     <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
                     <div>
@@ -702,7 +723,7 @@ ${jsonData}`;
                 )}
 
                 {/* Action Buttons */}
-                <div className="space-y-3">
+                <div className="space-y-3"> 
                   {!marketData && (
                     <button
                       onClick={fetchMarketData}
@@ -731,7 +752,7 @@ ${jsonData}`;
                   <button
                     onClick={generateSignal}
                     disabled={loading || !marketData || hasReachedDailyLimit}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 sm:py-4 px-6 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm sm:text-base"
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 sm:py-4 px-6 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm sm:text-base" 
                   >
                     {loading ? (
                       <>
@@ -756,7 +777,7 @@ ${jsonData}`;
           </div>
 
           {/* Sidebar - Mobile Responsive */}
-          <div className="space-y-6">
+          <div className="space-y-6"> 
             {/* Upgrade Prompt */}
             <div className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-blue-500/30">
               <h3 className="text-lg sm:text-xl font-bold text-white mb-3">
@@ -774,7 +795,7 @@ ${jsonData}`;
             </div>
 
             {/* Quick Stats */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20"> 
               <h3 className="text-lg font-semibold text-white mb-3">
                 Quick Stats
               </h3>
@@ -821,7 +842,7 @@ ${jsonData}`;
             </div>
 
             {/* Market Data Info */}
-            {marketData && (
+            {marketData && ( 
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/20">
                 <h3 className="text-lg font-semibold text-white mb-3">
                   Market Data
@@ -854,20 +875,25 @@ ${jsonData}`;
         </div>
 
         {/* Analysis Display */}
-        <div className="mt-8" ref={analysisRef}>
-          {(lastRecommendation || lastSignal) && (
-            <>
-              <h2 className="text-2xl font-bold text-white mb-4 flex items-center space-x-2">
-                <BarChart3 className="h-6 w-6 text-blue-400" />
-                <span>Analysis Results</span>
-              </h2>
-              <AnalysisDisplay
-                analysis={lastRecommendation}
-                signal={lastSignal}
-                school={schools.find(s => s.id === selectedSchool)?.name || 'Unknown'}
-                timestamp={new Date()}
-                onSendToTelegram={user?.plan === 'elite' && telegramConfig ? handleSendToTelegram : undefined}
-                prompt={createFullPrompt()}
+        <div 
+          className={`mt-8 transition-opacity duration-300 ${lastRecommendation ? 'opacity-100' : 'opacity-0'}`} 
+          ref={analysisRef}
+        >
+          {lastRecommendation && lastSignal && (
+            <> 
+              <div className="mb-4 flex items-center space-x-2">
+                <h2 className="text-2xl font-bold text-white flex items-center space-x-2">
+                  <BarChart3 className="h-6 w-6 text-blue-400" />
+                  <span>Analysis Results</span>
+                </h2>
+              </div>
+              <AnalysisDisplay 
+                analysis={lastRecommendation} 
+                signal={lastSignal} 
+                school={schools.find(s => s.id === selectedSchool)?.name || 'Unknown'} 
+                timestamp={new Date()} 
+                onSendToTelegram={user?.plan === 'elite' && telegramConfig ? handleSendToTelegram : undefined} 
+                prompt={createFullPrompt()} 
               />
             </>
           )}
