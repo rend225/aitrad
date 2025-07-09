@@ -10,9 +10,6 @@ let apiKeysLoaded = false;
 // Initialize with the default key
 const DEFAULT_API_KEY = import.meta.env.VITE_TWELVE_DATA_API_KEY || "6a49114a1cf942fe994ac33328d6c2c8";
 
-// Flag to track if API keys have been loaded
-let apiKeysLoaded = false;
-
 export interface CandleData {
   datetime: string;
   open: number;
@@ -477,6 +474,16 @@ export const generateMockMultiTimeframeData = (symbol: string): MultiTimeframeDa
       "1h": generateMockCandles(50, basePrice),
       "4h": generateMockCandles(50, basePrice)
     }
+  };
+};
+
+// Test API connection with better error handling
+export const testApiConnection = async (): Promise<boolean> => {
+  // Load API keys if not already loaded
+  if (apiKeys.length === 0 || !apiKeysLoaded) {
+    await loadApiKeys();
+  }
+  
   // If no valid API keys are available, return false immediately
   if (apiKeys.length === 0 || (apiKeys.length === 1 && (apiKeys[0] === 'your_api_key' || !apiKeys[0]))) {
     console.error('❌ No valid TwelveData API keys configured');
@@ -556,6 +563,11 @@ export const generateMockMultiTimeframeData = (symbol: string): MultiTimeframeDa
     console.error(`❌ All API keys failed the connection test`);
   }
   
+  return success;
+};
+
+// Get API usage information
+export const getApiUsage = async () => {
   try {
     const currentKey = getCurrentApiKey();
     const response = await fetch(`https://api.twelvedata.com/usage?apikey=${currentKey}`);
@@ -569,6 +581,7 @@ export const generateMockMultiTimeframeData = (symbol: string): MultiTimeframeDa
 };
 
 // Get all API keys and their status
+export const getApiKeyStatus = async () => {
   const keyStatus = [];
   
   for (let i = 0; i < apiKeys.length; i++) {
@@ -629,3 +642,23 @@ export const generateMockMultiTimeframeData = (symbol: string): MultiTimeframeDa
     totalKeys: apiKeys.length
   };
 };
+
+// Initialize API keys on module load
+const initializeApiKeys = async () => {
+  try {
+    if (!apiKeysLoaded) {
+      console.log('🔄 Initializing API keys on module load...');
+      await loadApiKeys();
+    }
+  } catch (error) {
+    console.error('❌ Error initializing API keys:', error);
+    // Ensure we have at least the default key
+    if (apiKeys.length === 0) {
+      apiKeys = [DEFAULT_API_KEY];
+      apiKeysLoaded = true;
+    }
+  }
+};
+
+// Run initialization
+initializeApiKeys();

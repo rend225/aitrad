@@ -225,24 +225,21 @@ export const saveRecommendation = async (recommendation: Omit<Recommendation, 'i
 export const getUserRecommendations = async (userId: string, limitCount = 10) => {
   try {
     // Query from the path: /recommendations/{userId}/recommendations
+    console.log(`Fetching recommendations for user ${userId} with limit ${limitCount}`);
+    
     const q = query(
       collection(db, 'recommendations', userId, 'recommendations'),
       orderBy('timestamp', 'desc'),
       limit(limitCount)
     );
     
-    console.log(`📊 Fetching up to ${limitCount} recommendations for user ${userId}`);
+    console.log('Executing Firestore query...');
     const snapshot = await getDocs(q);
     
-    if (snapshot.empty) {
-      console.log('ℹ️ No recommendations found for user');
-      return [];
-    }
-    
-    console.log(`✅ Found ${snapshot.docs.length} recommendations`);
+    console.log(`Query returned ${snapshot.docs.length} documents`);
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Recommendation[];
   } catch (error) {
-    console.error('❌ Error fetching user recommendations:', error);
+    console.error('Error fetching user recommendations:', error);
     throw error;
   }
 };
