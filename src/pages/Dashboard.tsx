@@ -907,16 +907,17 @@ ${jsonData}`;
         {/* Analysis Display */}
         <div className="mt-8" ref={analysisRef}>
           {(lastRecommendation || lastSignal) && (
-            <div className="mb-6 pb-6 border-b border-gradient-to-r from-blue-500/30 to-purple-500/30">
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4 flex items-center space-x-3">
-                <BarChart3 className="h-8 w-8 text-blue-400" />
-                <span>Trading Analysis Results</span>
-              </h2>
-              <p className="text-gray-300 text-lg">
-                Professional AI-powered trading signal for {signal?.pair || 'your selected asset'}
-              </p>
-            </div>
             <>
+              <div className="mb-6 pb-6 border-b border-gradient-to-r from-blue-500/30 to-purple-500/30">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4 flex items-center space-x-3">
+                  <BarChart3 className="h-8 w-8 text-blue-400" />
+                  <span>Trading Analysis Results</span>
+                </h2>
+                <p className="text-gray-300 text-lg">
+                  Professional AI-powered trading signal for {lastSignal?.pair || 'your selected asset'}
+                </p>
+              </div>
+              
               <AnalysisDisplay
                 analysis={lastRecommendation}
                 signal={lastSignal}
