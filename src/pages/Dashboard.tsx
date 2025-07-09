@@ -61,17 +61,24 @@ const Dashboard: React.FC = () => {
     used_today: 0,
     recommendation_limit: 1
   });
+  const [loadingLatestAnalysis, setLoadingLatestAnalysis] = useState(true);
   const analysisRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadSchools();
     checkApiConnection();
     loadApiKeys(); // Load API keys on component mount 
-    loadLatestAnalysis(); // Load the latest analysis when component mounts
     if (user?.plan === 'elite') {
       loadTelegramConfig();
     }
   }, [user]);
+
+  // Load the latest analysis when component mounts
+  useEffect(() => {
+    if (user) {
+      loadLatestAnalysis();
+    }
+  }, [user, schools]);
 
   // Real-time user stats listener
   useEffect(() => {
@@ -110,6 +117,7 @@ const Dashboard: React.FC = () => {
     if (!user) return;
     
     try {
+      setLoadingLatestAnalysis(true);
       console.log('Loading latest analysis for user...');
       
       // Query the user's recommendations, ordered by timestamp (most recent first), limit to 1
@@ -129,6 +137,19 @@ const Dashboard: React.FC = () => {
         setLastRecommendation(latestRec.response);
         setLastSignal(latestRec.signal);
         
+        // If we have a school from the recommendation, select it in the UI
+        if (latestRec.school && schools.length > 0) {
+          const matchingSchool = schools.find(s => s.name === latestRec.school);
+          if (matchingSchool) {
+            setSelectedSchool(matchingSchool.id);
+          }
+        }
+        
+        // If we have a pair from the signal, select it in the UI
+        if (latestRec.signal?.pair) {
+          setSelectedPair(latestRec.signal.pair);
+        }
+        
         // Scroll to analysis section after it's rendered
         setTimeout(() => {
           if (analysisRef.current) {
@@ -140,6 +161,8 @@ const Dashboard: React.FC = () => {
       }
     } catch (error) {
       console.error('Error loading latest analysis:', error);
+    } finally {
+      setLoadingLatestAnalysis(false);
     }
   };
 
@@ -934,17 +957,28 @@ ${jsonData}`;
         {/* Analysis Display */}
         {(lastRecommendation || lastSignal) && (
           <div className="mt-10" ref={analysisRef}>
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-6 flex items-center space-x-2 border-b border-gradient-to-r from-blue-500/30 to-purple-500/30 pb-3">
-              <BarChart3 className="h-7 w-7 text-blue-400" />
-              <span>{lastSignal ? 'Latest Analysis' : 'Analysis Results'}</span>
-            </h2>
-            <AnalysisDisplay
-              analysis={lastRecommendation}
-              signal={lastSignal}
-              school={schools.find(s => s.id === selectedSchool)?.name || 'Unknown'}
-              timestamp={new Date()}
-              onSendToTelegram={user?.plan === 'elite' && telegramConfig ? handleSendToTelegram : undefined}
-            />
+            {loadingLatestAnalysis ? (
+              <div className="flex items-center justify-center p-12">
+                <div className="text-center">
+                  <RefreshCw className="h-10 w-10 text-blue-400 animate-spin mx-auto mb-4" />
+                  <p className="text-gray-300">Loading your latest analysis...</p>
+                </div>
+              </div>
+            ) : (
+              <>
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-6 flex items-center space-x-2 border-b border-gradient-to-r from-blue-500/30 to-purple-500/30 pb-3">
+                  <BarChart3 className="h-7 w-7 text-blue-400" />
+                  <span>{lastSignal ? 'Latest Analysis' : 'Analysis Results'}</span>
+                </h2>
+                <AnalysisDisplay
+                  analysis={lastRecommendation}
+                  signal={lastSignal}
+                  school={schools.find(s => s.id === selectedSchool)?.name || 'Unknown'}
+                  timestamp={new Date()}
+                  onSendToTelegram={user?.plan === 'elite' && telegramConfig ? handleSendToTelegram : undefined}
+                />
+              </>
+            )}
           </div>
         )}
       </div>
