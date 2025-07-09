@@ -44,8 +44,9 @@ export interface PayPalPaymentResponse {
 
 // Default Plan IDs for reference (update these with your actual PayPal Plan IDs)
 export const PAYPAL_PLAN_IDS = {
-  pro: 'P-06P792050H561492LNBQW6ZA', // Replace with actual PayPal Plan ID
-  elite: 'P-2D270313MK3350614NBQYT3Q'  // This matches your current Elite plan!
+  basic: 'P-BASIC50ANALYSES',
+  pro: 'P-PRO120ANALYSES',
+  elite: 'P-ELITE200ANALYSES'
 };
 
 // Validate PayPal configuration

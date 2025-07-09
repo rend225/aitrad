@@ -195,7 +195,11 @@ const Navbar: React.FC = () => {
                       <p className="text-white font-medium text-sm">
                         {user.displayName || user.email}
                       </p>
-                      <p className="text-gray-400 text-xs capitalize">{user.plan} Plan</p>
+                      <p className={`text-xs capitalize ${
+                        user.plan === 'elite' ? 'text-purple-400' : 
+                        user.plan === 'pro' ? 'text-blue-400' : 
+                        'text-gray-400'
+                      }`}>{user.plan} Plan</p>
                     </div>
                   </div>
 

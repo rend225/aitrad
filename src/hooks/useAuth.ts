@@ -34,12 +34,12 @@ export const useAuth = () => {
                 setUser({ 
                   uid: firebaseUser.uid, 
                   ...userData,
-                  // Ensure these fields exist even if they're not in Firestore
+                  // Ensure these fields exist even if they're not in Firestore - updated for new plan structure
                   displayName: userData.displayName || firebaseUser.displayName || '',
                   email: userData.email || firebaseUser.email || '',
                   photoURL: userData.photoURL || firebaseUser.photoURL || '',
                   isAdmin: userData.isAdmin || false,
-                  plan: planType || 'free',
+                  plan: planType || 'basic',
                   used_today: userData.used_today || 0,
                   recommendation_limit: userData.recommendation_limit || 1
                 } as User);

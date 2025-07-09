@@ -5,7 +5,7 @@ import { getSchools, saveRecommendation, canUserGenerateRecommendation, getUserR
 import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { generateTradingSignalWithRealData } from '../services/gpt';
 import { fetchMultiTimeframeData, generateMockMultiTimeframeData, TRADING_PAIRS, testApiConnection, loadApiKeys } from '../services/marketData';
-import { sendTelegramMessage, formatSignal\ForTelegram } from '../services/telegram';
+import { sendTelegramMessage, formatSignalForTelegram } from '../services/telegram';
 import { db } from '../config/firebase';
 import { School } from '../types';
 import AnalysisDisplay from '../components/AnalysisDisplay';

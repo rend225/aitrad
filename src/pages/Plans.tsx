@@ -38,7 +38,8 @@ import {
   XSquare,
   ChevronDown,
   Mail,
-  MessageCircle
+  MessageCircle,
+  Activity
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -218,25 +219,30 @@ const Plans: React.FC = () => {
   return (
     <div className="min-h-screen py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Hero Section */}
-        <div className="text-center mb-20">
+        {/* Hero Section with Enhanced Gradient */}
+        <div className="text-center mb-20 relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 rounded-3xl -z-10"></div>
+          <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl -z-10"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl -z-10"></div>
+          
           <div className="inline-flex items-center space-x-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-2 mb-6">
             <Sparkles className="h-4 w-4 text-blue-400" />
             <span className="text-blue-400 text-sm font-medium">AI-Powered Trading</span>
           </div>
           
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-8">
             Choose Your
             <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
               {' '}Trading Plan
             </span>
           </h1>
           
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-            Unlock the power of AI-driven trading insights with our comprehensive plans designed for traders at every level
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-10">
+            Unlock the power of AI-driven trading insights with our comprehensive plans designed for traders at every level. 
+            Get access to professional analysis and trading signals to enhance your trading strategy.
           </p>
 
-          <div className="flex flex-wrap justify-center gap-8 text-sm text-gray-400">
+          <div className="flex flex-wrap justify-center gap-8 text-sm text-gray-300">
             <div className="flex items-center space-x-2">
               <CheckCircle className="h-4 w-4 text-green-400" />
               <span>Secure PayPal payments</span>
@@ -400,7 +406,9 @@ const Plans: React.FC = () => {
         )}
 
         {/* Pricing Cards */}
-        <div className="grid lg:grid-cols-3 gap-8 mb-20">
+        <div className="grid lg:grid-cols-3 gap-8 mb-20 relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-blue-600/5 to-purple-600/5 rounded-3xl -z-10 transform scale-105 blur-xl"></div>
+          
           {plans.map((plan, index) => {
             const badge = getPlanBadge(plan);
             const isCurrentPlan = user?.plan === plan.id;
@@ -411,7 +419,7 @@ const Plans: React.FC = () => {
                 key={plan.id}
                 className={`relative bg-white/5 backdrop-blur-sm rounded-2xl border transition-all duration-300 hover:scale-105 hover:bg-white/10 ${
                   plan.popular 
-                    ? 'border-blue-500 ring-2 ring-blue-500/50 shadow-2xl shadow-blue-500/20' 
+                    ? 'border-blue-500 ring-2 ring-blue-500/50 shadow-2xl shadow-blue-500/20 z-10' 
                     : 'border-white/10 hover:border-white/20'
                 } ${index === 1 ? 'lg:scale-110' : ''}`}
               >
@@ -430,7 +438,7 @@ const Plans: React.FC = () => {
                     <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-r ${getPlanGradient(plan.id)} mb-4`}>
                       <div className="text-white">
                         {getPlanIcon(plan.id)}
-                      </div>
+                      </div> 
                     </div>
                     
                     <h3 className="text-2xl font-bold text-white mb-2">
@@ -439,7 +447,7 @@ const Plans: React.FC = () => {
                     
                     <div className="mb-4">
                       <div className="flex items-baseline justify-center">
-                        <span className="text-5xl font-bold text-white">
+                        <span className="text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                           ${plan.price}
                         </span>
                         <span className="text-gray-400 ml-2">/month</span>
@@ -452,7 +460,7 @@ const Plans: React.FC = () => {
                     </div>
 
                     <div className="flex items-center justify-center space-x-2 text-gray-300">
-                      <Clock className="h-4 w-4" />
+                      <Activity className="h-4 w-4 text-blue-400" />
                       <span className="font-medium">
                         {plan.recommendations_per_day} signal{plan.recommendations_per_day !== 1 ? 's' : ''} per day
                       </span>
@@ -460,11 +468,11 @@ const Plans: React.FC = () => {
                   </div>
 
                   {/* Features List */}
-                  <ul className="space-y-4 mb-8">
+                  <ul className="space-y-4 mb-8 px-2">
                     {plan.features.map((feature, featureIndex) => (
                       <li key={featureIndex} className="flex items-start space-x-3">
                         <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center mt-0.5">
-                          <div className="text-green-400">
+                          <div className="text-green-500">
                             {getFeatureIcon(feature)}
                           </div>
                         </div>
@@ -478,15 +486,32 @@ const Plans: React.FC = () => {
                     <div className="text-center">
                       <div className="w-full py-4 px-6 rounded-xl font-semibold bg-green-500/20 text-green-400 border border-green-500/30 flex items-center justify-center space-x-2">
                         <CheckCircle className="h-5 w-5" />
-                        <span>Current Plan</span>
+                        <span>Your Current Plan</span>
                       </div>
                     </div>
-                  ) : plan.id === 'free' ? (
+                  ) : plan.id === 'basic' ? (
                     <button
-                      className="w-full py-4 px-6 rounded-xl font-semibold bg-white/10 text-white border border-white/20 hover:bg-white/20 transition-all"
-                      disabled
+                      onClick={() => {
+                        if (!user) {
+                          window.location.href = '/login';
+                          return;
+                        }
+                        if (!isSupported || !paypalReady) {
+                          if (user?.isAdmin) {
+                            setShowSetupInstructions(true);
+                          } else {
+                            setPaymentError('Payment system is currently unavailable. Please try again later or contact support.');
+                          }
+                          return;
+                        }
+                        setSelectedPlan(plan);
+                        setPaymentError('');
+                        setPaymentSuccess('');
+                      }}
+                      className="w-full py-4 px-6 rounded-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg transition-all flex items-center justify-center space-x-2"
                     >
-                      Free Forever
+                      <span>Get Started</span>
+                      <ArrowRight className="h-4 w-4" />
                     </button>
                   ) : (
                     <>
@@ -515,7 +540,7 @@ const Plans: React.FC = () => {
                               ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                               : plan.popular
                               ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg'
-                              : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
+                              : 'bg-gradient-to-r from-blue-600/80 to-purple-600/80 hover:from-blue-700/80 hover:to-purple-700/80 text-white shadow-lg'
                           }`}
                         >
                           {!user ? (
@@ -538,7 +563,7 @@ const Plans: React.FC = () => {
                       ) : (
                         <div className="space-y-4">
                           {paymentLoading && (
-                            <div className="bg-blue-500/10 border border-blue-500/20 text-blue-400 px-4 py-3 rounded-lg flex items-center space-x-2">
+                            <div className="bg-blue-500/10 border border-blue-500/20 text-blue-400 px-4 py-3 rounded-lg flex items-center space-x-2 shadow-inner">
                               <Loader className="h-4 w-4 animate-spin" />
                               <span>Processing subscription...</span>
                             </div>
@@ -567,7 +592,7 @@ const Plans: React.FC = () => {
                               setPaymentSuccess('');
                             }}
                             disabled={paymentLoading}
-                            className="w-full py-2 px-4 rounded-lg text-sm text-gray-400 hover:text-white border border-gray-600 hover:border-gray-400 transition-colors disabled:opacity-50"
+                            className="w-full py-2 px-4 rounded-lg text-sm text-gray-400 hover:text-white border border-gray-600 hover:border-gray-400 transition-colors disabled:opacity-50 bg-black/20"
                           >
                             Cancel
                           </button>
@@ -582,17 +607,19 @@ const Plans: React.FC = () => {
         </div>
 
         {/* Features Comparison */}
-        <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 mb-20">
-          <h3 className="text-2xl font-bold text-white text-center mb-8">
+        <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-2xl p-8 border border-white/10 shadow-xl mb-20">
+          <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent text-center mb-8">
             Why Choose AI Trader?
           </h3>
           
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-8 mt-10">
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <BarChart3 className="h-8 w-8 text-white" />
+              <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg transform hover:scale-110 transition-transform">
+                <div className="text-white">
+                  <BarChart3 className="h-10 w-10" />
+                </div>
               </div>
-              <h4 className="text-xl font-semibold text-white mb-2">
+              <h4 className="text-xl font-bold text-white mb-3">
                 Advanced AI Analysis
               </h4>
               <p className="text-gray-300">
@@ -601,10 +628,12 @@ const Plans: React.FC = () => {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Shield className="h-8 w-8 text-white" />
+              <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg transform hover:scale-110 transition-transform">
+                <div className="text-white">
+                  <Shield className="h-10 w-10" />
+                </div>
               </div>
-              <h4 className="text-xl font-semibold text-white mb-2">
+              <h4 className="text-xl font-bold text-white mb-3">
                 Secure Payments
               </h4>
               <p className="text-gray-300">
@@ -613,10 +642,12 @@ const Plans: React.FC = () => {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Users className="h-8 w-8 text-white" />
+              <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg transform hover:scale-110 transition-transform">
+                <div className="text-white">
+                  <Users className="h-10 w-10" />
+                </div>
               </div>
-              <h4 className="text-xl font-semibold text-white mb-2">
+              <h4 className="text-xl font-bold text-white mb-3">
                 Trusted by Thousands
               </h4>
               <p className="text-gray-300">
@@ -627,21 +658,24 @@ const Plans: React.FC = () => {
         </div>
 
         {/* Enterprise CTA */}
-        <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-sm rounded-2xl p-12 border border-blue-500/30 text-center">
+        <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-sm rounded-2xl p-12 border border-blue-500/30 text-center shadow-2xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5"></div>
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500"></div>
+          
           <div className="max-w-3xl mx-auto">
-            <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-xl transform hover:scale-110 transition-transform">
               <Crown className="h-10 w-10 text-white" />
             </div>
             
-            <h3 className="text-3xl font-bold text-white mb-4">
+            <h3 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-6">
               Need a Custom Solution?
             </h3>
             
-            <p className="text-xl text-gray-300 mb-8">
+            <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
               Get enterprise-grade features, custom integrations, and dedicated support for your organization
             </p>
 
-            <div className="flex flex-wrap justify-center gap-6 mb-8 text-sm text-gray-300">
+            <div className="flex flex-wrap justify-center gap-6 mb-10 text-sm text-gray-300">
               <div className="flex items-center space-x-2">
                 <CheckCircle className="h-4 w-4 text-green-400" />
                 <span>Custom API integrations</span>
@@ -662,7 +696,7 @@ const Plans: React.FC = () => {
 
             <button 
               onClick={() => window.location.href = 'mailto:enterprise@aitrader.com?subject=Enterprise Inquiry'}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold transition-all transform hover:scale-105 flex items-center space-x-2 mx-auto"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-10 py-4 rounded-xl font-semibold transition-all transform hover:scale-105 flex items-center space-x-2 mx-auto shadow-xl"
             >
               <span>Contact Sales Team</span>
               <ArrowRight className="h-5 w-5" />
@@ -671,18 +705,18 @@ const Plans: React.FC = () => {
         </div>
 
         {/* FAQ Section */}
-        <div className="mt-20">
+        <div className="mt-24">
           <div className="text-center mb-12">
-            <h3 className="text-2xl font-bold text-white mb-4">
+            <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-6">
               Frequently Asked Questions
             </h3>
-            <p className="text-gray-300 mb-6">
+            <p className="text-gray-300 mb-10 max-w-2xl mx-auto">
               Find answers to common questions about our plans and features
             </p>
           </div>
           
-          <div className="max-w-3xl mx-auto space-y-4">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 overflow-hidden">
+          <div className="max-w-3xl mx-auto space-y-5">
+            <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl border border-white/10 shadow-xl overflow-hidden">
               <button
                 onClick={() => setExpandedFAQ(expandedFAQ === 'faq-1' ? null : 'faq-1')}
                 className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-white/5 transition-colors"
@@ -697,13 +731,13 @@ const Plans: React.FC = () => {
               {expandedFAQ === 'faq-1' && (
                 <div className="px-6 pb-4">
                   <p className="text-gray-300 leading-relaxed">
-                    Our Free plan includes 1 signal per day with basic analysis. The Pro plan offers 5 signals daily with advanced analysis and priority support. The Elite plan provides 15 signals per day, VIP analysis, 24/7 support, custom strategies, and API access for automated trading.
+                    Our Basic plan includes 50 analyses per month with basic analysis features. The Pro plan offers 120 analyses per month with advanced analysis and priority support. The Elite plan provides 200 analyses per month, VIP analysis, 24/7 support, custom strategies, Telegram integration, MetaTrader integration, and API access for automated trading.
                   </p>
                 </div>
               )}
             </div>
             
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 overflow-hidden">
+            <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl border border-white/10 shadow-xl overflow-hidden">
               <button
                 onClick={() => setExpandedFAQ(expandedFAQ === 'faq-2' ? null : 'faq-2')}
                 className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-white/5 transition-colors"
@@ -724,7 +758,7 @@ const Plans: React.FC = () => {
               )}
             </div>
             
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 overflow-hidden">
+            <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl border border-white/10 shadow-xl overflow-hidden">
               <button
                 onClick={() => setExpandedFAQ(expandedFAQ === 'faq-3' ? null : 'faq-3')}
                 className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-white/5 transition-colors"
@@ -745,7 +779,7 @@ const Plans: React.FC = () => {
               )}
             </div>
             
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 overflow-hidden">
+            <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl border border-white/10 shadow-xl overflow-hidden">
               <button
                 onClick={() => setExpandedFAQ(expandedFAQ === 'faq-4' ? null : 'faq-4')}
                 className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-white/5 transition-colors"
@@ -766,6 +800,50 @@ const Plans: React.FC = () => {
               )}
             </div>
           </div>
+
+          <div className="max-w-3xl mx-auto space-y-5 mt-5">
+            <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl border border-white/10 shadow-xl overflow-hidden">
+              <button
+                onClick={() => setExpandedFAQ(expandedFAQ === 'faq-5' ? null : 'faq-5')}
+                className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-white/5 transition-colors"
+              >
+                <span className="text-white font-semibold">How does the Telegram integration work?</span>
+                <ChevronDown
+                  className={`h-5 w-5 text-gray-400 transition-transform ${
+                    expandedFAQ === 'faq-5' ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+              {expandedFAQ === 'faq-5' && (
+                <div className="px-6 pb-4">
+                  <p className="text-gray-300 leading-relaxed">
+                    With our Elite plan, you can connect your Telegram account to receive trading signals directly in your Telegram channel or group. Simply set up a Telegram bot, add it to your channel, and configure the integration in your account settings. Whenever you generate a new trading signal, you can send it to your Telegram channel with one click.
+                  </p>
+                </div>
+              )}
+            </div>
+            
+            <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl border border-white/10 shadow-xl overflow-hidden">
+              <button
+                onClick={() => setExpandedFAQ(expandedFAQ === 'faq-6' ? null : 'faq-6')}
+                className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-white/5 transition-colors"
+              >
+                <span className="text-white font-semibold">What is the MetaTrader integration?</span>
+                <ChevronDown
+                  className={`h-5 w-5 text-gray-400 transition-transform ${
+                    expandedFAQ === 'faq-6' ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+              {expandedFAQ === 'faq-6' && (
+                <div className="px-6 pb-4">
+                  <p className="text-gray-300 leading-relaxed">
+                    The MetaTrader integration, available exclusively with our Elite plan, allows you to connect your MetaTrader 4 or 5 account to our platform. This enables you to receive signals directly in your trading terminal and even execute trades automatically based on our AI recommendations. The integration is secure and requires minimal setup.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
           
           <div className="text-center mt-8">
             <Link to="/" className="text-blue-400 hover:text-blue-300 inline-flex items-center space-x-2">
@@ -776,24 +854,24 @@ const Plans: React.FC = () => {
         </div>
 
         {/* Contact CTA */}
-        <div className="mt-20 text-center">
-          <h3 className="text-2xl font-bold text-white mb-4">
+        <div className="mt-24 text-center">
+          <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-6">
             Questions? We're here to help
           </h3>
-          <p className="text-gray-300 mb-6">
+          <p className="text-gray-300 mb-8 max-w-2xl mx-auto">
             Contact our support team for any questions about our plans and features
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-5 justify-center">
             <button 
               onClick={() => window.location.href = 'mailto:support@aitrader.com?subject=Plan Question'}
-              className="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-lg font-medium transition-all border border-white/20 flex items-center justify-center space-x-2"
+              className="bg-gradient-to-r from-blue-600/80 to-purple-600/80 hover:from-blue-700/80 hover:to-purple-700/80 text-white px-8 py-4 rounded-xl font-semibold transition-all shadow-lg flex items-center justify-center space-x-2"
             >
               <Mail className="h-4 w-4" />
               <span>Email Support</span>
             </button>
             <button
               onClick={() => alert('Live chat feature coming soon!')}
-              className="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-lg font-medium transition-all border border-white/20 flex items-center justify-center space-x-2"
+              className="bg-gradient-to-r from-green-600/80 to-teal-600/80 hover:from-green-700/80 hover:to-teal-700/80 text-white px-8 py-4 rounded-xl font-semibold transition-all shadow-lg flex items-center justify-center space-x-2"
             >
               <MessageCircle className="h-4 w-4" />
               <span>Live Chat</span>

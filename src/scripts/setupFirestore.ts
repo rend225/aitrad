@@ -4,45 +4,51 @@ import { db } from '../config/firebase';
 // Plans data - Updated for PayPal integration
 const plansData = [
   {
-    id: 'free',
-    name: 'Free',
-    price: 0,
-    recommendations_per_day: 1,
+    id: 'basic',
+    name: 'Basic',
+    price: 10.50,
+    recommendations_per_day: 50,
     features: [
-      '1 signal per day',
+      '50 analyses per month',
       'Basic analysis',
-      'Email support'
+      'Email support',
+      'Market data access',
+      'Historical signals'
     ],
-    paypal_plan_id: '',
+    paypal_plan_id: 'P-BASIC50ANALYSES',
     popular: false
   },
   {
     id: 'pro',
     name: 'Pro',
-    price: 29.99,
-    recommendations_per_day: 5,
+    price: 19,
+    recommendations_per_day: 120,
     features: [
-      '5 signals per day',
+      '120 analyses per month',
       'Advanced analysis',
       'Priority support',
-      'Historical data'
+      'Historical data',
+      'Multiple trading schools',
+      'Custom risk parameters'
     ],
-    paypal_plan_id: 'P-5ML4271244454362WXNWU5NQ', // Replace with actual PayPal Plan ID
+    paypal_plan_id: 'P-PRO120ANALYSES',
     popular: true
   },
   {
     id: 'elite',
     name: 'Elite',
-    price: 99,
-    recommendations_per_day: 15,
+    price: 29,
+    recommendations_per_day: 200,
     features: [
-      '15 signals per day',
+      '200 analyses per month',
       'VIP analysis',
       '24/7 support',
       'Custom strategies',
-      'API access'
+      'API access',
+      'Telegram integration',
+      'MetaTrader integration'
     ],
-    paypal_plan_id: 'P-6XL9876543210987YXOWV6PR', // Replace with actual PayPal Plan ID
+    paypal_plan_id: 'P-ELITE200ANALYSES',
     popular: false
   }
 ];
@@ -97,9 +103,9 @@ export const setupPlans = async () => {
     console.log('🎉 All plans setup completed!');
     console.log('');
     console.log('📊 PAYMENT SYSTEM STATUS (PayPal Integration):');
-    console.log('✅ Free Plan - Ready');
-    console.log('✅ Pro Plan ($29.99/month) - PayPal Ready');
-    console.log('✅ Elite Plan ($99/month) - PayPal Ready');
+    console.log('✅ Basic Plan ($10.50/month) - PayPal Ready');
+    console.log('✅ Pro Plan ($19/month) - PayPal Ready');
+    console.log('✅ Elite Plan ($29/month) - PayPal Ready');
     console.log('');
     console.log('🎯 PayPal Configuration:');
     console.log('• Secure payment processing');
@@ -141,8 +147,9 @@ export const setupAllFirestoreData = async () => {
     console.log('✨ Firestore setup completed successfully!');
     console.log('');
     console.log('📊 FINAL CONFIGURATION:');
-    console.log('✅ Pro Plan: $29.99/month - PayPal Integration Ready');
-    console.log('✅ Elite Plan: $99/month - PayPal Integration Ready');
+    console.log('✅ Basic Plan: $10.50/month - PayPal Integration Ready');
+    console.log('✅ Pro Plan: $19/month - PayPal Integration Ready');
+    console.log('✅ Elite Plan: $29/month - PayPal Integration Ready');
     console.log('✅ All trading schools configured');
     console.log('✅ Payment system ready for PayPal');
     console.log('');
