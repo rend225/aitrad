@@ -245,6 +245,19 @@ export const getUserRecommendations = async (userId: string, limitCount = 10) =>
     console.error('❌ Error fetching user recommendations:', error);
     throw error;
   }
+    const snapshot = await getDocs(q);
+    
+    if (snapshot.empty) {
+      console.log('ℹ️ No recommendations found for user');
+      return [];
+    }
+    
+    console.log(`✅ Found ${snapshot.docs.length} recommendations`);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Recommendation[];
+  } catch (error) {
+    console.error('❌ Error fetching user recommendations:', error);
+    throw error;
+  }
 };
 
 // Featured Signals - Admin curated examples for homepage
