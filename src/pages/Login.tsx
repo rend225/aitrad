@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useTranslation } from '../contexts/TranslationContext';
 import { loginUser, resendVerificationEmail, checkEmailVerification } from '../services/auth';
 import { Mail, Lock, Eye, EyeOff, TrendingUp, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 import SocialLoginButtons from '../components/SocialLoginButtons';
 
 const Login: React.FC = () => {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);

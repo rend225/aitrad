@@ -4,6 +4,7 @@ import { useTranslation as useI18nTranslation } from 'react-i18next';
 interface TranslationContextType {
   language: string;
   setLanguage: (lang: string) => void;
+  t: (key: string) => string;
   translate: (text: string) => Promise<string>;
   isTranslating: boolean;
   isRTL: boolean;
@@ -16,7 +17,7 @@ interface TranslationProviderProps {
 }
 
 export const TranslationProvider: React.FC<TranslationProviderProps> = ({ children }) => {
-  const { i18n } = useI18nTranslation();
+  const { i18n, t } = useI18nTranslation();
   const [isTranslating, setIsTranslating] = useState(false);
   const [isRTL, setIsRTL] = useState(false);
 
@@ -82,6 +83,7 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({ childr
     <TranslationContext.Provider value={{ 
       language: i18n.language, 
       setLanguage, 
+      t,
       translate, 
       isTranslating,
       isRTL

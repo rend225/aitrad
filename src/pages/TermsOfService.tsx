@@ -1,9 +1,9 @@
 import React from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useTranslation } from '../contexts/TranslationContext';
 import { FileText, AlertTriangle, Shield, Scale, Users, Mail } from 'lucide-react';
 
 const TermsOfService: React.FC = () => {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useTranslation } from '../contexts/TranslationContext';
 import { getFeaturedSignals } from '../services/firestore';
 import ChatSupport from '../components/ChatSupport';
 import { 
@@ -47,7 +47,7 @@ interface FeaturedSignal {
 }
 
 const LandingPage: React.FC = () => {
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL } = useTranslation();
   const [featuredSignals, setFeaturedSignals] = useState<FeaturedSignal[]>([]);
   const [currentSignalIndex, setCurrentSignalIndex] = useState(0);
   const [loading, setLoading] = useState(true);

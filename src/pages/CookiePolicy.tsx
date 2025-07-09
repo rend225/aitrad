@@ -1,9 +1,9 @@
 import React from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useTranslation } from '../contexts/TranslationContext';
 import { Cookie, Settings, BarChart3, Shield, Eye, Mail } from 'lucide-react';
 
 const CookiePolicy: React.FC = () => {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">

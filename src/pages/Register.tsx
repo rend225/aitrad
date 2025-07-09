@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useTranslation } from '../contexts/TranslationContext';
 import { registerUser } from '../services/auth';
 import { Mail, Lock, Eye, EyeOff, TrendingUp, User, CheckCircle, AlertCircle } from 'lucide-react';
 import SocialLoginButtons from '../components/SocialLoginButtons';
 
 const Register: React.FC = () => {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const selectedPlan = searchParams.get('plan');
   
