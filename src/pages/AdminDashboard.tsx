@@ -32,7 +32,12 @@ import {
   Percent,
   Target,
   Wifi,
-  WifiOff
+  WifiOff,
+  Globe,
+  Info,
+  Eye,
+  Star,
+  Trash2
 } from 'lucide-react';
 import ChatAdmin from '../components/ChatAdmin';
 import DailyResetManager from '../components/DailyResetManager';

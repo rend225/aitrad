@@ -494,24 +494,46 @@ export const getAllUsers = async () => {
 // Get all recommendations across all users (admin only)
 export const getAllRecommendations = async (limitCount = 50) => {
   try {
-    // This is a simplified approach - in production you might want to use a different structure
-    // For now, we'll get recommendations from all users
-    const users = await getAllUsers();
-    const allRecommendations: Recommendation[] = [];
+    console.log('Fetching all recommendations for admin...');
     
-    for (const user of users.slice(0, 10)) { // Limit to first 10 users to avoid quota issues
-      try {
-        const userRecs = await getUserRecommendations(user.uid, 5);
-        allRecommendations.push(...userRecs);
-      } catch (error) {
-        console.warn(`Failed to get recommendations for user ${user.uid}:`, error);
+    // Try to get a sample of recommendations from the root collection
+    // This is a workaround for the subcollection structure
+    try {
+      // First, try to get users to iterate through their recommendations
+      const users = await getAllUsers();
+      const allRecommendations: Recommendation[] = [];
+      
+      // Limit to first 5 users to avoid quota issues and permission errors
+      for (const user of users.slice(0, 5)) {
+        try {
+          const userRecs = await getUserRecommendations(user.uid, 3);
+          allRecommendations.push(...userRecs.map(rec => ({
+            ...rec,
+            userId: user.uid // Ensure userId is set
+          })));
+        } catch (error) {
+          console.warn(`Skipping recommendations for user ${user.uid}:`, error.message);
+          // Continue with other users instead of failing completely
+        }
       }
+      
+      // Sort by timestamp and limit
+      const sortedRecs = allRecommendations
+        .filter(rec => rec.timestamp) // Only include recs with timestamps
+        .sort((a, b) => {
+          const aTime = a.timestamp?.toDate?.() || new Date(0);
+          const bTime = b.timestamp?.toDate?.() || new Date(0);
+          return bTime.getTime() - aTime.getTime();
+        })
+        .slice(0, limitCount);
+      
+      console.log(`Successfully fetched ${sortedRecs.length} recommendations`);
+      return sortedRecs;
+      
+    } catch (error) {
+      console.warn('Could not fetch user recommendations, returning empty array:', error);
+      return [];
     }
-    
-    // Sort by timestamp and limit
-    return allRecommendations
-      .sort((a, b) => b.timestamp.toDate().getTime() - a.timestamp.toDate().getTime())
-      .slice(0, limitCount);
   } catch (error) {
     console.error('Error fetching all recommendations:', error);
     return [];
