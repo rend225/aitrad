@@ -75,9 +75,31 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
   const formatAnalysisForDisplay = (text: string) => {
     // Split analysis into sections for better readability
     const sections = text.split(/\n\n+/);
+    
+    // Function to check if a section is about ICT Smart Money Logic
+    const isICTSection = (text: string) => {
+      return text.toLowerCase().includes('ict smart money') || 
+             text.toLowerCase().includes('smart money logic') ||
+             text.toLowerCase().includes('institutional order flow');
+    };
 
     // Function to format section titles with custom styling
     const formatSectionTitle = (title: string, content: string) => {
+      // Special styling for ICT Smart Money Logic section
+      if (isICTSection(title)) {
+        return (
+          <div className="mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent mb-4 flex items-center space-x-2 border-b border-blue-400/30 pb-3">
+              <Zap className="h-6 w-6 md:h-7 md:w-7 text-blue-400" />
+              <span>{title.trim().toUpperCase()}</span>
+            </h2>
+            <div className="text-gray-200 leading-relaxed text-sm md:text-base bg-blue-500/5 p-5 rounded-xl border border-blue-500/20 shadow-inner">
+              {content.trim()}
+            </div>
+          </div>
+        );
+      }
+      
       // Special styling for Invalidation section
       if (title.toLowerCase().includes('invalidation') || title.toLowerCase().includes('no-trade')) {
         return (
@@ -148,6 +170,24 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
       
       // Check for indicator sections
       const isIndicatorSection = /^🎯\s*Indicator Use|^📌\s*Strict Trading Rules|^🔶\s*Definition of a "Strong Zone"|^📊\s*Multi-Timeframe Context|^📈\s*Execution Timeframes|^🎯\s*Trade Setup|^🧠\s*Justification|^⚠\s*Invalidation|^✅\s*Final Output Format/i.test(section.trim());
+      
+      // Check for ICT Smart Money Logic sections
+      const isICTSmartMoneySection = isICTSection(section);
+      
+      if (isICTSmartMoneySection) {
+        return (
+          <div key={index} className="mb-6 bg-blue-500/10 p-5 rounded-xl border border-blue-500/20 shadow-lg">
+            <h3 className="text-xl font-bold text-blue-400 mb-3 border-b border-blue-500/30 pb-2">
+              ICT SMART MONEY LOGIC
+            </h3>
+            <div className="text-gray-200 leading-relaxed text-sm md:text-base">
+              {section.trim().split('\n').map((line, i) => (
+                <p key={i} className="mb-2">{line.trim()}</p>
+              ))}
+            </div>
+          </div>
+        );
+      }
 
       // Special styling for Invalidation sections
       const isInvalidationSection = /^⚠\s*Invalidation|No-Trade Criteria/i.test(section.trim());
@@ -186,7 +226,7 @@ const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({
         <div key={index} className="mb-5 text-gray-300 leading-relaxed text-sm md:text-base">
           {section.trim().split('\n').map((line, i) => {
             // Bold any text between ** or that starts with "Invalidation:"
-            if (line.includes('**') || line.toLowerCase().includes('invalidation:')) {
+            if (line.includes('**') || line.toLowerCase().includes('invalidation:') || line.toLowerCase().includes('ict smart money')) {
               return (
                 <p key={i} className="mb-2 font-bold text-white">
                   {line.trim().replace(/\*\*/g, '')}

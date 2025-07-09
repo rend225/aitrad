@@ -5,6 +5,7 @@
 /* Custom CSS Variables */
 :root {
   --blue-500-rgb: 59, 130, 246;
+  --blue-600-rgb: 37, 99, 235;
   --purple-500-rgb: 168, 85, 247;
   --gray-500-rgb: 107, 114, 128;
 }
@@ -185,6 +186,27 @@ a:focus {
   font-size: 1.25rem;
   line-height: 1.5rem;
   color: theme('colors.purple.400');
+}
+
+/* ICT Smart Money Logic styling */
+.prose h2:has(span:contains("ICT")),
+.prose h2:has(span:contains("SMART MONEY")),
+.prose h3:has(span:contains("ICT")),
+.prose h3:has(span:contains("SMART MONEY")) {
+  color: theme('colors.blue.400');
+  font-size: 1.75rem;
+  line-height: 2.25rem;
+  border-bottom-color: rgba(96, 165, 250, 0.3);
+  text-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
+}
+
+.ict-section {
+  background: linear-gradient(to right, rgba(37, 99, 235, 0.05), rgba(59, 130, 246, 0.1));
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 /* Special styling for invalidation sections */

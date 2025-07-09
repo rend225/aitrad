@@ -55,6 +55,7 @@ const Dashboard: React.FC = () => {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [apiStatus, setApiStatus] = useState<'unknown' | 'connected' | 'error'>('unknown');
   const [loadingLatestAnalysis, setLoadingLatestAnalysis] = useState(false);
+  const [showICTSection, setShowICTSection] = useState(true);
   const [telegramConfig, setTelegramConfig] = useState<any>(null);
   const [copiedPrompt, setCopiedPrompt] = useState(false);
   const [userStats, setUserStats] = useState({
@@ -589,10 +590,47 @@ ${jsonData}`;
           {/* Signal Generator - Mobile Responsive */}
           <div className="lg:col-span-2">
             <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-4 sm:p-6 lg:p-8 border border-white/10 shadow-xl">
-              <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4 sm:mb-6 flex items-center space-x-2 border-b border-blue-500/30 pb-3">
+              <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4 sm:mb-6 flex items-center space-x-2 border-b border-blue-500/30 pb-3 justify-between">
                 <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-blue-400" />
                 <span>{t('signal.title')}</span>
               </h2>
+
+              {/* ICT Smart Money Logic Section */}
+              {showICTSection && (
+                <div className="mb-6 bg-gradient-to-r from-blue-600/10 to-blue-400/10 rounded-xl p-5 border border-blue-500/20 shadow-lg">
+                  <div className="flex items-center justify-between mb-3 border-b border-blue-500/20 pb-2">
+                    <h3 className="text-xl font-bold text-blue-400 flex items-center space-x-2">
+                      <Zap className="h-5 w-5 text-blue-400" />
+                      <span>ICT SMART MONEY LOGIC</span>
+                    </h3>
+                    <button 
+                      onClick={() => setShowICTSection(false)}
+                      className="text-blue-400 hover:text-blue-300"
+                    >
+                      ×
+                    </button>
+                  </div>
+                  <div className="text-gray-200 text-sm space-y-3">
+                    <p className="font-medium">
+                      Trading based on <span className="text-blue-400 font-bold">Institutional Order Flow</span> and market structure:
+                    </p>
+                    <ul className="space-y-2 pl-5">
+                      <li className="flex items-start space-x-2">
+                        <span className="text-blue-400 font-bold">•</span>
+                        <span>Focus on <span className="text-blue-400 font-bold">Supply & Demand zones</span> where institutions enter positions</span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <span className="text-blue-400 font-bold">•</span>
+                        <span>Look for <span className="text-blue-400 font-bold">liquidity sweeps</span> and <span className="text-blue-400 font-bold">fair value gaps (FVGs)</span></span>
+                      </li>
+                      <li className="flex items-start space-x-2">
+                        <span className="text-blue-400 font-bold">•</span>
+                        <span>Trade with the <span className="text-blue-400 font-bold">smart money</span>, not against it</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-4 sm:space-y-6">
                 {/* Trading Pair Selection */}
@@ -911,7 +949,7 @@ ${jsonData}`;
               <div className="mb-6 pb-6 border-b border-gradient-to-r from-blue-500/30 to-purple-500/30">
                 <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4 flex items-center space-x-3">
                   <BarChart3 className="h-8 w-8 text-blue-400" />
-                  <span>Trading Analysis Results</span>
+                  <span>Smart Money Analysis Results</span>
                 </h2>
                 <p className="text-gray-300 text-lg">
                   Professional AI-powered trading signal for {lastSignal?.pair || 'your selected asset'}
