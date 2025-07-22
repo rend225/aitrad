@@ -4,7 +4,7 @@ import { useTranslation } from '../contexts/TranslationContext';
 import { getSchools, saveRecommendation, canUserGenerateRecommendation } from '../services/firestore';
 import { doc, getDoc, onSnapshot, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { generateTradingSignalWithRealData } from '../services/gpt';
-import { fetchMultiTimeframeData, generateMockMultiTimeframeData, TRADING_PAIRS, testApiConnection, loadApiKeys, apiKeys, apiKeysLoaded, initializeMarketData } from '../services/marketData';
+import { fetchMultiTimeframeData, generateMockMultiTimeframeData, TRADING_PAIRS, testApiConnection, loadApiKeys, apiKeysLoaded, initializeMarketData } from '../services/marketData';
 import { sendTelegramMessage, formatSignalForTelegram } from '../services/telegram';
 import { db } from '../config/firebase';
 import { School } from '../types';
