@@ -1,35 +1,5 @@
-// Enhanced market data service with better error handling and API connection
-import { getSetting, updateSetting } from './firestore';
-
-// API key management
-let currentApiKeyIndex = 0;
-export let apiKeys: string[] = [];
-// Flag to track if API keys have been loaded
-export let apiKeysLoaded = false;
-
-// Initialize with the default key
-const DEFAULT_API_KEY = import.meta.env.VITE_TWELVE_DATA_API_KEY || "6a49114a1cf942fe994ac33328d6c2c8";
-
-// Function to initialize market data
-export const initializeMarketData = async () => {
-  try {
-    console.log('🔄 Initializing market data service...');
-    
-    // Load API keys if not already loaded
-    if (apiKeys.length === 0 || !apiKeysLoaded) {
-      await loadApiKeys();
-    }
-    
-    // Test API connection
-    const isConnected = await testApiConnection();
-    console.log(`✅ API connection test result: ${isConnected ? 'Connected' : 'Error'}`);
-    
-    return isConnected;
-  } catch (error) {
-    console.error('❌ Error initializing market data:', error);
-    return false;
-  }
-};
+// Enhanced market data service using local MT5 Flask server
+export let apiKeysLoaded = false; // Keep for compatibility but not used
 
 export interface CandleData {
   datetime: string;
@@ -66,162 +36,27 @@ export const TRADING_PAIRS = [
   { symbol: 'ETHUSD', name: 'Ethereum', category: 'Crypto' },
 ];
 
-// Symbol mapping for TwelveData API compatibility
-const SYMBOL_MAPPING: { [key: string]: string } = {
-  'XAUUSD': 'XAU/USD',
-  'EURUSD': 'EUR/USD',
-  'GBPUSD': 'GBP/USD',
-  'USDJPY': 'USD/JPY',
-  'USDCHF': 'USD/CHF',
-  'AUDUSD': 'AUD/USD',
-  'USDCAD': 'USD/CAD',
-  'NZDUSD': 'NZD/USD',
-  'SPX': 'SPX',
-  'NDX': 'NDX',
-  'DJI': 'DJI',
-  'BTCUSD': 'BTC/USD',
-  'ETHUSD': 'ETH/USD'
-};
+// MT5 Flask server configuration
+const MT5_SERVER_URL = 'http://192.168.8.100:5000';
 
-// Get the correct symbol format for TwelveData API
-const getApiSymbol = (symbol: string): string => {
-  return SYMBOL_MAPPING[symbol.toUpperCase()] || symbol;
-};
-
-// Load API keys from Firestore
-export const loadApiKeys = async (): Promise<string[]> => {
+// Function to initialize market data (simplified for MT5)
+export const initializeMarketData = async () => {
   try {
-    // Skip if already loaded
-    if (apiKeysLoaded && apiKeys.length > 0) {
-      console.log(`ℹ️ API keys already loaded (${apiKeys.length} keys)`);
-      return apiKeys;
-    }
+    console.log('🔄 Initializing MT5 market data service...');
     
-    // Skip if already loaded
-    if (apiKeysLoaded && apiKeys.length > 0) {
-      console.log(`ℹ️ API keys already loaded (${apiKeys.length} keys)`);
-      return apiKeys;
-    }
+    // Test MT5 server connection
+    const isConnected = await testApiConnection();
+    console.log(`✅ MT5 server connection test result: ${isConnected ? 'Connected' : 'Error'}`);
     
-    const apiSettings = await getSetting('marketData');
-    if (apiSettings && apiSettings.apiKeys && Array.isArray(apiSettings.apiKeys)) {
-      apiKeys = apiSettings.apiKeys.filter(key => key && key.trim() !== '');
-      
-      // Always ensure the default key is included if not already present
-      if (DEFAULT_API_KEY && !apiKeys.includes(DEFAULT_API_KEY)) {
-        apiKeys.unshift(DEFAULT_API_KEY);
-      }
-      
-      console.log(`✅ Loaded ${apiKeys.length} API keys for market data`);
-    } else {
-      // If no keys in Firestore, use the default key
-      console.log('ℹ️ No API keys found in database, using default key');
-      console.log('ℹ️ No API keys found in database, using default key');
-      apiKeys = [DEFAULT_API_KEY];
-      console.log('ℹ️ Using default API key for market data');
-    }
-    
-    apiKeysLoaded = true;
-    apiKeysLoaded = true;
-    return apiKeys;
+    return isConnected;
   } catch (error) {
-    console.error('❌ Error loading API keys:', error);
-    console.log('ℹ️ Falling back to default API key');
-    console.log('ℹ️ Falling back to default API key');
-    
-    // Fallback to default key
-    apiKeys = [DEFAULT_API_KEY];
-    apiKeysLoaded = true;
-    apiKeysLoaded = true;
-    return apiKeys;
-  }
-};
-
-// Get the current API key
-export const getCurrentApiKey = (): string => {
-  // If no keys are loaded, return the default key without loading from database
-  // If no keys are loaded, return the default key without loading from database
-  if (apiKeys.length === 0) {
-    return DEFAULT_API_KEY;
-  }
-  return apiKeys[currentApiKeyIndex];
-};
-
-// Rotate to the next API key - now used proactively, not just on errors
-export const rotateApiKey = (): string => {
-  if (apiKeys.length <= 1) {
-    console.log('ℹ️ Only one API key available, no rotation needed');
-    console.log('ℹ️ Only one API key available, no rotation needed');
-    return getCurrentApiKey();
-  }
-  
-  currentApiKeyIndex = (currentApiKeyIndex + 1) % apiKeys.length;
-  const newKey = getCurrentApiKey();
-  console.log(`🔄 Rotating to API key ${currentApiKeyIndex + 1}/${apiKeys.length}`);
-  return newKey;
-};
-
-// Add a new API key
-export const addApiKey = async (newKey: string): Promise<boolean> => {
-  if (!newKey || newKey.trim() === '') {
-    return false;
-  }
-  
-  // Don't add duplicates
-  if (apiKeys.includes(newKey)) {
-    return false;
-  }
-  
-  try {
-    // Add to local array
-    console.log(`🔄 Adding new API key to collection`);
-    apiKeys.push(newKey);
-    
-    // Save to Firestore
-    await updateSetting('marketData', { apiKeys });
-    
-    console.log(`✅ Added new API key. Total keys: ${apiKeys.length}`);
-    return true;
-  } catch (error) {
-    console.error('❌ Error adding API key:', error);
+    console.error('❌ Error initializing MT5 market data:', error);
     return false;
   }
 };
 
-// Remove an API key
-export const removeApiKey = async (keyToRemove: string): Promise<boolean> => {
-  if (!keyToRemove || apiKeys.length <= 1) {
-    return false;
-  }
-  
-  try {
-    // Remove from local array
-    console.log(`🔄 Removing API key from collection`);
-    apiKeys = apiKeys.filter(key => key !== keyToRemove);
-    
-    // Reset index if needed
-    if (currentApiKeyIndex >= apiKeys.length) {
-      currentApiKeyIndex = 0;
-    }
-    
-    // Save to Firestore
-    await updateSetting('marketData', { apiKeys });
-    
-    console.log(`✅ Removed API key. Total keys: ${apiKeys.length}`);
-    return true;
-  } catch (error) {
-    console.error('❌ Error removing API key:', error);
-    return false;
-  }
-};
-
-// Validate API key and symbol
+// Validate parameters
 const validateApiParams = (symbol: string) => {
-  if (apiKeys.length === 0) {
-    console.log('❌ No API keys available for market data');
-    throw new Error('No TwelveData API keys configured');
-  }
-  
   if (!symbol || symbol.trim() === '') {
     throw new Error('Symbol parameter is required');
   }
@@ -229,41 +64,28 @@ const validateApiParams = (symbol: string) => {
   return true;
 };
 
-// Fetch candlestick data with sequential API key rotation
+// Fetch candlestick data from MT5 Flask server
 export const fetchCandlestickData = async (
   symbol: string, 
   interval: string, 
-  count: number,
-  maxRetries: number = 3
+  count: number
 ): Promise<CandleData[]> => {  
   // Validate parameters
   validateApiParams(symbol);
   
-  // Get the correct API symbol format
-  const apiSymbol = getApiSymbol(symbol);
+  const cleanSymbol = symbol.trim().toUpperCase();
   
-  // Rotate API key for each new request - sequential rotation
-  const currentKey = rotateApiKey();
-  
-  console.log(`📈 Fetching ${interval} data for ${apiSymbol} (${symbol}) with API key ${currentApiKeyIndex + 1}/${apiKeys.length}...`);
+  console.log(`📈 Fetching ${interval} data for ${cleanSymbol} from MT5 server...`);
   
   try {
-    // Build URL with proper encoding
-    const params = new URLSearchParams({
-      symbol: apiSymbol,
-      interval: interval,
-      outputsize: count.toString(),
-      apikey: currentKey,
-      format: 'json'
-    });
-    
-    const url = `https://api.twelvedata.com/time_series?${params.toString()}`;
+    // Build URL for MT5 Flask server
+    const url = `${MT5_SERVER_URL}/candles?symbol=${cleanSymbol}&timeframe=${interval}&limit=${count}`;
     
     const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
-        'User-Agent': 'AI-Trading-Platform/1.0'
+        'Content-Type': 'application/json'
       }
     });
     
@@ -273,56 +95,25 @@ export const fetchCandlestickData = async (
     
     const data = await response.json();
     
-    // Handle API errors
-    if (data.status === 'error') {
-      throw new Error(data.message || 'API returned error status');
-    }
-    
-    if (data.code) {
-      if (data.code === 400) {
-        throw new Error(`Invalid symbol or parameters: ${data.message}`);
-      } else if (data.code === 401) {
-        throw new Error('Invalid API key');
-      } else if (data.code === 429) {
-        throw new Error('API rate limit exceeded');
-      } else {
-        throw new Error(`API Error ${data.code}: ${data.message}`);
-      }
-    }
-    
-    // Check for rate limiting message
-    if (data.message && data.message.includes('API calls quota')) {
-      throw new Error('API rate limit exceeded');
+    // Handle MT5 server errors
+    if (data.error) {
+      throw new Error(data.error);
     }
     
     // Validate data structure
-    if (!data.values || !Array.isArray(data.values)) {
-      // Sometimes the API returns different structure for different symbols
-      if (data.price) {
-        // Single price point - convert to candle format
-        const now = new Date().toISOString();
-        return [{
-          datetime: now,
-          open: parseFloat(data.price),
-          high: parseFloat(data.price),
-          low: parseFloat(data.price),
-          close: parseFloat(data.price),
-          volume: 1000
-        }];
-      }
-      
-      throw new Error(`No candlestick data available for ${apiSymbol}. This symbol might not support the ${interval} timeframe.`);
+    if (!data.candles || !Array.isArray(data.candles)) {
+      throw new Error(`No candlestick data available for ${cleanSymbol} on ${interval} timeframe`);
     }
     
-    if (data.values.length === 0) {
-      throw new Error(`No historical data available for ${apiSymbol} on ${interval} timeframe`);
+    if (data.candles.length === 0) {
+      throw new Error(`No historical data available for ${cleanSymbol} on ${interval} timeframe`);
     }
     
     // Process and validate candle data
-    const processedCandles = data.values.reverse().map((candle: any, index: number) => {
+    const processedCandles = data.candles.map((candle: any, index: number) => {
       try {
         const processed = {
-          datetime: candle.datetime,
+          datetime: candle.datetime || candle.time,
           open: parseFloat(candle.open),
           high: parseFloat(candle.high),
           low: parseFloat(candle.low),
@@ -337,22 +128,15 @@ export const fetchCandlestickData = async (
         
         return processed;
       } catch (error) {
-        throw new Error(`Invalid candle data at index ${index} for ${apiSymbol}: ${error}`);
+        throw new Error(`Invalid candle data at index ${index} for ${cleanSymbol}: ${error}`);
       }
     });
     
-    console.log(`✅ Successfully fetched ${processedCandles.length} ${interval} candles for ${apiSymbol}`);
+    console.log(`✅ Successfully fetched ${processedCandles.length} ${interval} candles for ${cleanSymbol} from MT5`);
     return processedCandles;
     
   } catch (error: any) {
-    console.error(`❌ Error fetching data with API key ${currentApiKeyIndex + 1}/${apiKeys.length}: ${error.message}`);
-    
-    // If we have more API keys and retries left, try with the next key
-    if (apiKeys.length > 1 && maxRetries > 0) {
-      console.log(`🔄 Retrying with next API key (${maxRetries} retries left)...`);
-      return fetchCandlestickData(symbol, interval, count, maxRetries - 1);
-    }
-    
+    console.error(`❌ Error fetching MT5 data: ${error.message}`);
     throw error;
   }
 };
@@ -365,30 +149,29 @@ export const fetchMultiTimeframeData = async (
     validateApiParams(symbol);
     
     const cleanSymbol = symbol.trim().toUpperCase();
-    const apiSymbol = getApiSymbol(cleanSymbol);
     
-    console.log(`📊 Fetching multi-timeframe data for ${apiSymbol} (${cleanSymbol})...`);
+    console.log(`📊 Fetching multi-timeframe data for ${cleanSymbol} from MT5...`);
     
-    // Define timeframe mappings for TwelveData API
+    // Define timeframe mappings for MT5
     const timeframes = [
-      { key: "5min", interval: "5min", count: Math.min(candleCount, 50) }, // Limit to avoid quota issues
-      { key: "15min", interval: "15min", count: Math.min(candleCount, 50) },
-      { key: "1h", interval: "1h", count: Math.min(candleCount, 50) },
-      { key: "4h", interval: "4h", count: Math.min(candleCount, 50) }
+      { key: "5min", interval: "M5", count: candleCount },
+      { key: "15min", interval: "M15", count: candleCount },
+      { key: "1h", interval: "H1", count: candleCount },
+      { key: "4h", interval: "H4", count: candleCount }
     ];
     
-    // Fetch timeframes with proper delay to avoid rate limiting
+    // Fetch timeframes sequentially
     const timeframeData: any = {};
     let errors: string[] = [];
     
     for (let i = 0; i < timeframes.length; i++) {
       const tf = timeframes[i];
       try {
-        console.log(`📊 Fetching ${tf.key} data for ${apiSymbol}...`);
+        console.log(`📊 Fetching ${tf.key} data for ${cleanSymbol}...`);
         
-        // Add delay between requests (TwelveData free tier has rate limits)
+        // Small delay between requests to be gentle on MT5 server
         if (i > 0) {
-          await new Promise(resolve => setTimeout(resolve, 1200)); // 1.2 second delay
+          await new Promise(resolve => setTimeout(resolve, 200));
         }
         
         timeframeData[tf.key] = await fetchCandlestickData(cleanSymbol, tf.interval, tf.count);
@@ -409,7 +192,7 @@ export const fetchMultiTimeframeData = async (
     
     if (successfulTimeframes.length === 0) {
       console.warn(`⚠️ All timeframes failed for ${cleanSymbol}, using demo data`);
-      throw new Error(`Failed to fetch any real data for ${cleanSymbol}. Using demo data instead.`);
+      throw new Error(`Failed to fetch any real data for ${cleanSymbol}. MT5 server may be unavailable.`);
     }
     
     // Log success/failure summary
@@ -432,8 +215,8 @@ export const fetchMultiTimeframeData = async (
     };
     
   } catch (error) {
-    console.error('❌ Error fetching multi-timeframe data:', error);
-    throw new Error(`Failed to fetch market data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    console.error('❌ Error fetching multi-timeframe data from MT5:', error);
+    throw new Error(`Failed to fetch MT5 market data: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 };
 
@@ -453,7 +236,7 @@ const getBasePrice = (symbol: string): number => {
   return 100; // Default
 };
 
-// Generate mock candles
+// Generate mock candles (fallback when MT5 server is unavailable)
 const generateMockCandles = (count: number, basePrice: number = 100): CandleData[] => {
   const candles: CandleData[] = [];
   let currentPrice = basePrice;
@@ -498,188 +281,84 @@ export const generateMockMultiTimeframeData = (symbol: string): MultiTimeframeDa
   };
 };
 
-// Test API connection with better error handling
+// Test MT5 server connection
 export const testApiConnection = async (): Promise<boolean> => {
-  // Load API keys if not already loaded
-  if (apiKeys.length === 0 || !apiKeysLoaded) {
-    await loadApiKeys();
-  }
-  
-  // If no valid API keys are available, return false immediately
-  if (apiKeys.length === 0 || (apiKeys.length === 1 && (apiKeys[0] === 'your_api_key' || !apiKeys[0]))) {
-    console.error('❌ No valid TwelveData API keys configured');
+  try {
+    console.log(`🔍 Testing MT5 server connection at ${MT5_SERVER_URL}...`);
+    
+    // Test with a simple health check or basic symbol request
+    const response = await fetch(`${MT5_SERVER_URL}/health`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      // If health endpoint doesn't exist, try a simple candle request
+      const testResponse = await fetch(`${MT5_SERVER_URL}/candles?symbol=EURUSD&timeframe=M1&limit=1`);
+      if (!testResponse.ok) {
+        throw new Error(`MT5 server returned HTTP ${testResponse.status}`);
+      }
+    }
+    
+    console.log(`✅ MT5 server connection successful`);
+    return true;
+    
+  } catch (error) {
+    console.error(`❌ MT5 server connection test failed:`, error);
     return false;
   }
-  
-  let success = false;
-  let attempts = 0;
-  
-  // Try each API key until one works
-  while (!success && attempts < apiKeys.length) {
-    const currentKey = getCurrentApiKey();
-    
-    try {
-      if (!currentKey || currentKey === 'your_api_key') {
-        console.error('❌ TwelveData API key not configured');
-        rotateApiKey();
-        attempts++;
-        continue;
-      }
-      
-      // Test with a simple, reliable symbol
-      const params = new URLSearchParams({
-        symbol: 'EUR/USD',
-        interval: '1h',
-        outputsize: '1',
-        apikey: currentKey,
-        format: 'json'
-      });
-      
-      const url = `https://api.twelvedata.com/time_series?${params.toString()}`;
-      
-      console.log(`🔍 Testing TwelveData API connection with key ${currentApiKeyIndex + 1}/${apiKeys.length}...`);
-      
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'AI-Trading-Platform/1.0'
-        }
-      });
-      
-      if (!response.ok) {
-        console.error(`❌ API Test Failed: HTTP ${response.status}`);
-        rotateApiKey();
-        attempts++;
-        continue;
-      }
-      
-      const data = await response.json();
-      
-      if (data.status === 'error' || data.code) {
-        console.error('❌ API Test Failed:', data.message || `Error code: ${data.code}`);
-        rotateApiKey();
-        attempts++;
-        continue;
-      }
-      
-      if (!data.values && !data.price) {
-        console.error('❌ API Test Failed: No data returned');
-        rotateApiKey();
-        attempts++;
-        continue;
-      }
-      
-      console.log(`✅ TwelveData API connection successful with key ${currentApiKeyIndex + 1}`);
-      success = true;
-      
-    } catch (error) {
-      console.error(`❌ API Test Failed with key ${currentApiKeyIndex + 1}:`, error);
-      rotateApiKey();
-      attempts++;
-    }
-  }
-  
-  if (!success) {
-    console.error(`❌ All API keys failed the connection test`);
-  }
-  
-  return success;
 };
 
-// Get API usage information
+// Compatibility functions (kept for existing code that might reference them)
+export const loadApiKeys = async (): Promise<string[]> => {
+  console.log('ℹ️ API keys not needed for MT5 server');
+  return [];
+};
+
+export const getCurrentApiKey = (): string => {
+  return 'MT5_SERVER';
+};
+
+export const rotateApiKey = (): string => {
+  return 'MT5_SERVER';
+};
+
+export const addApiKey = async (newKey: string): Promise<boolean> => {
+  console.log('ℹ️ API key management not needed for MT5 server');
+  return false;
+};
+
+export const removeApiKey = async (keyToRemove: string): Promise<boolean> => {
+  console.log('ℹ️ API key management not needed for MT5 server');
+  return false;
+};
+
 export const getApiUsage = async () => {
-  try {
-    const currentKey = getCurrentApiKey();
-    const response = await fetch(`https://api.twelvedata.com/usage?apikey=${currentKey}`);
-    if (response.ok) {
-      return await response.json();
-    }
-  } catch (error) {
-    console.warn('Could not fetch API usage info:', error);
-  }
-  return null;
-};
-
-// Get all API keys and their status
-export const getApiKeyStatus = async () => {
-  const keyStatus = [];
-  
-  for (let i = 0; i < apiKeys.length; i++) {
-    const key = apiKeys[i];
-    let status: 'active' | 'error' | 'unknown' = 'unknown';
-    let usage = null;
-    
-    try {
-      // Test key with a simple request
-      const params = new URLSearchParams({
-        symbol: 'EUR/USD',
-        interval: '1h',
-        outputsize: '1',
-        apikey: key,
-        format: 'json'
-      });
-      
-      const url = `https://api.twelvedata.com/time_series?${params.toString()}`;
-      const response = await fetch(url);
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (!data.status && !data.code && (data.values || data.price)) {
-          status = 'active';
-          
-          // Try to get usage info
-          try {
-            const usageResponse = await fetch(`https://api.twelvedata.com/usage?apikey=${key}`);
-            if (usageResponse.ok) {
-              usage = await usageResponse.json();
-            }
-          } catch (e) {
-            // Ignore usage fetch errors
-          }
-        } else {
-          status = 'error';
-        }
-      } else {
-        status = 'error';
-      }
-    } catch (error) {
-      status = 'error';
-    }
-    
-    // Mask the API key for security
-    const maskedKey = key.substring(0, 4) + '...' + key.substring(key.length - 4);
-    
-    keyStatus.push({
-      key: maskedKey,
-      status,
-      usage
-    });
-  }
-  
   return {
-    keys: keyStatus,
-    activeKey: currentApiKeyIndex,
-    totalKeys: apiKeys.length
+    message: 'MT5 server - no usage limits',
+    used: 0,
+    total: 'unlimited'
   };
 };
 
-// Initialize API keys on module load
-const initializeApiKeys = async () => {
-  try {
-    if (!apiKeysLoaded) {
-      console.log('🔄 Initializing API keys on module load...');
-      await loadApiKeys();
-    }
-  } catch (error) {
-    console.error('❌ Error initializing API keys:', error);
-    // Ensure we have at least the default key
-    if (apiKeys.length === 0) {
-      apiKeys = [DEFAULT_API_KEY];
-      apiKeysLoaded = true;
-    }
-  }
+export const getApiKeyStatus = async () => {
+  const isConnected = await testApiConnection();
+  
+  return {
+    keys: [{
+      key: 'MT5 Server',
+      status: isConnected ? 'active' : 'error',
+      usage: {
+        used: 0,
+        total: 'unlimited'
+      }
+    }],
+    activeKey: 0,
+    totalKeys: 1
+  };
 };
 
-// Run initialization
-initializeApiKeys();
+// Set compatibility flag
+apiKeysLoaded = true;
