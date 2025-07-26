@@ -233,11 +233,16 @@ export const fetchMultiTimeframeData = async (
     // Combine results into the expected format
     const timeframeData: any = {};
     let successfulTimeframes = 0;
+    let totalCandles = 0;
 
     for (const result of results) {
       timeframeData[result.timeframe] = result.candles;
-      if (result.candles.length > 0) {
+      if (result.candles && Array.isArray(result.candles) && result.candles.length > 0) {
         successfulTimeframes++;
+        totalCandles += result.candles.length;
+        console.log(`✅ ${result.timeframe}: ${result.candles.length} candles loaded successfully`);
+      } else {
+        console.warn(`⚠️ ${result.timeframe}: No candles available`);
       }
     }
 
