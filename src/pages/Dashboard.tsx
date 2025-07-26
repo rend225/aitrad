@@ -835,10 +835,15 @@ ${jsonData}`;
                         <AlertCircle className="h-5 w-5" />
                         <span>Daily Limit Reached</span>
                       </>
+                    ) : !hasValidMarketData() ? (
+                      <>
+                        <AlertCircle className="h-5 w-5" />
+                        <span>Real Market Data Required</span>
+                      </>
                     ) : (
                       <>
                         <Zap className="h-5 w-5" />
-                        <span>{marketData ? '2. ' : ''}{t('signal.generateSignal')}</span>
+                        <span>2. {t('signal.generateSignal')}</span>
                       </>
                     )}
                   </button>
