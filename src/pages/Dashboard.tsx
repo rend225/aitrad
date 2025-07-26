@@ -784,11 +784,14 @@ ${jsonData}`;
                 )}
 
                 {error && (
-                  <div className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 px-4 py-3 rounded-lg flex items-start space-x-2 shadow-lg">
-                    <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                  <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg flex items-start space-x-2 shadow-lg">
+                    <XCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-medium">Notice</p>
+                      <p className="font-medium">Real Market Data Required</p>
                       <p className="text-sm">{error}</p>
+                      <p className="text-xs mt-2 text-red-300">
+                        Trading recommendations require authentic MT5 market data. Demo data is not used for analysis.
+                      </p>
                     </div>
                   </div>
                 )}
