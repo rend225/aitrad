@@ -187,8 +187,8 @@ export const fetchMultiTimeframeData = async (
         }
 
         // Validate and extract candles
-        if (!data.candles || !Array.isArray(data.candles)) {
-          throw new Error(`No candlestick data available for ${cleanSymbol} on ${tf.mt5Timeframe} timeframe`);
+        if (!data.candles || !Array.isArray(data.candles) || data.candles.length === 0) {
+          throw new Error(`No candlestick data available for ${cleanSymbol} on ${tf.mt5Timeframe} timeframe. Symbol may not exist in MT5 terminal.`);
         }
 
         console.log(`✅ Successfully fetched ${data.candles.length} ${tf.key} candles for ${cleanSymbol}`);
