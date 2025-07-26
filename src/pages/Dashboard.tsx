@@ -66,12 +66,27 @@ const Dashboard: React.FC = () => {
 
   // Function to validate if we have real market data
   const hasValidMarketData = (): boolean => {
-    if (!marketData || !marketData.timeframes) return false;
+    console.log('🔍 Validating market data...', {
+      hasMarketData: !!marketData,
+      hasTimeframes: !!(marketData?.timeframes),
+      timeframeData: marketData?.timeframes ? Object.entries(marketData.timeframes).map(([tf, candles]) => ({
+        timeframe: tf,
+        candleCount: Array.isArray(candles) ? candles.length : 0
+      })) : 'No timeframes'
+    });
+
+    if (!marketData || !marketData.timeframes) {
+      console.log('❌ Validation failed: No market data or timeframes');
+      return false;
+    }
 
     // Check if at least one timeframe has real data
-    return Object.values(marketData.timeframes).some(
+    const hasData = Object.values(marketData.timeframes).some(
       (candles: any) => Array.isArray(candles) && candles.length > 0
     );
+
+    console.log(`${hasData ? '✅' : '❌'} Validation result: ${hasData ? 'HAS VALID DATA' : 'NO VALID DATA'}`);
+    return hasData;
   };
 
   useEffect(() => {
@@ -333,7 +348,7 @@ You are allowed to use only ONE indicator: *ATR (Average True Range)* (14-period
 - Check if ATR conditions support a clean entry
 - Validate that the zone has not been touched
 
-━━━━━━━━━━━━━��━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━
 🎯 3. Trade Setup Recommendation
 - Direction: Buy / Sell / No Trade
 - Entry Price: After confirmation only
