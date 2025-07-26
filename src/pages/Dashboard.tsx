@@ -323,7 +323,7 @@ You are allowed to use only ONE indicator: *ATR (Average True Range)* (14-period
 - Check if ATR conditions support a clean entry
 - Validate that the zone has not been touched
 
-━━━━━━━━━━━━━━━━━━���━━━
+━━━━━━━━━━━━━━━━━━━━━━
 🎯 3. Trade Setup Recommendation
 - Direction: Buy / Sell / No Trade
 - Entry Price: After confirmation only
@@ -583,7 +583,7 @@ ${jsonData}`;
             {getApiStatusIcon()}
             <span className="font-medium">{getApiStatusText()}</span>
             {apiStatus === 'error' && (
-              <span className="text-xs">��� {t('api.demoDataUsed')}</span>
+              <span className="text-xs">• {t('api.demoDataUsed')}</span>
             )}
             <button
               onClick={checkApiConnection}
@@ -822,7 +822,7 @@ ${jsonData}`;
 
                   <button
                     onClick={generateSignal}
-                    disabled={loading || !marketData || hasReachedDailyLimit}
+                    disabled={loading || !hasValidMarketData() || hasReachedDailyLimit}
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 sm:py-4 px-6 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm sm:text-base shadow-lg"
                   >
                     {loading ? (
