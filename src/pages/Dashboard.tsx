@@ -233,19 +233,25 @@ const Dashboard: React.FC = () => {
       }
       
       const data = await fetchMultiTimeframeData(selectedPair, candleCount);
-      console.log('Market data fetched successfully:', {
-        symbol: data.symbol,
-        timeframes: {
-          '5min': data.timeframes['5min']?.length,
-          '15min': data.timeframes['15min']?.length,
-          '1h': data.timeframes['1h']?.length,
-          '4h': data.timeframes['4h']?.length
-        }
-      });
-      
-      setMarketData(data);
-      setError('');
-      setApiStatus('connected');
+
+      // Validate that we actually have data
+      const totalCandles = Object.values(data.timeframes).reduce((sum: number, candles: any) =>
+        sum + (Array.isArray(candles) ? candles.length : 0), 0
+      );
+
+      console.log('🎉 DASHBOARD: Market data fetch completed');
+      console.log(`📊 Symbol: ${data.symbol}`);
+      console.log(`📈 Total candles: ${totalCandles}`);
+      console.log(`✅ Data validation: ${hasValidMarketData() ? 'PASSED' : 'FAILED'}`);
+
+      if (totalCandles > 0) {
+        console.log('🚀 DASHBOARD: Market data is READY for trading analysis');
+        setMarketData(data);
+        setError('');
+        setApiStatus('connected');
+      } else {
+        throw new Error('No candles received from MT5 server');
+      }
     } catch (error: any) {
       console.error('Error fetching market data:', error);
       setApiStatus('error');
