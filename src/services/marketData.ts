@@ -141,6 +141,20 @@ export const fetchCandlestickData = async (
   }
 };
 
+// Check available symbols on MT5 server
+export const checkAvailableSymbols = async (): Promise<string[]> => {
+  try {
+    const response = await fetch(`${MT5_SERVER_URL}/symbols`);
+    if (response.ok) {
+      const data = await response.json();
+      return data.symbols?.map((s: any) => s.name) || [];
+    }
+  } catch (error) {
+    console.warn('Could not fetch available symbols from MT5 server');
+  }
+  return [];
+};
+
 export const fetchMultiTimeframeData = async (
   symbol: string,
   candleCount: number = 50
@@ -151,6 +165,7 @@ export const fetchMultiTimeframeData = async (
     const cleanSymbol = symbol.trim().toUpperCase();
 
     console.log(`📊 Fetching multi-timeframe data for ${cleanSymbol} from MT5 Flask server...`);
+    console.log(`🔗 MT5 Server URL: ${MT5_SERVER_URL}`);
 
     // Define timeframe mappings for individual requests
     const timeframes = [
