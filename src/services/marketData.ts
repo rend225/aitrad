@@ -21,7 +21,7 @@ export interface MultiTimeframeData {
 }
 
 export const TRADING_PAIRS = [
-  { symbol: 'XAUUSDm', name: 'Gold (XAU/USD)', category: 'Metals' },
+  { symbol: 'XAUUSD', name: 'Gold (XAU/USD)', category: 'Metals' },
   { symbol: 'EURUSD', name: 'EUR/USD', category: 'Forex' },
   { symbol: 'GBPUSD', name: 'GBP/USD', category: 'Forex' },
   { symbol: 'USDJPY', name: 'USD/JPY', category: 'Forex' },
@@ -29,11 +29,11 @@ export const TRADING_PAIRS = [
   { symbol: 'AUDUSD', name: 'AUD/USD', category: 'Forex' },
   { symbol: 'USDCAD', name: 'USD/CAD', category: 'Forex' },
   { symbol: 'NZDUSD', name: 'NZD/USD', category: 'Forex' },
-  { symbol: 'US500m', name: 'S&P 500', category: 'Indices' },
-  { symbol: 'NAS100m', name: 'NASDAQ 100', category: 'Indices' },
-  { symbol: 'US30m', name: 'Dow Jones', category: 'Indices' },
-  { symbol: 'BTCUSDm', name: 'Bitcoin', category: 'Crypto' },
-  { symbol: 'ETHUSDm', name: 'Ethereum', category: 'Crypto' },
+  { symbol: 'US500', name: 'S&P 500', category: 'Indices' },
+  { symbol: 'NAS100', name: 'NASDAQ 100', category: 'Indices' },
+  { symbol: 'US30', name: 'Dow Jones', category: 'Indices' },
+  { symbol: 'BTCUSD', name: 'Bitcoin', category: 'Crypto' },
+  { symbol: 'ETHUSD', name: 'Ethereum', category: 'Crypto' },
 ];
 
 // MT5 Flask server configuration
