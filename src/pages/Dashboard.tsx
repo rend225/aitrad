@@ -64,6 +64,16 @@ const Dashboard: React.FC = () => {
   const [loadingLatestAnalysis, setLoadingLatestAnalysis] = useState(true);
   const analysisRef = useRef<HTMLDivElement>(null);
 
+  // Function to validate if we have real market data
+  const hasValidMarketData = (): boolean => {
+    if (!marketData || !marketData.timeframes) return false;
+
+    // Check if at least one timeframe has real data
+    return Object.values(marketData.timeframes).some(
+      (candles: any) => Array.isArray(candles) && candles.length > 0
+    );
+  };
+
   useEffect(() => {
     loadSchools();
     checkApiConnection();
@@ -313,7 +323,7 @@ You are allowed to use only ONE indicator: *ATR (Average True Range)* (14-period
 - Check if ATR conditions support a clean entry
 - Validate that the zone has not been touched
 
-━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━���━━━
 🎯 3. Trade Setup Recommendation
 - Direction: Buy / Sell / No Trade
 - Entry Price: After confirmation only
@@ -573,7 +583,7 @@ ${jsonData}`;
             {getApiStatusIcon()}
             <span className="font-medium">{getApiStatusText()}</span>
             {apiStatus === 'error' && (
-              <span className="text-xs">• {t('api.demoDataUsed')}</span>
+              <span className="text-xs">��� {t('api.demoDataUsed')}</span>
             )}
             <button
               onClick={checkApiConnection}
