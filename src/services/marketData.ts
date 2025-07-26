@@ -251,14 +251,16 @@ export const fetchMultiTimeframeData = async (
       throw new Error(`❌ No real market data available for ${cleanSymbol} from MT5 server. Cannot generate trading signal without real data. Please check symbol availability in your MT5 terminal.`);
     }
 
-    console.log(`✅ Multi-timeframe data ready for ${cleanSymbol}:`, {
+    console.log(`✅ MARKET DATA FETCH COMPLETED FOR ${cleanSymbol}:`);
+    console.log(`📊 Successful timeframes: ${successfulTimeframes}/4`);
+    console.log(`📈 Total candles loaded: ${totalCandles}`);
+    console.log(`📋 Timeframe breakdown:`, {
       '5min': timeframeData['5min']?.length || 0,
       '15min': timeframeData['15min']?.length || 0,
       '1h': timeframeData['1h']?.length || 0,
-      '4h': timeframeData['4h']?.length || 0,
-      'successful_timeframes': successfulTimeframes,
-      'real_data_only': true
+      '4h': timeframeData['4h']?.length || 0
     });
+    console.log(`🎯 STATUS: ${successfulTimeframes > 0 ? 'READY FOR TRADING ANALYSIS' : 'INSUFFICIENT DATA'}`);
 
     return {
       symbol: cleanSymbol,
