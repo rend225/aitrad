@@ -203,16 +203,29 @@ export const fetchMultiTimeframeData = async (
           throw new Error(data.error);
         }
 
-        // Validate and extract candles
-        if (!data.candles || !Array.isArray(data.candles) || data.candles.length === 0) {
+        // Validate and extract candles - handle both direct array and wrapped formats
+        let candles;
+        if (Array.isArray(data)) {
+          // Direct array response
+          candles = data;
+          console.log(`📋 Direct array response detected for ${tf.key}`);
+        } else if (data.candles && Array.isArray(data.candles)) {
+          // Wrapped in candles property
+          candles = data.candles;
+          console.log(`📋 Wrapped response detected for ${tf.key}`);
+        } else {
+          throw new Error(`Invalid response format for ${cleanSymbol} on ${tf.mt5Timeframe} timeframe. Expected array or object with candles property.`);
+        }
+
+        if (!candles || candles.length === 0) {
           throw new Error(`No candlestick data available for ${cleanSymbol} on ${tf.mt5Timeframe} timeframe. Symbol may not exist in MT5 terminal.`);
         }
 
-        console.log(`✅ Successfully fetched ${data.candles.length} ${tf.key} candles for ${cleanSymbol}`);
+        console.log(`✅ Successfully fetched ${candles.length} ${tf.key} candles for ${cleanSymbol}`);
 
         return {
           timeframe: tf.key,
-          candles: data.candles
+          candles: candles
         };
 
       } catch (error: any) {
