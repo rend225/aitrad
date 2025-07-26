@@ -142,81 +142,84 @@ export const fetchCandlestickData = async (
 };
 
 export const fetchMultiTimeframeData = async (
-  symbol: string, 
+  symbol: string,
   candleCount: number = 50
 ): Promise<MultiTimeframeData> => {
-  try {    
+  try {
     validateApiParams(symbol);
-    
+
     const cleanSymbol = symbol.trim().toUpperCase();
-    
-    console.log(`📊 Fetching multi-timeframe data for ${cleanSymbol} from MT5...`);
-    
-    // Define timeframe mappings for MT5
-    const timeframes = [
-      { key: "5min", interval: "M5", count: candleCount },
-      { key: "15min", interval: "M15", count: candleCount },
-      { key: "1h", interval: "H1", count: candleCount },
-      { key: "4h", interval: "H4", count: candleCount }
-    ];
-    
-    // Fetch timeframes sequentially
-    const timeframeData: any = {};
-    let errors: string[] = [];
-    
-    for (let i = 0; i < timeframes.length; i++) {
-      const tf = timeframes[i];
-      try {
-        console.log(`📊 Fetching ${tf.key} data for ${cleanSymbol}...`);
-        
-        // Small delay between requests to be gentle on MT5 server
-        if (i > 0) {
-          await new Promise(resolve => setTimeout(resolve, 200));
-        }
-        
-        timeframeData[tf.key] = await fetchCandlestickData(cleanSymbol, tf.interval, tf.count);
-        
-      } catch (error: any) {
-        console.warn(`⚠️ Failed to fetch ${tf.interval} data: ${error.message}`);
-        errors.push(`${tf.key}: ${error.message}`);
-        
-        // Generate fallback data for this timeframe
-        timeframeData[tf.key] = generateMockCandles(tf.count, getBasePrice(cleanSymbol));
+
+    console.log(`📊 Fetching multi-timeframe data for ${cleanSymbol} from MT5 Flask server...`);
+
+    // Use the new /multi_timeframe endpoint
+    const url = `${MT5_SERVER_URL}/multi_timeframe?symbol=${cleanSymbol}&limit=${candleCount}`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
       }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
-    
-    // Check if we have at least some real data
-    const successfulTimeframes = Object.keys(timeframeData).filter(key => 
-      timeframeData[key].length > 0 && !errors.some(e => e.startsWith(key))
+
+    const data = await response.json();
+
+    // Handle MT5 server errors
+    if (data.error) {
+      throw new Error(data.error);
+    }
+
+    // Validate data structure
+    if (!data.timeframes) {
+      throw new Error(`Invalid response format from MT5 server`);
+    }
+
+    // Check if we have any data
+    const timeframeKeys = Object.keys(data.timeframes);
+    const successfulTimeframes = timeframeKeys.filter(key =>
+      data.timeframes[key] && data.timeframes[key].length > 0
     );
-    
+
     if (successfulTimeframes.length === 0) {
-      console.warn(`⚠️ All timeframes failed for ${cleanSymbol}, using demo data`);
+      console.warn(`⚠️ No data available for ${cleanSymbol}, using demo data`);
       throw new Error(`Failed to fetch any real data for ${cleanSymbol}. MT5 server may be unavailable.`);
     }
-    
-    // Log success/failure summary
-    if (errors.length > 0) {
-      console.warn(`⚠️ Some timeframes failed for ${cleanSymbol}:`, errors);
+
+    // Fill missing timeframes with mock data if needed
+    const requiredTimeframes = ["5min", "15min", "1h", "4h"];
+    const basePrice = getBasePrice(cleanSymbol);
+
+    for (const tf of requiredTimeframes) {
+      if (!data.timeframes[tf] || data.timeframes[tf].length === 0) {
+        console.warn(`⚠️ No ${tf} data for ${cleanSymbol}, generating fallback data`);
+        data.timeframes[tf] = generateMockCandles(candleCount, basePrice);
+      }
     }
-    
+
     console.log(`✅ Multi-timeframe data ready for ${cleanSymbol}:`, {
-      '5min': timeframeData['5min'].length,
-      '15min': timeframeData['15min'].length,
-      '1h': timeframeData['1h'].length,
-      '4h': timeframeData['4h'].length,
-      'real_data_timeframes': successfulTimeframes.length,
-      'fallback_timeframes': errors.length
+      '5min': data.timeframes['5min']?.length || 0,
+      '15min': data.timeframes['15min']?.length || 0,
+      '1h': data.timeframes['1h']?.length || 0,
+      '4h': data.timeframes['4h']?.length || 0,
+      'real_data_timeframes': successfulTimeframes.length
     });
-    
+
     return {
       symbol: cleanSymbol,
-      timeframes: timeframeData
+      timeframes: data.timeframes
     };
-    
+
   } catch (error) {
     console.error('❌ Error fetching multi-timeframe data from MT5:', error);
-    throw new Error(`Failed to fetch MT5 market data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+
+    // Fallback to mock data if MT5 server is unavailable
+    console.log(`📊 Generating demo data for ${symbol} as fallback`);
+    return generateMockMultiTimeframeData(symbol);
   }
 };
 
