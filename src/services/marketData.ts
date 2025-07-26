@@ -200,12 +200,17 @@ export const fetchMultiTimeframeData = async (
 
       } catch (error: any) {
         console.warn(`⚠️ Failed to fetch ${tf.key} data for ${cleanSymbol}: ${error.message}`);
+        console.warn(`💡 Try these common symbol alternatives: ${cleanSymbol}m, ${cleanSymbol.replace('m', '')}, ${cleanSymbol.replace('M', '')}`);
 
         // Generate fallback data for this timeframe
         const basePrice = getBasePrice(cleanSymbol);
+        const mockCandles = generateMockCandles(candleCount, basePrice);
+
+        console.log(`📊 Generated ${mockCandles.length} mock ${tf.key} candles for ${cleanSymbol} as fallback`);
+
         return {
           timeframe: tf.key,
-          candles: generateMockCandles(candleCount, basePrice)
+          candles: mockCandles
         };
       }
     });
