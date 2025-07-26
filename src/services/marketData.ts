@@ -152,66 +152,89 @@ export const fetchMultiTimeframeData = async (
 
     console.log(`📊 Fetching multi-timeframe data for ${cleanSymbol} from MT5 Flask server...`);
 
-    // Use the new /multi_timeframe endpoint
-    const url = `${MT5_SERVER_URL}/multi_timeframe?symbol=${cleanSymbol}&limit=${candleCount}`;
+    // Define timeframe mappings for individual requests
+    const timeframes = [
+      { key: "5min", mt5Timeframe: "M5" },
+      { key: "15min", mt5Timeframe: "M15" },
+      { key: "1h", mt5Timeframe: "H1" },
+      { key: "4h", mt5Timeframe: "H4" }
+    ];
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+    // Fetch each timeframe individually
+    const timeframePromises = timeframes.map(async (tf) => {
+      try {
+        console.log(`📊 Fetching ${tf.key} (${tf.mt5Timeframe}) data for ${cleanSymbol}...`);
+
+        const url = `${MT5_SERVER_URL}/candles?symbol=${cleanSymbol}&timeframe=${tf.mt5Timeframe}&limit=${candleCount}`;
+
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        // Handle MT5 server errors
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        // Validate and extract candles
+        if (!data.candles || !Array.isArray(data.candles)) {
+          throw new Error(`No candlestick data available for ${cleanSymbol} on ${tf.mt5Timeframe} timeframe`);
+        }
+
+        console.log(`✅ Successfully fetched ${data.candles.length} ${tf.key} candles for ${cleanSymbol}`);
+
+        return {
+          timeframe: tf.key,
+          candles: data.candles
+        };
+
+      } catch (error: any) {
+        console.warn(`⚠️ Failed to fetch ${tf.key} data for ${cleanSymbol}: ${error.message}`);
+
+        // Generate fallback data for this timeframe
+        const basePrice = getBasePrice(cleanSymbol);
+        return {
+          timeframe: tf.key,
+          candles: generateMockCandles(candleCount, basePrice)
+        };
       }
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
+    // Wait for all timeframe requests to complete
+    const results = await Promise.all(timeframePromises);
 
-    const data = await response.json();
+    // Combine results into the expected format
+    const timeframeData: any = {};
+    let successfulTimeframes = 0;
 
-    // Handle MT5 server errors
-    if (data.error) {
-      throw new Error(data.error);
-    }
-
-    // Validate data structure
-    if (!data.timeframes) {
-      throw new Error(`Invalid response format from MT5 server`);
-    }
-
-    // Check if we have any data
-    const timeframeKeys = Object.keys(data.timeframes);
-    const successfulTimeframes = timeframeKeys.filter(key =>
-      data.timeframes[key] && data.timeframes[key].length > 0
-    );
-
-    if (successfulTimeframes.length === 0) {
-      console.warn(`⚠️ No data available for ${cleanSymbol}, using demo data`);
-      throw new Error(`Failed to fetch any real data for ${cleanSymbol}. MT5 server may be unavailable.`);
-    }
-
-    // Fill missing timeframes with mock data if needed
-    const requiredTimeframes = ["5min", "15min", "1h", "4h"];
-    const basePrice = getBasePrice(cleanSymbol);
-
-    for (const tf of requiredTimeframes) {
-      if (!data.timeframes[tf] || data.timeframes[tf].length === 0) {
-        console.warn(`⚠️ No ${tf} data for ${cleanSymbol}, generating fallback data`);
-        data.timeframes[tf] = generateMockCandles(candleCount, basePrice);
+    for (const result of results) {
+      timeframeData[result.timeframe] = result.candles;
+      if (result.candles.length > 0) {
+        successfulTimeframes++;
       }
     }
 
     console.log(`✅ Multi-timeframe data ready for ${cleanSymbol}:`, {
-      '5min': data.timeframes['5min']?.length || 0,
-      '15min': data.timeframes['15min']?.length || 0,
-      '1h': data.timeframes['1h']?.length || 0,
-      '4h': data.timeframes['4h']?.length || 0,
-      'real_data_timeframes': successfulTimeframes.length
+      '5min': timeframeData['5min']?.length || 0,
+      '15min': timeframeData['15min']?.length || 0,
+      '1h': timeframeData['1h']?.length || 0,
+      '4h': timeframeData['4h']?.length || 0,
+      'successful_timeframes': successfulTimeframes
     });
 
     return {
       symbol: cleanSymbol,
-      timeframes: data.timeframes
+      timeframes: timeframeData
     };
 
   } catch (error) {
