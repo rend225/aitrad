@@ -242,13 +242,17 @@ const Dashboard: React.FC = () => {
       console.log('🎉 DASHBOARD: Market data fetch completed');
       console.log(`📊 Symbol: ${data.symbol}`);
       console.log(`📈 Total candles: ${totalCandles}`);
-      console.log(`✅ Data validation: ${hasValidMarketData() ? 'PASSED' : 'FAILED'}`);
 
       if (totalCandles > 0) {
         console.log('🚀 DASHBOARD: Market data is READY for trading analysis');
         setMarketData(data);
         setError('');
         setApiStatus('connected');
+
+        // Log validation after setting data
+        setTimeout(() => {
+          console.log(`✅ UI Validation: ${hasValidMarketData() ? 'PASSED - Generate button should be enabled' : 'FAILED - Generate button should be disabled'}`);
+        }, 100);
       } else {
         throw new Error('No candles received from MT5 server');
       }
@@ -329,7 +333,7 @@ You are allowed to use only ONE indicator: *ATR (Average True Range)* (14-period
 - Check if ATR conditions support a clean entry
 - Validate that the zone has not been touched
 
-━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━��━━━━━━━━
 🎯 3. Trade Setup Recommendation
 - Direction: Buy / Sell / No Trade
 - Entry Price: After confirmation only
