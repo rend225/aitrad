@@ -287,29 +287,33 @@ export const generateMockMultiTimeframeData = (symbol: string): MultiTimeframeDa
 // Test MT5 server connection
 export const testApiConnection = async (): Promise<boolean> => {
   try {
-    console.log(`🔍 Testing MT5 server connection at ${MT5_SERVER_URL}...`);
-    
-    // Test with a simple health check or basic symbol request
+    console.log(`🔍 Testing MT5 Flask server connection at ${MT5_SERVER_URL}...`);
+
+    // Test with the health endpoint
     const response = await fetch(`${MT5_SERVER_URL}/health`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json'
-      }
+      },
+      // Add timeout
+      signal: AbortSignal.timeout(5000)
     });
-    
+
     if (!response.ok) {
-      // If health endpoint doesn't exist, try a simple candle request
-      const testResponse = await fetch(`${MT5_SERVER_URL}/candles?symbol=EURUSD&timeframe=M1&limit=1`);
-      if (!testResponse.ok) {
-        throw new Error(`MT5 server returned HTTP ${testResponse.status}`);
-      }
+      throw new Error(`MT5 server returned HTTP ${response.status}: ${response.statusText}`);
     }
-    
-    console.log(`✅ MT5 server connection successful`);
+
+    const healthData = await response.json();
+
+    if (healthData.status !== 'healthy') {
+      throw new Error(`MT5 server health check failed: ${healthData.message || 'Unknown error'}`);
+    }
+
+    console.log(`✅ MT5 Flask server connection successful - MT5 Connected: ${healthData.mt5_connected}`);
     return true;
-    
+
   } catch (error) {
-    console.error(`❌ MT5 server connection test failed:`, error);
+    console.error(`❌ MT5 Flask server connection test failed:`, error);
     return false;
   }
 };
