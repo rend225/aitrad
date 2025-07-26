@@ -927,10 +927,33 @@ ${jsonData}`;
 
             {/* Market Data Info */}
             {marketData && (
-              <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-6 border border-white/10 shadow-xl">
-                <h3 className="text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
-                  Market Data
-                </h3>
+              <div className={`bg-gradient-to-br backdrop-blur-sm rounded-xl p-6 border shadow-xl ${
+                hasValidMarketData()
+                  ? 'from-green-800/20 to-emerald-800/20 border-green-500/30'
+                  : 'from-red-800/20 to-orange-800/20 border-red-500/30'
+              }`}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                    Market Data
+                  </h3>
+                  <div className={`flex items-center space-x-2 text-xs px-2 py-1 rounded-full ${
+                    hasValidMarketData()
+                      ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                      : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                  }`}>
+                    {hasValidMarketData() ? (
+                      <>
+                        <CheckCircle className="h-3 w-3" />
+                        <span>Real MT5 Data</span>
+                      </>
+                    ) : (
+                      <>
+                        <XCircle className="h-3 w-3" />
+                        <span>No Real Data</span>
+                      </>
+                    )}
+                  </div>
+                </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-300">{t('market.symbol')}:</span>
@@ -938,19 +961,27 @@ ${jsonData}`;
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-300">{t('market.candles5min')}:</span>
-                    <span className="text-white">{marketData.timeframes['5min']?.length || 0}</span>
+                    <span className={`${marketData.timeframes['5min']?.length > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {marketData.timeframes['5min']?.length || 0}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-300">{t('market.candles15min')}:</span>
-                    <span className="text-white">{marketData.timeframes['15min']?.length || 0}</span>
+                    <span className={`${marketData.timeframes['15min']?.length > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {marketData.timeframes['15min']?.length || 0}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-300">{t('market.candles1h')}:</span>
-                    <span className="text-white">{marketData.timeframes['1h']?.length || 0}</span>
+                    <span className={`${marketData.timeframes['1h']?.length > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {marketData.timeframes['1h']?.length || 0}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-300">{t('market.candles4h')}:</span>
-                    <span className="text-white">{marketData.timeframes['4h']?.length || 0}</span>
+                    <span className={`${marketData.timeframes['4h']?.length > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {marketData.timeframes['4h']?.length || 0}
+                    </span>
                   </div>
                 </div>
               </div>
