@@ -226,16 +226,16 @@ export const fetchMultiTimeframeData = async (
 // Helper function to get realistic base prices
 const getBasePrice = (symbol: string): number => {
   const cleanSymbol = symbol.toUpperCase();
-  
-  if (cleanSymbol.includes('XAU')) return 2000; // Gold
-  if (cleanSymbol.includes('BTC')) return 45000; // Bitcoin
-  if (cleanSymbol.includes('ETH')) return 3000; // Ethereum
+
+  if (cleanSymbol.includes('XAUUSD') || cleanSymbol.includes('XAU')) return 2600; // Gold
+  if (cleanSymbol.includes('BTCUSD') || cleanSymbol.includes('BTC')) return 65000; // Bitcoin
+  if (cleanSymbol.includes('ETHUSD') || cleanSymbol.includes('ETH')) return 3500; // Ethereum
   if (cleanSymbol.includes('EUR') || cleanSymbol.includes('GBP') || cleanSymbol.includes('AUD')) return 1.1; // Major forex
   if (cleanSymbol.includes('JPY')) return 150; // USD/JPY
-  if (cleanSymbol.includes('SPX')) return 4500; // S&P 500
-  if (cleanSymbol.includes('NDX')) return 15000; // NASDAQ
-  if (cleanSymbol.includes('DJI')) return 35000; // Dow Jones
-  
+  if (cleanSymbol.includes('US500') || cleanSymbol.includes('SPX')) return 5800; // S&P 500
+  if (cleanSymbol.includes('NAS100') || cleanSymbol.includes('NDX')) return 20000; // NASDAQ
+  if (cleanSymbol.includes('US30') || cleanSymbol.includes('DJI')) return 43000; // Dow Jones
+
   return 100; // Default
 };
 
