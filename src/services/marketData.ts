@@ -37,7 +37,7 @@ export const TRADING_PAIRS = [
 ];
 
 // MT5 Flask server configuration
-const MT5_SERVER_URL = 'http://192.168.8.100:5000';
+const MT5_SERVER_URL = import.meta.env.VITE_MT5_SERVER_URL || 'http://localhost:5000';
 
 // Function to initialize market data (simplified for MT5)
 export const initializeMarketData = async () => {
