@@ -196,6 +196,7 @@ export const fetchMultiTimeframeData = async (
         }
 
         const data = await response.json();
+        console.log(`📄 Response for ${tf.key}:`, data);
 
         // Handle MT5 server errors
         if (data.error) {
