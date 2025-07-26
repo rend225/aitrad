@@ -252,11 +252,10 @@ const Dashboard: React.FC = () => {
         errorMessage = t('error.marketDataUnavailable');
       }
       
-      // Fallback to mock data
-      console.log('Falling back to demo data...');
-      const mockData = generateMockMultiTimeframeData(selectedPair);
-      setMarketData(mockData);
-      setError(errorMessage);
+      // Don't use mock data - display error instead
+      console.error('Real market data required for trading analysis');
+      setMarketData(null);
+      setError(`${errorMessage} - Real market data is required for accurate trading analysis.`);
     } finally {
       setDataLoading(false);
     }
