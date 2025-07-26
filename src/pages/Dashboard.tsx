@@ -412,10 +412,20 @@ ${jsonData}`;
         throw new Error('Selected school not found');
       }
 
-      console.log('Generating signal with market data...');
+      // Validate that we have real market data
+      const hasRealData = marketData && Object.values(marketData.timeframes).some(
+        (candles: any) => Array.isArray(candles) && candles.length > 0
+      );
+
+      if (!hasRealData) {
+        throw new Error('Real market data is required for trading analysis. Please ensure MT5 server is running and symbol is available.');
+      }
+
+      console.log('Generating signal with real MT5 market data...');
       console.log('Selected school:', school.name);
       console.log('Selected pair:', selectedPair);
       console.log('AI Provider:', aiProvider);
+      console.log('Market data validation passed - using real MT5 data only');
       
       const result = await generateTradingSignalWithRealData({
         symbol: selectedPair,
