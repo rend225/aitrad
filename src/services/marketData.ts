@@ -263,9 +263,8 @@ export const fetchMultiTimeframeData = async (
   } catch (error) {
     console.error('❌ Error fetching multi-timeframe data from MT5:', error);
 
-    // Fallback to mock data if MT5 server is unavailable
-    console.log(`📊 Generating demo data for ${symbol} as fallback`);
-    return generateMockMultiTimeframeData(symbol);
+    // Don't use mock data - throw the error to inform user that real data is required
+    throw new Error(`Failed to fetch real market data for ${symbol}. ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 };
 
