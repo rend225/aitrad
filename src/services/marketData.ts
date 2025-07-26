@@ -241,12 +241,18 @@ export const fetchMultiTimeframeData = async (
       }
     }
 
+    // Require at least one timeframe with real data for trading analysis
+    if (successfulTimeframes === 0) {
+      throw new Error(`❌ No real market data available for ${cleanSymbol} from MT5 server. Cannot generate trading signal without real data. Please check symbol availability in your MT5 terminal.`);
+    }
+
     console.log(`✅ Multi-timeframe data ready for ${cleanSymbol}:`, {
       '5min': timeframeData['5min']?.length || 0,
       '15min': timeframeData['15min']?.length || 0,
       '1h': timeframeData['1h']?.length || 0,
       '4h': timeframeData['4h']?.length || 0,
-      'successful_timeframes': successfulTimeframes
+      'successful_timeframes': successfulTimeframes,
+      'real_data_only': true
     });
 
     return {
