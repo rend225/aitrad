@@ -165,7 +165,7 @@ export const fetchMultiTimeframeData = async (
       try {
         console.log(`📊 Fetching ${tf.key} (${tf.mt5Timeframe}) data for ${cleanSymbol}...`);
 
-        const url = `${MT5_SERVER_URL}/candles?symbol=${cleanSymbol}&timeframe=${tf.mt5Timeframe}&limit=${candleCount}`;
+        const url = `${MT5_SERVER_URL}/candles?symbol=${encodeURIComponent(cleanSymbol)}&timeframe=${tf.mt5Timeframe}&limit=${candleCount}`;
 
         const response = await fetch(url, {
           method: 'GET',
