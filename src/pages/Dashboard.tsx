@@ -679,8 +679,11 @@ ${jsonData}`;
                   <select
                     value={selectedPair}
                     onChange={(e) => {
-                      setSelectedPair(e.target.value);
+                      const newPair = e.target.value;
+                      console.log(`🔄 User selected new trading pair: "${selectedPair}" → "${newPair}"`);
+                      setSelectedPair(newPair);
                       setMarketData(null);
+                      console.log(`✅ State updated - selectedPair should now be: "${newPair}"`);
                     }}
                     className="w-full px-4 py-3 bg-black/30 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base shadow-inner"
                   >
