@@ -238,15 +238,17 @@ const Dashboard: React.FC = () => {
     setError('');
     
     try {
-      console.log(`Fetching market data for ${selectedPair}...`);
-      
+      console.log(`🎯 DASHBOARD: Fetching market data for selected pair: "${selectedPair}"`);
+      console.log(`📋 Current state - selectedPair: "${selectedPair}", candleCount: ${candleCount}`);
+
       // Ensure API keys are loaded before fetching
       if (apiStatus === 'unknown' || apiStatus === 'error') {
         console.log('🔄 API not ready, initializing...');
         await loadApiKeys();
         await checkApiConnection();
       }
-      
+
+      console.log(`🚀 Calling fetchMultiTimeframeData with symbol: "${selectedPair}"`);
       const data = await fetchMultiTimeframeData(selectedPair, candleCount);
 
       // Validate that we actually have data
