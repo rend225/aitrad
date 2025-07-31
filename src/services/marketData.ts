@@ -180,9 +180,12 @@ export const fetchMultiTimeframeData = async (
     // Fetch each timeframe individually
     const timeframePromises = timeframes.map(async (tf) => {
       try {
-        console.log(`📊 Fetching ${tf.key} (${tf.mt5Timeframe}) data for ${cleanSymbol}...`);
+        console.log(`📊 Fetching ${tf.key} (${tf.mt5Timeframe}) data for "${cleanSymbol}"...`);
 
-        const url = `${MT5_SERVER_URL}/candles?symbol=${encodeURIComponent(cleanSymbol)}&timeframe=${tf.mt5Timeframe}&limit=${candleCount}`;
+        const encodedSymbol = encodeURIComponent(cleanSymbol);
+        const url = `${MT5_SERVER_URL}/candles?symbol=${encodedSymbol}&timeframe=${tf.mt5Timeframe}&limit=${candleCount}`;
+
+        console.log(`🔍 Symbol encoding: "${cleanSymbol}" → "${encodedSymbol}"`);
         console.log(`🔗 Request URL: ${url}`);
 
         const response = await fetch(url, {
