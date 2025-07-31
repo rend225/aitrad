@@ -160,11 +160,13 @@ export const fetchMultiTimeframeData = async (
   candleCount: number = 50
 ): Promise<MultiTimeframeData> => {
   try {
+    console.log(`🎯 fetchMultiTimeframeData called with symbol: "${symbol}", candleCount: ${candleCount}`);
+
     validateApiParams(symbol);
 
     const cleanSymbol = symbol.trim().toUpperCase();
 
-    console.log(`📊 Fetching multi-timeframe data for ${cleanSymbol} from MT5 Flask server...`);
+    console.log(`📊 Processing symbol: "${symbol}" → cleaned: "${cleanSymbol}"`);
     console.log(`🔗 MT5 Server URL: ${MT5_SERVER_URL}`);
 
     // Define timeframe mappings for individual requests
