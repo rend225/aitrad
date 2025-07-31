@@ -830,7 +830,10 @@ ${jsonData}`;
                 <div className="space-y-3">
                   {!marketData && (
                     <button
-                      onClick={fetchMarketData}
+                      onClick={() => {
+                        console.log(`🖱️ Fetch Market Data button clicked - selectedPair: "${selectedPair}"`);
+                        fetchMarketData();
+                      }}
                       disabled={dataLoading || hasReachedDailyLimit}
                       className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-3 sm:py-4 px-6 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm sm:text-base shadow-lg"
                     >
