@@ -514,30 +514,30 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-black/20">
+      <section className="py-12 sm:py-16 lg:py-20 px-3 sm:px-6 lg:px-8 bg-black/20">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-4 sm:mb-6">
               {t('landing.pricing.title')}
             </h2>
-            <p className="text-xl text-gray-300">
+            <p className="text-base sm:text-lg lg:text-xl text-gray-300">
               {t('landing.pricing.subtitle')}
             </p>
           </div>
-          
-          <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto">
             {plans.map((plan, index) => (
-              <div 
+              <div
                 key={index}
-                className={`relative bg-white/10 backdrop-blur-sm rounded-2xl p-8 border transition-all hover:scale-105 ${
-                  plan.popular 
-                    ? 'border-blue-500 ring-2 ring-blue-500/50 shadow-2xl shadow-blue-500/20' 
+                className={`relative bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border transition-all hover:scale-105 active:scale-95 ${
+                  plan.popular
+                    ? 'border-blue-500 ring-2 ring-blue-500/50 shadow-2xl shadow-blue-500/20'
                     : 'border-white/20 hover:border-white/40'
                 }`}
               >
                 {plan.badge && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <div className={`px-6 py-2 rounded-full text-sm font-semibold text-white ${
+                  <div className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2">
+                    <div className={`px-3 py-1 sm:px-6 sm:py-2 rounded-full text-xs sm:text-sm font-semibold text-white ${
                       plan.popular ? 'bg-gradient-to-r from-blue-500 to-purple-500' : 'bg-gradient-to-r from-green-500 to-emerald-500'
                     }`}>
                       {plan.badge}
@@ -545,25 +545,25 @@ const LandingPage: React.FC = () => {
                   </div>
                 )}
 
-                <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-white mb-4">{plan.name}</h3>
-                  <div className="mb-4">
-                    <div className="flex items-baseline justify-center space-x-2">
-                      <span className="text-5xl font-bold text-white">{plan.price}</span>
-                      <span className="text-gray-400">/month</span>
+                <div className="text-center mb-6 sm:mb-8">
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-3 sm:mb-4">{plan.name}</h3>
+                  <div className="mb-3 sm:mb-4">
+                    <div className="flex items-baseline justify-center space-x-1 sm:space-x-2">
+                      <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white">{plan.price}</span>
+                      <span className="text-gray-400 text-sm sm:text-base">/month</span>
                     </div>
                     {plan.originalPrice && (
-                      <div className="text-gray-400 line-through text-lg mt-1">
+                      <div className="text-gray-400 line-through text-sm sm:text-base lg:text-lg mt-1">
                         {plan.originalPrice}/month
                       </div>
                     )}
                   </div>
                 </div>
 
-                <ul className="space-y-4 mb-8">
+                <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
                   {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center text-gray-300">
-                      <CheckCircle className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" />
+                    <li key={featureIndex} className="flex items-center text-gray-300 text-sm sm:text-base">
+                      <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mr-2 sm:mr-3 flex-shrink-0" />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -571,7 +571,7 @@ const LandingPage: React.FC = () => {
 
                 <Link
                   to="/register"
-                  className={`w-full py-4 px-6 rounded-xl font-semibold transition-all text-center block ${
+                  className={`w-full py-3 sm:py-4 px-4 sm:px-6 rounded-xl font-semibold transition-all text-center block touch-manipulation active:scale-95 text-sm sm:text-base ${
                     plan.popular
                       ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg'
                       : 'bg-white/10 hover:bg-white/20 text-white border border-white/30'
@@ -583,23 +583,23 @@ const LandingPage: React.FC = () => {
             ))}
           </div>
 
-          <div className="text-center mt-12">
-            <p className="text-gray-400 mb-6">All plans include:</p>
-            <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-300">
+          <div className="text-center mt-8 sm:mt-12">
+            <p className="text-gray-400 mb-4 sm:mb-6 text-sm sm:text-base">All plans include:</p>
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-gray-300">
               <div className="flex items-center space-x-2">
-                <CheckCircle className="h-4 w-4 text-green-400" />
+                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
                 <span>No setup fees</span>
               </div>
               <div className="flex items-center space-x-2">
-                <CheckCircle className="h-4 w-4 text-green-400" />
+                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
                 <span>Cancel anytime</span>
               </div>
               <div className="flex items-center space-x-2">
-                <CheckCircle className="h-4 w-4 text-green-400" />
+                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
                 <span>24/7 support</span>
               </div>
               <div className="flex items-center space-x-2">
-                <CheckCircle className="h-4 w-4 text-green-400" />
+                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
                 <span>Money-back guarantee</span>
               </div>
             </div>
