@@ -28,6 +28,9 @@ import AdminDashboard from './pages/AdminDashboard';
 
 // Setup pages
 import FirestoreSetup from './components/FirestoreSetup';
+
+// Debug pages
+import Debug from './pages/Debug';
 import AdminMaker from './components/AdminMaker';
 
 function App() {
