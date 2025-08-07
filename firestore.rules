@@ -8,19 +8,37 @@ service cloud.firestore {
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
     
-    // Users collection
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-      allow read: if isAdmin();
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
     }
     
-    // Recommendations collection - fixed to allow admin access
+    // Helper function to check if user owns the document
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Users collection - Allow user creation and self-management
+    match /users/{userId} {
+      // Allow users to create their own document during registration
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      // Allow users to read and update their own data
+      allow read, update: if isOwner(userId);
+      // Allow admins to read all users
+      allow read: if isAdmin();
+      // Allow admins to update any user (for plan management, etc.)
+      allow update: if isAdmin();
+      // Prevent deletion except by admins
+      allow delete: if isAdmin();
+    }
+    
+    // Recommendations collection - User data with admin access
     match /recommendations/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if isOwner(userId);
       allow read, write: if isAdmin();
       
       match /{document=**} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read, write: if isOwner(userId);
         allow read, write: if isAdmin();
       }
     }
@@ -31,8 +49,9 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
+    // Schools - authenticated read, admin write
     match /schools/{document} {
-      allow read: if request.auth != null;
+      allow read: if isAuthenticated();
       allow write: if isAdmin();
     }
     
@@ -56,20 +75,33 @@ service cloud.firestore {
     // Chat system rules
     match /chats/{chatId} {
       // Users can create new chats where they are the owner
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-      // Users can read/update/delete their own chats - made more robust
-      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId && resource.data.userId is string;
+      allow create: if isAuthenticated() && request.auth.uid == request.resource.data.userId;
+      // Users can read/update/delete their own chats
+      allow read, update, delete: if isAuthenticated() && 
+                                   resource != null && 
+                                   resource.data != null && 
+                                   resource.data.userId != null && 
+                                   request.auth.uid == resource.data.userId;
       // Admins can read/write all chats
       allow read, write: if isAdmin();
       
       // Chat messages
       match /messages/{messageId} {
         // Users can create/read/write messages in their own chats
-        allow create: if request.auth != null && get(/databases/$(database)/documents/chats/$(chatId)).data.userId == request.auth.uid;
-        allow read, write: if request.auth != null && get(/databases/$(database)/documents/chats/$(chatId)).data.userId == request.auth.uid;
+        allow create: if isAuthenticated() && 
+                      exists(/databases/$(database)/documents/chats/$(chatId)) &&
+                      get(/databases/$(database)/documents/chats/$(chatId)).data.userId == request.auth.uid;
+        allow read, write: if isAuthenticated() && 
+                           exists(/databases/$(database)/documents/chats/$(chatId)) &&
+                           get(/databases/$(database)/documents/chats/$(chatId)).data.userId == request.auth.uid;
         // Admins can read/write all messages
         allow read, write: if isAdmin();
       }
+    }
+    
+    // Allow temporary anonymous access for debugging (remove in production)
+    match /debug/{document} {
+      allow read, write: if isAuthenticated();
     }
   }
 }
