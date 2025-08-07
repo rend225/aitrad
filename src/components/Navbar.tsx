@@ -162,23 +162,25 @@ const Navbar: React.FC = () => {
 
         {/* Mobile Navigation Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-white/20 py-4">
-            <div className="space-y-2">
+          <div className="md:hidden border-t border-white/20 py-3 sm:py-4 bg-black/20 backdrop-blur-sm">
+            <div className="space-y-1">
               {/* Public Links */}
               <Link
                 to="/plans"
-                className="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors"
+                className="flex items-center space-x-2 text-gray-300 hover:text-white px-3 py-3 rounded-md text-base font-medium hover:bg-white/10 transition-colors touch-manipulation active:bg-white/20"
                 onClick={closeMobileMenu}
               >
-                Pricing
+                <DollarSign className="h-4 w-4" />
+                <span>Pricing</span>
               </Link>
-              
+
               <Link
                 to="/about"
-                className="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors"
+                className="flex items-center space-x-2 text-gray-300 hover:text-white px-3 py-3 rounded-md text-base font-medium hover:bg-white/10 transition-colors touch-manipulation active:bg-white/20"
                 onClick={closeMobileMenu}
               >
-                About
+                <Info className="h-4 w-4" />
+                <span>About</span>
               </Link>
 
               {user ? (
