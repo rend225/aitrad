@@ -148,13 +148,14 @@ const Navbar: React.FC = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center space-x-2">
+          <div className="md:hidden flex items-center space-x-1 sm:space-x-2">
             <LanguageSelector />
             <button
               onClick={toggleMobileMenu}
-              className="text-gray-300 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
+              className="text-gray-300 hover:text-white p-2 sm:p-3 rounded-lg hover:bg-white/10 transition-colors touch-manipulation"
+              aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
             >
-              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isMobileMenuOpen ? <X className="h-5 w-5 sm:h-6 sm:w-6" /> : <Menu className="h-5 w-5 sm:h-6 sm:w-6" />}
             </button>
           </div>
         </div>
