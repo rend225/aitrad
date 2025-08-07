@@ -47,6 +47,7 @@ function App() {
           <Route path="about" element={<About />} />
           <Route path="setup" element={<FirestoreSetup />} />
           <Route path="make-admin" element={<AdminMaker />} />
+          <Route path="debug" element={<Debug />} />
           
           {/* Legal pages */}
           <Route path="privacy" element={<PrivacyPolicy />} />
