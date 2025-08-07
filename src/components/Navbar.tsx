@@ -267,18 +267,22 @@ const Navbar: React.FC = () => {
                 <>
                   <Link
                     to="/login"
-                    className="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors"
+                    className="flex items-center space-x-2 text-gray-300 hover:text-white px-3 py-3 rounded-md text-base font-medium hover:bg-white/10 transition-colors touch-manipulation active:bg-white/20"
                     onClick={closeMobileMenu}
                   >
-                    Login
+                    <User className="h-4 w-4" />
+                    <span>Login</span>
                   </Link>
-                  <Link
-                    to="/register"
-                    className="block bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-base font-medium transition-colors mx-3"
-                    onClick={closeMobileMenu}
-                  >
-                    Get Started
-                  </Link>
+                  <div className="px-3 mt-2">
+                    <Link
+                      to="/register"
+                      className="flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg text-base font-medium transition-colors touch-manipulation active:scale-95 w-full"
+                      onClick={closeMobileMenu}
+                    >
+                      <TrendingUp className="h-4 w-4" />
+                      <span>Get Started</span>
+                    </Link>
+                  </div>
                 </>
               )}
             </div>
