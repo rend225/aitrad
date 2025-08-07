@@ -617,26 +617,26 @@ const LandingPage: React.FC = () => {
       </div>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-12 sm:py-16 lg:py-20 px-3 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-sm rounded-3xl p-12 border border-blue-500/30">
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+          <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 border border-blue-500/30">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-4 sm:mb-6">
               {t('landing.cta.title')}
             </h2>
-            <p className="text-xl text-gray-300 mb-8">
+            <p className="text-base sm:text-lg lg:text-xl text-gray-300 mb-6 sm:mb-8">
               {t('landing.cta.subtitle')}
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col gap-3 sm:gap-4 justify-center">
               <Link
                 to="/register"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all transform hover:scale-105 inline-flex items-center justify-center space-x-2"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-base sm:text-lg font-semibold transition-all transform hover:scale-105 active:scale-95 inline-flex items-center justify-center space-x-2 touch-manipulation"
               >
                 <span>{t('landing.cta.startTrial')}</span>
-                <ArrowRight className={`h-5 w-5 ${isRTL ? 'rotate-180' : ''}`} />
+                <ArrowRight className={`h-4 w-4 sm:h-5 sm:w-5 ${isRTL ? 'rotate-180' : ''}`} />
               </Link>
               <Link
                 to="/plans"
-                className="border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 rounded-xl text-lg font-semibold transition-all"
+                className="border-2 border-white/30 text-white hover:bg-white/10 px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-base sm:text-lg font-semibold transition-all touch-manipulation active:scale-95"
               >
                 View All Plans
               </Link>
