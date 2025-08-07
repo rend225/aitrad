@@ -304,18 +304,18 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-black/20">
+      <section className="py-10 sm:py-16 px-3 sm:px-6 lg:px-8 bg-black/20">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
             {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl mb-4 mx-auto">
-                  <div className="text-white">
+              <div key={index} className="text-center bg-white/5 rounded-xl p-4 sm:p-6 border border-white/10 hover:border-white/20 transition-all duration-300">
+                <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl sm:rounded-2xl mb-3 sm:mb-4 mx-auto">
+                  <div className="text-white scale-75 sm:scale-100">
                     {stat.icon}
                   </div>
                 </div>
-                <div className="text-3xl sm:text-4xl font-bold text-white mb-2">{stat.value}</div>
-                <div className="text-gray-400 font-medium">{stat.label}</div>
+                <div className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-white mb-1 sm:mb-2">{stat.value}</div>
+                <div className="text-gray-400 font-medium text-xs sm:text-sm lg:text-base">{stat.label}</div>
               </div>
             ))}
           </div>
