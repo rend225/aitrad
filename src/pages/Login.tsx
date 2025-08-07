@@ -4,6 +4,7 @@ import { useTranslation } from '../contexts/TranslationContext';
 import { loginUser, resendVerificationEmail, checkEmailVerification } from '../services/auth';
 import { Mail, Lock, Eye, EyeOff, TrendingUp, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 import SocialLoginButtons from '../components/SocialLoginButtons';
+import FirebaseTest from '../components/FirebaseTest';
 
 const Login: React.FC = () => {
   const { t } = useTranslation();
