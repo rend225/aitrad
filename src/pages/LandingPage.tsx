@@ -243,60 +243,59 @@ const LandingPage: React.FC = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <section className="relative py-12 sm:py-16 lg:py-20 px-3 sm:px-6 lg:px-8 overflow-hidden min-h-[90vh] flex items-center">
         {/* Background Effects */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
-        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl"></div>
-        
-        <div className="max-w-7xl mx-auto relative">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center space-x-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-6 py-3 mb-8">
-              <Star className="h-5 w-5 text-yellow-400" />
-              <span className="text-blue-400 font-semibold">Trusted by 10,000+ Traders Worldwide</span>
+        <div className="absolute top-1/4 left-1/4 w-48 h-48 sm:w-72 sm:h-72 bg-blue-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 sm:w-72 sm:h-72 bg-purple-500/20 rounded-full blur-3xl"></div>
+
+        <div className="max-w-7xl mx-auto relative w-full">
+          <div className="text-center">
+            <div className="inline-flex items-center space-x-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-3 py-2 sm:px-6 sm:py-3 mb-6 sm:mb-8">
+              <Star className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400" />
+              <span className="text-blue-400 font-semibold text-xs sm:text-sm">Trusted by 10,000+ Traders</span>
             </div>
-            
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-4 sm:mb-6 leading-tight px-2">
+              <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent block">
                 AI-Powered
               </span>
-              <br />
-              Trading Signals
+              <span className="block mt-2">Trading Signals</span>
             </h1>
-            
-            <p className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed">
+
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-6 sm:mb-8 max-w-4xl mx-auto leading-relaxed px-4">
               {t('landing.hero.subtitle')}
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            <div className="flex flex-col gap-3 sm:gap-4 justify-center mb-8 sm:mb-12 px-4">
               <Link
                 to="/register"
-                className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all transform hover:scale-105 flex items-center justify-center space-x-2 shadow-2xl"
+                className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-base sm:text-lg font-semibold transition-all transform active:scale-95 hover:scale-105 flex items-center justify-center space-x-2 shadow-2xl touch-manipulation"
               >
                 <span>{t('landing.hero.startTrial')}</span>
-                <ArrowRight className={`h-5 w-5 group-hover:translate-x-1 transition-transform ${isRTL ? 'rotate-180' : ''}`} />
+                <ArrowRight className={`h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform ${isRTL ? 'rotate-180' : ''}`} />
               </Link>
               <Link
                 to="/plans"
-                className="border-2 border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all flex items-center justify-center space-x-2"
+                className="border-2 border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-base sm:text-lg font-semibold transition-all flex items-center justify-center space-x-2 touch-manipulation active:scale-95"
               >
-                <Play className="h-5 w-5" />
+                <Play className="h-4 w-4 sm:h-5 sm:w-5" />
                 <span>Watch Demo</span>
               </Link>
             </div>
 
             {/* Trust Indicators */}
-            <div className="flex flex-wrap justify-center items-center gap-8 text-gray-400 text-sm">
+            <div className="flex flex-col sm:flex-row flex-wrap justify-center items-center gap-4 sm:gap-8 text-gray-400 text-xs sm:text-sm px-4">
               <div className="flex items-center space-x-2">
-                <Shield className="h-4 w-4 text-green-400" />
+                <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
                 <span>Bank-Level Security</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Award className="h-4 w-4 text-yellow-400" />
+                <Award className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-400" />
                 <span>Award-Winning Platform</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Clock className="h-4 w-4 text-blue-400" />
+                <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-blue-400" />
                 <span>Real-Time Signals</span>
               </div>
             </div>
