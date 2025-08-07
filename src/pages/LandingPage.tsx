@@ -339,79 +339,84 @@ const LandingPage: React.FC = () => {
           </div>
 
           {!loading && featuredSignals.length > 0 && (
-            <div className="relative">
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center space-x-4">
-                    <div className={`px-4 py-2 rounded-full text-sm font-medium border flex items-center space-x-2 ${getSignalTypeColor(featuredSignals[currentSignalIndex].type)}`}>
-                      {getSignalTypeIcon(featuredSignals[currentSignalIndex].type)}
-                      <span className="uppercase">{featuredSignals[currentSignalIndex].type}</span>
+            <div className="relative px-2 sm:px-0">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border border-white/20">
+                {/* Mobile-optimized header */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                    <div className="flex items-center space-x-2 sm:space-x-4">
+                      <div className={`px-3 py-1 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium border flex items-center space-x-1 sm:space-x-2 ${getSignalTypeColor(featuredSignals[currentSignalIndex].type)}`}>
+                        {getSignalTypeIcon(featuredSignals[currentSignalIndex].type)}
+                        <span className="uppercase">{featuredSignals[currentSignalIndex].type}</span>
+                      </div>
+                      <div className="text-xl sm:text-2xl font-bold text-white">
+                        {featuredSignals[currentSignalIndex].pair}
+                      </div>
                     </div>
-                    <div className="text-2xl font-bold text-white">
-                      {featuredSignals[currentSignalIndex].pair}
-                    </div>
-                    <div className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-sm font-semibold">
+                    <div className="bg-green-500/20 text-green-400 px-2 py-1 sm:px-3 rounded-full text-xs sm:text-sm font-semibold self-start">
                       +{featuredSignals[currentSignalIndex].profitPips} pips
                     </div>
                   </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={prevSignal}
-                      className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all"
-                    >
-                      <ChevronLeft className="h-5 w-5" />
-                    </button>
-                    <span className="text-gray-400 text-sm">
+
+                  <div className="flex items-center justify-between sm:justify-end space-x-2">
+                    <span className="text-gray-400 text-xs sm:text-sm">
                       {currentSignalIndex + 1} / {featuredSignals.length}
                     </span>
-                    <button
-                      onClick={nextSignal}
-                      className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all"
-                    >
-                      <ChevronRight className="h-5 w-5" />
-                    </button>
+                    <div className="flex items-center space-x-1 sm:space-x-2">
+                      <button
+                        onClick={prevSignal}
+                        className="p-2 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/30 text-white transition-all touch-manipulation"
+                      >
+                        <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+                      </button>
+                      <button
+                        onClick={nextSignal}
+                        className="p-2 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/30 text-white transition-all touch-manipulation"
+                      >
+                        <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                  <div className="bg-black/20 rounded-lg p-4">
-                    <p className="text-gray-400 text-sm mb-1">Entry Price</p>
-                    <p className="text-white font-bold text-lg">{featuredSignals[currentSignalIndex].entry}</p>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6">
+                  <div className="bg-black/20 rounded-lg p-3 sm:p-4">
+                    <p className="text-gray-400 text-xs sm:text-sm mb-1">Entry Price</p>
+                    <p className="text-white font-bold text-sm sm:text-base lg:text-lg">{featuredSignals[currentSignalIndex].entry}</p>
                   </div>
-                  
+
                   {featuredSignals[currentSignalIndex].stopLoss && (
-                    <div className="bg-black/20 rounded-lg p-4">
-                      <p className="text-gray-400 text-sm mb-1">Stop Loss</p>
-                      <p className="text-red-400 font-bold text-lg">{featuredSignals[currentSignalIndex].stopLoss}</p>
+                    <div className="bg-black/20 rounded-lg p-3 sm:p-4">
+                      <p className="text-gray-400 text-xs sm:text-sm mb-1">Stop Loss</p>
+                      <p className="text-red-400 font-bold text-sm sm:text-base lg:text-lg">{featuredSignals[currentSignalIndex].stopLoss}</p>
                     </div>
                   )}
-                  
+
                   {featuredSignals[currentSignalIndex].takeProfit1 && (
-                    <div className="bg-black/20 rounded-lg p-4">
-                      <p className="text-gray-400 text-sm mb-1">Take Profit</p>
-                      <p className="text-green-400 font-bold text-lg">{featuredSignals[currentSignalIndex].takeProfit1}</p>
+                    <div className="bg-black/20 rounded-lg p-3 sm:p-4">
+                      <p className="text-gray-400 text-xs sm:text-sm mb-1">Take Profit</p>
+                      <p className="text-green-400 font-bold text-sm sm:text-base lg:text-lg">{featuredSignals[currentSignalIndex].takeProfit1}</p>
                     </div>
                   )}
-                  
-                  <div className="bg-black/20 rounded-lg p-4">
-                    <p className="text-gray-400 text-sm mb-1">Probability</p>
-                    <p className="text-blue-400 font-bold text-lg">{featuredSignals[currentSignalIndex].probability}%</p>
+
+                  <div className="bg-black/20 rounded-lg p-3 sm:p-4">
+                    <p className="text-gray-400 text-xs sm:text-sm mb-1">Probability</p>
+                    <p className="text-blue-400 font-bold text-sm sm:text-base lg:text-lg">{featuredSignals[currentSignalIndex].probability}%</p>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-sm text-gray-400">
-                  <div className="flex items-center space-x-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 text-xs sm:text-sm text-gray-400">
+                  <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4">
                     <div className="flex items-center space-x-2">
-                      <Calendar className="h-4 w-4" />
+                      <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
                       <span>{new Date(featuredSignals[currentSignalIndex].date).toLocaleDateString()}</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <BarChart3 className="h-4 w-4" />
+                      <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
                       <span>{featuredSignals[currentSignalIndex].school}</span>
                     </div>
                   </div>
-                  <div className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-semibold">
+                  <div className="bg-green-500/20 text-green-400 px-2 py-1 sm:px-3 rounded-full text-xs font-semibold self-start sm:self-auto">
                     PROFITABLE
                   </div>
                 </div>
