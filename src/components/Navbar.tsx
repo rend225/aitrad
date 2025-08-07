@@ -212,49 +212,55 @@ const Navbar: React.FC = () => {
 
                   <Link
                     to="/dashboard"
-                    className="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors"
+                    className="flex items-center space-x-2 text-gray-300 hover:text-white px-3 py-3 rounded-md text-base font-medium hover:bg-white/10 transition-colors touch-manipulation active:bg-white/20"
                     onClick={closeMobileMenu}
                   >
-                    Dashboard
+                    <BarChart3 className="h-4 w-4" />
+                    <span>Dashboard</span>
                   </Link>
                   <Link
                     to="/signals"
-                    className="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors"
+                    className="flex items-center space-x-2 text-gray-300 hover:text-white px-3 py-3 rounded-md text-base font-medium hover:bg-white/10 transition-colors touch-manipulation active:bg-white/20"
                     onClick={closeMobileMenu}
                   >
-                    Signals
+                    <TrendingUp className="h-4 w-4" />
+                    <span>Signals</span>
                   </Link>
                   <Link
                     to="/history"
-                    className="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors"
+                    className="flex items-center space-x-2 text-gray-300 hover:text-white px-3 py-3 rounded-md text-base font-medium hover:bg-white/10 transition-colors touch-manipulation active:bg-white/20"
                     onClick={closeMobileMenu}
                   >
-                    History
+                    <BarChart3 className="h-4 w-4" />
+                    <span>History</span>
                   </Link>
                   {user.isAdmin && (
                     <Link
                       to="/admin"
-                      className="block text-yellow-400 hover:text-yellow-300 px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors"
+                      className="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300 px-3 py-3 rounded-md text-base font-medium hover:bg-white/10 transition-colors touch-manipulation active:bg-white/20"
                       onClick={closeMobileMenu}
                     >
-                      Admin
+                      <Shield className="h-4 w-4" />
+                      <span>Admin</span>
                     </Link>
                   )}
                   <Link
                     to="/settings"
-                    className="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors"
+                    className="flex items-center space-x-2 text-gray-300 hover:text-white px-3 py-3 rounded-md text-base font-medium hover:bg-white/10 transition-colors touch-manipulation active:bg-white/20"
                     onClick={closeMobileMenu}
                   >
-                    Settings
+                    <Settings className="h-4 w-4" />
+                    <span>Settings</span>
                   </Link>
                   <button
                     onClick={() => {
                       handleLogout();
                       closeMobileMenu();
                     }}
-                    className="block w-full text-left text-gray-300 hover:text-white px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors"
+                    className="flex items-center space-x-2 w-full text-left text-gray-300 hover:text-white px-3 py-3 rounded-md text-base font-medium hover:bg-white/10 transition-colors touch-manipulation active:bg-white/20"
                   >
-                    Logout
+                    <LogOut className="h-4 w-4" />
+                    <span>Logout</span>
                   </button>
                 </>
               ) : (
