@@ -81,8 +81,20 @@ const Plans: React.FC = () => {
   });
 
   useEffect(() => {
+    // Set a timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      if (loading) {
+        console.warn('⚠️ Plans loading timeout, using fallback data');
+        setPlans(fallbackPlans);
+        setLoading(false);
+        setPaymentError('Connection timeout. Showing standard plans.');
+      }
+    }, 10000); // 10 second timeout
+
     loadPlans();
     initializePayPal();
+
+    return () => clearTimeout(timeout);
   }, []);
 
   const initializePayPal = async () => {
@@ -103,7 +115,7 @@ const Plans: React.FC = () => {
           errors: [],
           lastCheck: new Date()
         });
-        console.log('�� PayPal initialization successful!');
+        console.log('✅ PayPal initialization successful!');
         setPaymentError('');
       } else {
         throw new Error('Failed to connect to PayPal SDK');
