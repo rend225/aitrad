@@ -22,99 +22,145 @@ const facebookProvider = new FacebookAuthProvider();
 googleProvider.addScope('email');
 googleProvider.addScope('profile');
 
-// Helper function to handle Firebase errors
+// Helper function to handle Firebase errors with better messaging
 const handleFirebaseError = (error: any): string => {
-  console.error('Firebase Error Details:', {
+  console.error('🔥 Firebase Error Details:', {
     code: error.code,
     message: error.message,
-    stack: error.stack
+    name: error.name,
+    customData: error.customData
   });
 
+  // Handle specific network errors
+  if (error.code === 'auth/network-request-failed') {
+    return 'Unable to connect to authentication servers. This may be due to:\n' +
+           '• Network connectivity issues\n' +
+           '• Firewall restrictions\n' +
+           '• DNS resolution problems\n\n' +
+           'Please check your internet connection and try again.';
+  }
+
+  // Handle other common errors
   switch (error.code) {
-    case 'auth/network-request-failed':
-      return 'Network connection failed. Please check your internet connection and try again.';
     case 'auth/invalid-api-key':
-      return 'Authentication service is temporarily unavailable. Please try again later.';
+      return 'Authentication service configuration error. Please contact support.';
     case 'auth/user-not-found':
       return 'No account found with this email address.';
     case 'auth/wrong-password':
       return 'Incorrect password. Please try again.';
     case 'auth/email-already-in-use':
-      return 'An account with this email already exists.';
+      return 'An account with this email already exists. Please sign in instead.';
     case 'auth/weak-password':
-      return 'Password is too weak. Please choose a stronger password.';
+      return 'Password is too weak. Please choose a stronger password (at least 6 characters).';
     case 'auth/invalid-email':
       return 'Please enter a valid email address.';
     case 'auth/too-many-requests':
-      return 'Too many failed attempts. Please try again later.';
+      return 'Too many failed attempts. Please wait a few minutes before trying again.';
+    case 'auth/operation-not-allowed':
+      return 'This sign-in method is not enabled. Please contact support.';
+    case 'auth/user-disabled':
+      return 'This account has been disabled. Please contact support.';
     case 'permission-denied':
-      return 'Permission denied. Please try logging in again.';
+      return 'Permission denied. Please try signing in again.';
     default:
-      return error.message || 'An unexpected error occurred. Please try again.';
+      return error.message || 'An unexpected error occurred. Please try again or contact support.';
   }
 };
 
-// Helper function to retry operations
+// Simple retry logic with exponential backoff
 const retryOperation = async <T>(
   operation: () => Promise<T>, 
-  maxRetries: number = 3, 
-  delay: number = 1000
+  maxRetries: number = 2,
+  baseDelay: number = 1000
 ): Promise<T> => {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       return await operation();
     } catch (error: any) {
-      console.log(`Attempt ${attempt} failed:`, error.message);
-      
-      if (attempt === maxRetries) {
-        throw error;
-      }
+      console.log(`🔄 Attempt ${attempt}/${maxRetries} failed:`, error.code || error.message);
       
       // Don't retry certain errors
-      if (error.code === 'auth/email-already-in-use' || 
-          error.code === 'auth/wrong-password' ||
-          error.code === 'auth/user-not-found' ||
-          error.code === 'auth/invalid-email') {
+      const nonRetryableErrors = [
+        'auth/email-already-in-use',
+        'auth/wrong-password',
+        'auth/user-not-found',
+        'auth/invalid-email',
+        'auth/weak-password',
+        'auth/invalid-api-key',
+        'auth/operation-not-allowed',
+        'auth/user-disabled'
+      ];
+      
+      if (nonRetryableErrors.includes(error.code)) {
+        console.log('❌ Non-retryable error, failing immediately');
         throw error;
       }
       
-      // Wait before retrying
-      await new Promise(resolve => setTimeout(resolve, delay * attempt));
+      if (attempt === maxRetries) {
+        console.log('❌ Max retries exceeded');
+        throw error;
+      }
+      
+      // Exponential backoff
+      const delay = baseDelay * Math.pow(2, attempt - 1);
+      console.log(`⏳ Waiting ${delay}ms before retry...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
   throw new Error('Max retries exceeded');
 };
 
+// Check if Firebase is available
+const checkFirebaseAvailability = (): boolean => {
+  if (!auth || !db) {
+    console.error('❌ Firebase services not available');
+    return false;
+  }
+  return true;
+};
+
 export const registerUser = async (email: string, password: string, fullName?: string) => {
   try {
-    console.log('🔄 Starting user registration...');
+    console.log('🔄 Starting user registration for:', email);
+    
+    if (!checkFirebaseAvailability()) {
+      throw new Error('Authentication service is temporarily unavailable. Please try again later.');
+    }
     
     const operation = async () => {
       // Create user account
+      console.log('📝 Creating Firebase user account...');
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      console.log('✅ Firebase user created successfully');
+      console.log('✅ Firebase user created:', user.uid);
       
       // Update user profile with display name if provided
       if (fullName) {
         try {
+          console.log('👤 Updating user profile...');
           await updateProfile(user, { displayName: fullName });
-          console.log('✅ User profile updated with display name');
+          console.log('✅ User profile updated');
         } catch (profileError) {
           console.warn('⚠️ Failed to update profile, continuing...', profileError);
         }
       }
       
-      // Send email verification
-      try {
-        await sendEmailVerification(user);
-        console.log('✅ Verification email sent');
-      } catch (emailError) {
-        console.warn('⚠️ Failed to send verification email, continuing...', emailError);
+      // Send email verification (skip in development for easier testing)
+      if (import.meta.env.PROD) {
+        try {
+          console.log('📧 Sending verification email...');
+          await sendEmailVerification(user);
+          console.log('✅ Verification email sent');
+        } catch (emailError) {
+          console.warn('⚠️ Failed to send verification email, continuing...', emailError);
+        }
+      } else {
+        console.log('🚀 Skipping email verification in development mode');
       }
       
       // Create user document in Firestore
       try {
+        console.log('💾 Creating user document in Firestore...');
         const userData = {
           email: user.email,
           displayName: fullName || '',
@@ -127,47 +173,55 @@ export const registerUser = async (email: string, password: string, fullName?: s
           school: 'default',
           createdAt: serverTimestamp(),
           isAdmin: false,
-          emailVerified: false,
-          verificationEmailSent: true,
-          registrationCompleted: false
+          emailVerified: !import.meta.env.PROD, // Auto-verify in development
+          verificationEmailSent: import.meta.env.PROD,
+          registrationCompleted: true
         };
         
         await setDoc(doc(db, 'users', user.uid), userData);
         console.log('✅ User document created in Firestore');
-      } catch (firestoreError) {
+      } catch (firestoreError: any) {
         console.error('❌ Failed to create user document:', firestoreError);
         // Don't throw here - user account is created, document can be created later
+        console.warn('⚠️ User account created but profile incomplete. You can complete it later.');
       }
       
       return user;
     };
     
     const user = await retryOperation(operation);
-    console.log('✅ User registration completed successfully');
+    console.log('🎉 User registration completed successfully');
     return user;
     
   } catch (error: any) {
-    console.error('❌ Registration error:', error);
+    console.error('❌ Registration failed:', error);
     throw new Error(handleFirebaseError(error));
   }
 };
 
 export const loginUser = async (email: string, password: string) => {
   try {
-    console.log('🔄 Starting user login...');
+    console.log('🔄 Starting user login for:', email);
+    
+    if (!checkFirebaseAvailability()) {
+      throw new Error('Authentication service is temporarily unavailable. Please try again later.');
+    }
     
     const operation = async () => {
+      console.log('🔐 Signing in user...');
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      console.log('✅ User signed in successfully');
+      console.log('✅ User signed in successfully:', user.uid);
       
-      // Check if email is verified (skip for development)
+      // Check if email is verified (skip in development)
       if (!user.emailVerified && import.meta.env.PROD) {
+        console.warn('⚠️ Email not verified');
         throw new Error('Please verify your email address before logging in. Check your inbox for the verification link.');
       }
       
-      // Update user document with email verification status
+      // Update user document with login info
       try {
+        console.log('📝 Updating user document...');
         const userDoc = await getDoc(doc(db, 'users', user.uid));
         if (userDoc.exists()) {
           const userData = userDoc.data();
@@ -180,6 +234,7 @@ export const loginUser = async (email: string, password: string) => {
           console.log('✅ User document updated');
         } else {
           // Create user document if it doesn't exist
+          console.log('📝 Creating missing user document...');
           await setDoc(doc(db, 'users', user.uid), {
             email: user.email,
             displayName: user.displayName || '',
@@ -196,7 +251,7 @@ export const loginUser = async (email: string, password: string) => {
             registrationCompleted: true,
             lastLoginAt: serverTimestamp()
           });
-          console.log('✅ New user document created');
+          console.log('✅ User document created');
         }
       } catch (firestoreError) {
         console.warn('⚠️ Failed to update user document:', firestoreError);
@@ -207,11 +262,11 @@ export const loginUser = async (email: string, password: string) => {
     };
     
     const user = await retryOperation(operation);
-    console.log('✅ User login completed successfully');
+    console.log('🎉 User login completed successfully');
     return user;
     
   } catch (error: any) {
-    console.error('❌ Login error:', error);
+    console.error('❌ Login failed:', error);
     throw new Error(handleFirebaseError(error));
   }
 };
@@ -220,6 +275,10 @@ export const loginUser = async (email: string, password: string) => {
 export const signInWithGoogle = async () => {
   try {
     console.log('🔄 Starting Google sign in...');
+    
+    if (!checkFirebaseAvailability()) {
+      throw new Error('Authentication service is temporarily unavailable. Please try again later.');
+    }
     
     const operation = async () => {
       const result = await signInWithPopup(auth, googleProvider);
@@ -271,6 +330,10 @@ export const signInWithGoogle = async () => {
 export const signInWithFacebook = async () => {
   try {
     console.log('🔄 Starting Facebook sign in...');
+    
+    if (!checkFirebaseAvailability()) {
+      throw new Error('Authentication service is temporarily unavailable. Please try again later.');
+    }
     
     const operation = async () => {
       const result = await signInWithPopup(auth, facebookProvider);
