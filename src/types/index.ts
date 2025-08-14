@@ -21,7 +21,7 @@ export interface Plan {
   price: number;
   recommendations_per_day: number;
   features: string[];
-  paypal_plan_id: string;
+  paypal_plan_id: string | null;
   popular?: boolean;
 }
 
