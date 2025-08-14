@@ -95,7 +95,7 @@ const Plans: React.FC = () => {
     initializePayPal();
 
     return () => clearTimeout(timeout);
-  }, []);
+  }, [loading]); // Add loading dependency
 
   const initializePayPal = async () => {
     try {
