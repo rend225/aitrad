@@ -1,5 +1,6 @@
 import React from 'react';
 import FirebaseTest from '../components/FirebaseTest';
+import FirebaseSetupHelper from '../components/FirebaseSetupHelper';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
@@ -25,6 +26,12 @@ const Debug: React.FC = () => {
 
         {/* Firebase Test Component */}
         <FirebaseTest />
+
+        {/* Firebase Setup Helper */}
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold text-white mb-4">Firebase Setup</h2>
+          <FirebaseSetupHelper />
+        </div>
 
         {/* Additional Debug Information */}
         <div className="mt-8 p-6 bg-slate-800 rounded-lg border border-gray-700">
