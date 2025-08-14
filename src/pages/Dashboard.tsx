@@ -4,7 +4,7 @@ import { useTranslation } from '../contexts/TranslationContext';
 import { getSchools, saveRecommendation, canUserGenerateRecommendation } from '../services/firestore';
 import { doc, getDoc, onSnapshot, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { generateTradingSignalWithRealData } from '../services/gpt';
-import { fetchMultiTimeframeData, TRADING_PAIRS, testApiConnection, loadApiKeys, apiKeysLoaded, initializeMarketData } from '../services/marketData';
+import { fetchMultiTimeframeData, TRADING_PAIRS, testApiConnection, loadApiKeys, apiKeysLoaded, initializeMarketData, apiKeys } from '../services/marketData';
 import { sendTelegramMessage, formatSignalForTelegram } from '../services/telegram';
 import { db } from '../config/firebase';
 import { School } from '../types';
@@ -318,7 +318,7 @@ You are allowed to use only ONE indicator: *ATR (Average True Range)* (14-period
 - Assessing market volatility (avoid trades in low or extremely high volatility)
 - Adjusting risk-to-reward calculations
 
-━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━���━━━━━━
 📌 *Strict Trading Rules:*
 ✅ Only trade setups based on *strong Supply & Demand zones*  
 ✅ Do *NOT* enter immediately — wait for *clear confirmation* like:

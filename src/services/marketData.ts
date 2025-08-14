@@ -1,5 +1,6 @@
 // Enhanced market data service using local MT5 Flask server
 export let apiKeysLoaded = false; // Keep for compatibility but not used
+export const apiKeys: string[] = []; // Empty array for MT5 compatibility
 
 export interface CandleData {
   datetime: string;
