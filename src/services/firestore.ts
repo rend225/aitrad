@@ -340,13 +340,31 @@ export const promoteToFeaturedSignal = async (recommendation: Recommendation, si
   }
 };
 
-// Plans - Enhanced with proper document naming
-export const getPlans = async () => {
+// Plans - Enhanced with proper document naming and timeout
+export const getPlans = async (): Promise<Plan[]> => {
   try {
-    const snapshot = await getDocs(collection(db, 'plans'));
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Plan[];
-  } catch (error) {
-    console.error('Error fetching plans:', error);
+    console.log('🔄 Fetching plans from Firestore...');
+
+    // Add timeout to prevent hanging
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('Firestore request timeout')), 8000);
+    });
+
+    const plansPromise = getDocs(collection(db, 'plans'));
+
+    const snapshot = await Promise.race([plansPromise, timeoutPromise]);
+    const plans = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Plan[];
+
+    console.log(`✅ Successfully fetched ${plans.length} plans from Firestore`);
+    return plans;
+  } catch (error: any) {
+    console.error('❌ Error fetching plans:', error);
+
+    // Check if it's a connectivity issue
+    if (error.code === 'unavailable' || error.message?.includes('timeout')) {
+      throw new Error('Cannot connect to pricing database. Please check your internet connection.');
+    }
+
     throw error;
   }
 };
