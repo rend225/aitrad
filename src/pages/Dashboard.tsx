@@ -213,19 +213,28 @@ const Dashboard: React.FC = () => {
 
   const checkApiConnection = async () => {
     try {
-      console.log('Checking API connection...');
-      
+      console.log('🔍 Checking API connection...');
+
       // Ensure API keys are loaded first
       if (apiKeys.length === 0 || !apiKeysLoaded) {
         await loadApiKeys();
       }
-      
+
       const isConnected = await testApiConnection();
-      console.log('API connection status:', isConnected ? 'connected' : 'error');
+      console.log('🔗 API connection status:', isConnected ? 'connected' : 'error');
       setApiStatus(isConnected ? 'connected' : 'error');
-    } catch (error) {
-      console.error('Error checking API connection:', error);
+
+      if (!isConnected) {
+        console.warn('⚠️ MT5 server is not available. Market data features will be limited.');
+      }
+    } catch (error: any) {
+      console.error('❌ Error checking API connection:', error);
       setApiStatus('error');
+
+      // Don't show intrusive errors for expected MT5 server unavailability
+      if (error.message?.includes('Failed to fetch')) {
+        console.info('💡 MT5 server is not running. This is normal for development without MT5 setup.');
+      }
     }
   };
 
