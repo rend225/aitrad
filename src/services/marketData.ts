@@ -323,50 +323,6 @@ const getBasePrice = (symbol: string): number => {
   return 100; // Default
 };
 
-// Generate mock candles (fallback when MT5 server is unavailable)
-const generateMockCandles = (count: number, basePrice: number = 100): CandleData[] => {
-  const candles: CandleData[] = [];
-  let currentPrice = basePrice;
-  
-  for (let i = 0; i < count; i++) {
-    const change = (Math.random() - 0.5) * (basePrice * 0.02); // 2% max change
-    const open = currentPrice;
-    const close = currentPrice + change;
-    const high = Math.max(open, close) + Math.random() * (basePrice * 0.01);
-    const low = Math.min(open, close) - Math.random() * (basePrice * 0.01);
-    
-    candles.push({
-      datetime: new Date(Date.now() - (count - i) * 5 * 60 * 1000).toISOString(), // 5 min intervals
-      open: Number(open.toFixed(basePrice > 100 ? 2 : 4)),
-      high: Number(high.toFixed(basePrice > 100 ? 2 : 4)),
-      low: Number(low.toFixed(basePrice > 100 ? 2 : 4)),
-      close: Number(close.toFixed(basePrice > 100 ? 2 : 4)),
-      volume: Math.floor(Math.random() * 10000) + 1000
-    });
-    
-    currentPrice = close;
-  }
-  
-  return candles;
-};
-
-// Generate complete mock multi-timeframe data
-export const generateMockMultiTimeframeData = (symbol: string): MultiTimeframeData => {
-  const cleanSymbol = symbol.toUpperCase();
-  const basePrice = getBasePrice(cleanSymbol);
-  
-  console.log(`📊 Generating demo data for ${cleanSymbol} with base price ${basePrice}`);
-  
-  return {
-    symbol: cleanSymbol,
-    timeframes: {
-      "5min": generateMockCandles(50, basePrice),
-      "15min": generateMockCandles(50, basePrice),
-      "1h": generateMockCandles(50, basePrice),
-      "4h": generateMockCandles(50, basePrice)
-    }
-  };
-};
 
 // Test MT5 server connection
 export const testApiConnection = async (): Promise<boolean> => {
