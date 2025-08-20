@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import LiveChat from './components/LiveChat';
 import SEOHead from './components/SEOHead';
 import GoogleTranslateScript from './components/GoogleTranslateScript';
+import FirebaseSetupNotification from './components/FirebaseSetupNotification';
 
 // Public pages
 import LandingPage from './pages/LandingPage';
@@ -37,6 +38,7 @@ function App() {
   return (
     <Router>
       <SEOHead />
+      <FirebaseSetupNotification />
       <Routes>
         <Route path="/" element={<Layout />}>
           {/* Public routes */}

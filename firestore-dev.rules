@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // TEMPORARY DEVELOPMENT RULES - Very permissive for initial setup
+    // TODO: Replace with production rules after setup is complete
+    
+    // Allow all authenticated users to read/write everything for now
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Allow public read access for certain collections
+    match /plans/{document} {
+      allow read: if true; // Public read for pricing page
+    }
+    
+    match /settings/{document} {
+      allow read: if true; // Public read for SEO settings
+    }
+    
+    match /featured_signals/{document} {
+      allow read: if true; // Public read for homepage
+    }
+    
+    // NOTE: These rules are for development only!
+    // In production, use the more restrictive rules from firestore.rules
+  }
+}
