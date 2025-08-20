@@ -4,7 +4,7 @@ import { useTranslation } from '../contexts/TranslationContext';
 import { getSchools, saveRecommendation, canUserGenerateRecommendation } from '../services/firestore';
 import { doc, getDoc, onSnapshot, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { generateTradingSignalWithRealData } from '../services/gpt';
-import { fetchMultiTimeframeData, generateMockMultiTimeframeData, TRADING_PAIRS, testApiConnection, loadApiKeys, apiKeysLoaded, initializeMarketData } from '../services/marketData';
+import { fetchMultiTimeframeData, TRADING_PAIRS, testApiConnection, loadApiKeys, apiKeysLoaded, initializeMarketData, apiKeys } from '../services/marketData';
 import { sendTelegramMessage, formatSignalForTelegram } from '../services/telegram';
 import { db } from '../config/firebase';
 import { School } from '../types';
@@ -63,6 +63,31 @@ const Dashboard: React.FC = () => {
   });
   const [loadingLatestAnalysis, setLoadingLatestAnalysis] = useState(true);
   const analysisRef = useRef<HTMLDivElement>(null);
+
+  // Function to validate if we have real market data
+  const hasValidMarketData = (): boolean => {
+    console.log('🔍 Validating market data...', {
+      hasMarketData: !!marketData,
+      hasTimeframes: !!(marketData?.timeframes),
+      timeframeData: marketData?.timeframes ? Object.entries(marketData.timeframes).map(([tf, candles]) => ({
+        timeframe: tf,
+        candleCount: Array.isArray(candles) ? candles.length : 0
+      })) : 'No timeframes'
+    });
+
+    if (!marketData || !marketData.timeframes) {
+      console.log('❌ Validation failed: No market data or timeframes');
+      return false;
+    }
+
+    // Check if at least one timeframe has real data
+    const hasData = Object.values(marketData.timeframes).some(
+      (candles: any) => Array.isArray(candles) && candles.length > 0
+    );
+
+    console.log(`${hasData ? '✅' : '❌'} Validation result: ${hasData ? 'HAS VALID DATA' : 'NO VALID DATA'}`);
+    return hasData;
+  };
 
   useEffect(() => {
     loadSchools();
@@ -188,19 +213,28 @@ const Dashboard: React.FC = () => {
 
   const checkApiConnection = async () => {
     try {
-      console.log('Checking API connection...');
-      
+      console.log('🔍 Checking API connection...');
+
       // Ensure API keys are loaded first
       if (apiKeys.length === 0 || !apiKeysLoaded) {
         await loadApiKeys();
       }
-      
+
       const isConnected = await testApiConnection();
-      console.log('API connection status:', isConnected ? 'connected' : 'error');
+      console.log('🔗 API connection status:', isConnected ? 'connected' : 'error');
       setApiStatus(isConnected ? 'connected' : 'error');
-    } catch (error) {
-      console.error('Error checking API connection:', error);
+
+      if (!isConnected) {
+        console.warn('⚠️ MT5 server is not available. Market data features will be limited.');
+      }
+    } catch (error: any) {
+      console.error('❌ Error checking API connection:', error);
       setApiStatus('error');
+
+      // Don't show intrusive errors for expected MT5 server unavailability
+      if (error.message?.includes('Failed to fetch')) {
+        console.info('💡 MT5 server is not running. This is normal for development without MT5 setup.');
+      }
     }
   };
 
@@ -213,29 +247,41 @@ const Dashboard: React.FC = () => {
     setError('');
     
     try {
-      console.log(`Fetching market data for ${selectedPair}...`);
-      
+      console.log(`🎯 DASHBOARD: Fetching market data for selected pair: "${selectedPair}"`);
+      console.log(`📋 Current state - selectedPair: "${selectedPair}", candleCount: ${candleCount}`);
+
       // Ensure API keys are loaded before fetching
       if (apiStatus === 'unknown' || apiStatus === 'error') {
         console.log('🔄 API not ready, initializing...');
         await loadApiKeys();
         await checkApiConnection();
       }
-      
+
+      console.log(`🚀 Calling fetchMultiTimeframeData with symbol: "${selectedPair}"`);
       const data = await fetchMultiTimeframeData(selectedPair, candleCount);
-      console.log('Market data fetched successfully:', {
-        symbol: data.symbol,
-        timeframes: {
-          '5min': data.timeframes['5min']?.length,
-          '15min': data.timeframes['15min']?.length,
-          '1h': data.timeframes['1h']?.length,
-          '4h': data.timeframes['4h']?.length
-        }
-      });
-      
-      setMarketData(data);
-      setError('');
-      setApiStatus('connected');
+
+      // Validate that we actually have data
+      const totalCandles = Object.values(data.timeframes).reduce((sum: number, candles: any) =>
+        sum + (Array.isArray(candles) ? candles.length : 0), 0
+      );
+
+      console.log('🎉 DASHBOARD: Market data fetch completed');
+      console.log(`📊 Symbol: ${data.symbol}`);
+      console.log(`📈 Total candles: ${totalCandles}`);
+
+      if (totalCandles > 0) {
+        console.log('🚀 DASHBOARD: Market data is READY for trading analysis');
+        setMarketData(data);
+        setError('');
+        setApiStatus('connected');
+
+        // Log validation after setting data
+        setTimeout(() => {
+          console.log(`✅ UI Validation: ${hasValidMarketData() ? 'PASSED - Generate button should be enabled' : 'FAILED - Generate button should be disabled'}`);
+        }, 100);
+      } else {
+        throw new Error('No candles received from MT5 server');
+      }
     } catch (error: any) {
       console.error('Error fetching market data:', error);
       setApiStatus('error');
@@ -252,11 +298,10 @@ const Dashboard: React.FC = () => {
         errorMessage = t('error.marketDataUnavailable');
       }
       
-      // Fallback to mock data
-      console.log('Falling back to demo data...');
-      const mockData = generateMockMultiTimeframeData(selectedPair);
-      setMarketData(mockData);
-      setError(errorMessage);
+      // Don't use mock data - display error instead
+      console.error('Real market data required for trading analysis');
+      setMarketData(null);
+      setError(`${errorMessage} - Real market data is required for accurate trading analysis.`);
     } finally {
       setDataLoading(false);
     }
@@ -282,7 +327,7 @@ You are allowed to use only ONE indicator: *ATR (Average True Range)* (14-period
 - Assessing market volatility (avoid trades in low or extremely high volatility)
 - Adjusting risk-to-reward calculations
 
-━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━���━━━━━━
 📌 *Strict Trading Rules:*
 ✅ Only trade setups based on *strong Supply & Demand zones*  
 ✅ Do *NOT* enter immediately — wait for *clear confirmation* like:
@@ -413,10 +458,20 @@ ${jsonData}`;
         throw new Error('Selected school not found');
       }
 
-      console.log('Generating signal with market data...');
+      // Validate that we have real market data
+      const hasRealData = marketData && Object.values(marketData.timeframes).some(
+        (candles: any) => Array.isArray(candles) && candles.length > 0
+      );
+
+      if (!hasRealData) {
+        throw new Error('Real market data is required for trading analysis. Please ensure MT5 server is running and symbol is available.');
+      }
+
+      console.log('Generating signal with real MT5 market data...');
       console.log('Selected school:', school.name);
       console.log('Selected pair:', selectedPair);
       console.log('AI Provider:', aiProvider);
+      console.log('Market data validation passed - using real MT5 data only');
       
       const result = await generateTradingSignalWithRealData({
         symbol: selectedPair,
@@ -633,8 +688,11 @@ ${jsonData}`;
                   <select
                     value={selectedPair}
                     onChange={(e) => {
-                      setSelectedPair(e.target.value);
+                      const newPair = e.target.value;
+                      console.log(`🔄 User selected new trading pair: "${selectedPair}" → "${newPair}"`);
+                      setSelectedPair(newPair);
                       setMarketData(null);
+                      console.log(`✅ State updated - selectedPair should now be: "${newPair}"`);
                     }}
                     className="w-full px-4 py-3 bg-black/30 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base shadow-inner"
                   >
@@ -765,11 +823,14 @@ ${jsonData}`;
                 )}
 
                 {error && (
-                  <div className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 px-4 py-3 rounded-lg flex items-start space-x-2 shadow-lg">
-                    <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                  <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg flex items-start space-x-2 shadow-lg">
+                    <XCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-medium">Notice</p>
+                      <p className="font-medium">Real Market Data Required</p>
                       <p className="text-sm">{error}</p>
+                      <p className="text-xs mt-2 text-red-300">
+                        Trading recommendations require authentic MT5 market data. Demo data is not used for analysis.
+                      </p>
                     </div>
                   </div>
                 )}
@@ -778,7 +839,10 @@ ${jsonData}`;
                 <div className="space-y-3">
                   {!marketData && (
                     <button
-                      onClick={fetchMarketData}
+                      onClick={() => {
+                        console.log(`🖱️ Fetch Market Data button clicked - selectedPair: "${selectedPair}"`);
+                        fetchMarketData();
+                      }}
                       disabled={dataLoading || hasReachedDailyLimit}
                       className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-3 sm:py-4 px-6 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm sm:text-base shadow-lg"
                     >
@@ -803,7 +867,7 @@ ${jsonData}`;
 
                   <button
                     onClick={generateSignal}
-                    disabled={loading || !marketData || hasReachedDailyLimit}
+                    disabled={loading || !hasValidMarketData() || hasReachedDailyLimit}
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 sm:py-4 px-6 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm sm:text-base shadow-lg"
                   >
                     {loading ? (
@@ -816,10 +880,15 @@ ${jsonData}`;
                         <AlertCircle className="h-5 w-5" />
                         <span>Daily Limit Reached</span>
                       </>
+                    ) : !hasValidMarketData() ? (
+                      <>
+                        <AlertCircle className="h-5 w-5" />
+                        <span>Real Market Data Required</span>
+                      </>
                     ) : (
                       <>
                         <Zap className="h-5 w-5" />
-                        <span>{marketData ? '2. ' : ''}{t('signal.generateSignal')}</span>
+                        <span>2. {t('signal.generateSignal')}</span>
                       </>
                     )}
                   </button>
@@ -903,10 +972,33 @@ ${jsonData}`;
 
             {/* Market Data Info */}
             {marketData && (
-              <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-xl p-6 border border-white/10 shadow-xl">
-                <h3 className="text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
-                  Market Data
-                </h3>
+              <div className={`bg-gradient-to-br backdrop-blur-sm rounded-xl p-6 border shadow-xl ${
+                hasValidMarketData()
+                  ? 'from-green-800/20 to-emerald-800/20 border-green-500/30'
+                  : 'from-red-800/20 to-orange-800/20 border-red-500/30'
+              }`}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                    Market Data
+                  </h3>
+                  <div className={`flex items-center space-x-2 text-xs px-2 py-1 rounded-full ${
+                    hasValidMarketData()
+                      ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                      : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                  }`}>
+                    {hasValidMarketData() ? (
+                      <>
+                        <CheckCircle className="h-3 w-3" />
+                        <span>Real MT5 Data</span>
+                      </>
+                    ) : (
+                      <>
+                        <XCircle className="h-3 w-3" />
+                        <span>No Real Data</span>
+                      </>
+                    )}
+                  </div>
+                </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-300">{t('market.symbol')}:</span>
@@ -914,19 +1006,27 @@ ${jsonData}`;
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-300">{t('market.candles5min')}:</span>
-                    <span className="text-white">{marketData.timeframes['5min']?.length || 0}</span>
+                    <span className={`${marketData.timeframes['5min']?.length > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {marketData.timeframes['5min']?.length || 0}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-300">{t('market.candles15min')}:</span>
-                    <span className="text-white">{marketData.timeframes['15min']?.length || 0}</span>
+                    <span className={`${marketData.timeframes['15min']?.length > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {marketData.timeframes['15min']?.length || 0}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-300">{t('market.candles1h')}:</span>
-                    <span className="text-white">{marketData.timeframes['1h']?.length || 0}</span>
+                    <span className={`${marketData.timeframes['1h']?.length > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {marketData.timeframes['1h']?.length || 0}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-300">{t('market.candles4h')}:</span>
-                    <span className="text-white">{marketData.timeframes['4h']?.length || 0}</span>
+                    <span className={`${marketData.timeframes['4h']?.length > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {marketData.timeframes['4h']?.length || 0}
+                    </span>
                   </div>
                 </div>
               </div>

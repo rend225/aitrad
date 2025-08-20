@@ -31,13 +31,13 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className="bg-white/10 backdrop-blur-md border-b border-white/20 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-14 sm:h-16">
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2" onClick={closeMobileMenu}>
-              <TrendingUp className="h-8 w-8 text-blue-400" />
-              <span className="text-xl font-bold text-white">AI Trader</span>
+              <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-blue-400" />
+              <span className="text-lg sm:text-xl font-bold text-white">AI Trader</span>
             </Link>
           </div>
           
@@ -148,36 +148,39 @@ const Navbar: React.FC = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center space-x-2">
+          <div className="md:hidden flex items-center space-x-1 sm:space-x-2">
             <LanguageSelector />
             <button
               onClick={toggleMobileMenu}
-              className="text-gray-300 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
+              className="text-gray-300 hover:text-white p-2 sm:p-3 rounded-lg hover:bg-white/10 transition-colors touch-manipulation"
+              aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
             >
-              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isMobileMenuOpen ? <X className="h-5 w-5 sm:h-6 sm:w-6" /> : <Menu className="h-5 w-5 sm:h-6 sm:w-6" />}
             </button>
           </div>
         </div>
 
         {/* Mobile Navigation Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-white/20 py-4">
-            <div className="space-y-2">
+          <div className="md:hidden border-t border-white/20 py-3 sm:py-4 bg-black/20 backdrop-blur-sm">
+            <div className="space-y-1">
               {/* Public Links */}
               <Link
                 to="/plans"
-                className="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors"
+                className="flex items-center space-x-2 text-gray-300 hover:text-white px-3 py-3 rounded-md text-base font-medium hover:bg-white/10 transition-colors touch-manipulation active:bg-white/20"
                 onClick={closeMobileMenu}
               >
-                Pricing
+                <DollarSign className="h-4 w-4" />
+                <span>Pricing</span>
               </Link>
-              
+
               <Link
                 to="/about"
-                className="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors"
+                className="flex items-center space-x-2 text-gray-300 hover:text-white px-3 py-3 rounded-md text-base font-medium hover:bg-white/10 transition-colors touch-manipulation active:bg-white/20"
                 onClick={closeMobileMenu}
               >
-                About
+                <Info className="h-4 w-4" />
+                <span>About</span>
               </Link>
 
               {user ? (
@@ -209,67 +212,77 @@ const Navbar: React.FC = () => {
 
                   <Link
                     to="/dashboard"
-                    className="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors"
+                    className="flex items-center space-x-2 text-gray-300 hover:text-white px-3 py-3 rounded-md text-base font-medium hover:bg-white/10 transition-colors touch-manipulation active:bg-white/20"
                     onClick={closeMobileMenu}
                   >
-                    Dashboard
+                    <BarChart3 className="h-4 w-4" />
+                    <span>Dashboard</span>
                   </Link>
                   <Link
                     to="/signals"
-                    className="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors"
+                    className="flex items-center space-x-2 text-gray-300 hover:text-white px-3 py-3 rounded-md text-base font-medium hover:bg-white/10 transition-colors touch-manipulation active:bg-white/20"
                     onClick={closeMobileMenu}
                   >
-                    Signals
+                    <TrendingUp className="h-4 w-4" />
+                    <span>Signals</span>
                   </Link>
                   <Link
                     to="/history"
-                    className="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors"
+                    className="flex items-center space-x-2 text-gray-300 hover:text-white px-3 py-3 rounded-md text-base font-medium hover:bg-white/10 transition-colors touch-manipulation active:bg-white/20"
                     onClick={closeMobileMenu}
                   >
-                    History
+                    <BarChart3 className="h-4 w-4" />
+                    <span>History</span>
                   </Link>
                   {user.isAdmin && (
                     <Link
                       to="/admin"
-                      className="block text-yellow-400 hover:text-yellow-300 px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors"
+                      className="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300 px-3 py-3 rounded-md text-base font-medium hover:bg-white/10 transition-colors touch-manipulation active:bg-white/20"
                       onClick={closeMobileMenu}
                     >
-                      Admin
+                      <Shield className="h-4 w-4" />
+                      <span>Admin</span>
                     </Link>
                   )}
                   <Link
                     to="/settings"
-                    className="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors"
+                    className="flex items-center space-x-2 text-gray-300 hover:text-white px-3 py-3 rounded-md text-base font-medium hover:bg-white/10 transition-colors touch-manipulation active:bg-white/20"
                     onClick={closeMobileMenu}
                   >
-                    Settings
+                    <Settings className="h-4 w-4" />
+                    <span>Settings</span>
                   </Link>
                   <button
                     onClick={() => {
                       handleLogout();
                       closeMobileMenu();
                     }}
-                    className="block w-full text-left text-gray-300 hover:text-white px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors"
+                    className="flex items-center space-x-2 w-full text-left text-gray-300 hover:text-white px-3 py-3 rounded-md text-base font-medium hover:bg-white/10 transition-colors touch-manipulation active:bg-white/20"
                   >
-                    Logout
+                    <LogOut className="h-4 w-4" />
+                    <span>Logout</span>
                   </button>
                 </>
               ) : (
                 <>
                   <Link
                     to="/login"
-                    className="block text-gray-300 hover:text-white px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 transition-colors"
+                    className="flex items-center space-x-2 text-gray-300 hover:text-white px-3 py-3 rounded-md text-base font-medium hover:bg-white/10 transition-colors touch-manipulation active:bg-white/20"
                     onClick={closeMobileMenu}
                   >
-                    Login
+                    <User className="h-4 w-4" />
+                    <span>Login</span>
                   </Link>
-                  <Link
-                    to="/register"
-                    className="block bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-base font-medium transition-colors mx-3"
-                    onClick={closeMobileMenu}
-                  >
-                    Get Started
-                  </Link>
+                  <div className="px-3 mt-2">
+                    <Link
+                      to="/register"
+                      className="flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg text-base font-medium transition-colors touch-manipulation active:scale-95 w-full"
+                      onClick={closeMobileMenu}
+                    >
+                      <TrendingUp className="h-4 w-4" />
+                      <span>Get Started</span>
+                    </Link>
+                  </div>
                 </>
               )}
             </div>

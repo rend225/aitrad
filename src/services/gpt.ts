@@ -343,31 +343,3 @@ export const generateTradingSignal = async (prompt: string, candlestickData: any
   });
   return result.analysis;
 };
-
-// Generate mock candlestick data (keeping for fallback)
-export const generateMockCandlestickData = () => {
-  const data = [];
-  const basePrice = 100;
-  let currentPrice = basePrice;
-  
-  for (let i = 0; i < 20; i++) {
-    const change = (Math.random() - 0.5) * 4;
-    const open = currentPrice;
-    const close = currentPrice + change;
-    const high = Math.max(open, close) + Math.random() * 2;
-    const low = Math.min(open, close) - Math.random() * 2;
-    
-    data.push({
-      timestamp: new Date(Date.now() - (19 - i) * 60 * 60 * 1000).toISOString(),
-      open: Number(open.toFixed(2)),
-      high: Number(high.toFixed(2)),
-      low: Number(low.toFixed(2)),
-      close: Number(close.toFixed(2)),
-      volume: Math.floor(Math.random() * 10000) + 1000
-    });
-    
-    currentPrice = close;
-  }
-  
-  return data;
-};

@@ -305,12 +305,15 @@ const Register: React.FC = () => {
           </div>
 
           {/* Email Verification Notice */}
-          <div className="mt-6 bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
+          <div className="mt-6 bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
             <div className="flex items-start space-x-2">
-              <Mail className="h-4 w-4 text-yellow-400 mt-0.5 flex-shrink-0" />
-              <div className="text-yellow-300 text-xs">
-                <p className="font-medium mb-1">Email Verification Required</p>
-                <p>After registration, you'll need to verify your email address before accessing your dashboard. Check your inbox for the verification link.</p>
+              <Mail className="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" />
+              <div className="text-blue-300 text-xs">
+                <p className="font-medium mb-1">Email Verification (Development Mode)</p>
+                <p>For testing purposes, you can access your account immediately after registration. In production, email verification would be required. If you want to test email verification, check your inbox and spam folder.</p>
+                <p className="mt-2 text-blue-200">
+                  <strong>Not receiving emails?</strong> Visit <Link to="/debug" className="underline hover:text-blue-100">Debug Page</Link> for troubleshooting tips.
+                </p>
               </div>
             </div>
           </div>

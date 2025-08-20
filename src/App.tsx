@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import LiveChat from './components/LiveChat';
 import SEOHead from './components/SEOHead';
 import GoogleTranslateScript from './components/GoogleTranslateScript';
+import FirebaseSetupNotification from './components/FirebaseSetupNotification';
 
 // Public pages
 import LandingPage from './pages/LandingPage';
@@ -28,12 +29,16 @@ import AdminDashboard from './pages/AdminDashboard';
 
 // Setup pages
 import FirestoreSetup from './components/FirestoreSetup';
+
+// Debug pages
+import Debug from './pages/Debug';
 import AdminMaker from './components/AdminMaker';
 
 function App() {
   return (
     <Router>
       <SEOHead />
+      <FirebaseSetupNotification />
       <Routes>
         <Route path="/" element={<Layout />}>
           {/* Public routes */}
@@ -44,6 +49,7 @@ function App() {
           <Route path="about" element={<About />} />
           <Route path="setup" element={<FirestoreSetup />} />
           <Route path="make-admin" element={<AdminMaker />} />
+          <Route path="debug" element={<Debug />} />
           
           {/* Legal pages */}
           <Route path="privacy" element={<PrivacyPolicy />} />

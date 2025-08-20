@@ -1,5 +1,6 @@
 // Enhanced market data service using local MT5 Flask server
 export let apiKeysLoaded = false; // Keep for compatibility but not used
+export const apiKeys: string[] = []; // Empty array for MT5 compatibility
 
 export interface CandleData {
   datetime: string;
@@ -29,15 +30,15 @@ export const TRADING_PAIRS = [
   { symbol: 'AUDUSD', name: 'AUD/USD', category: 'Forex' },
   { symbol: 'USDCAD', name: 'USD/CAD', category: 'Forex' },
   { symbol: 'NZDUSD', name: 'NZD/USD', category: 'Forex' },
-  { symbol: 'SPX', name: 'S&P 500', category: 'Indices' },
-  { symbol: 'NDX', name: 'NASDAQ 100', category: 'Indices' },
-  { symbol: 'DJI', name: 'Dow Jones', category: 'Indices' },
+  { symbol: 'US500', name: 'S&P 500', category: 'Indices' },
+  { symbol: 'NAS100', name: 'NASDAQ 100', category: 'Indices' },
+  { symbol: 'US30', name: 'Dow Jones', category: 'Indices' },
   { symbol: 'BTCUSD', name: 'Bitcoin', category: 'Crypto' },
   { symbol: 'ETHUSD', name: 'Ethereum', category: 'Crypto' },
 ];
 
 // MT5 Flask server configuration
-const MT5_SERVER_URL = 'http://192.168.8.100:5000';
+const MT5_SERVER_URL = import.meta.env.VITE_MT5_SERVER_URL || 'http://127.0.0.1:5000';
 
 // Function to initialize market data (simplified for MT5)
 export const initializeMarketData = async () => {
@@ -136,177 +137,236 @@ export const fetchCandlestickData = async (
     return processedCandles;
     
   } catch (error: any) {
-    console.error(`❌ Error fetching MT5 data: ${error.message}`);
-    throw error;
+    console.error(`❌ Error fetching ${interval} data for ${cleanSymbol}:`, error);
+
+    // Provide specific error messages and fallbacks
+    if (error.name === 'AbortError') {
+      console.warn(`⚠️ Request timeout for ${cleanSymbol} ${interval} data`);
+      throw new Error(`Request timeout - MT5 server may be slow or offline`);
+    } else if (error.message?.includes('Failed to fetch')) {
+      console.warn(`⚠️ Network error fetching ${cleanSymbol} data - MT5 server offline`);
+      throw new Error(`MT5 server is not running. Please start the server: python mt5_server.py`);
+    } else if (error.message?.includes('ECONNREFUSED')) {
+      console.warn(`⚠️ Connection refused for ${cleanSymbol} data`);
+      throw new Error(`Cannot connect to MT5 server on port 5000`);
+    } else {
+      throw new Error(`Failed to fetch candlestick data: ${error.message}`);
+    }
   }
 };
 
+// Check available symbols on MT5 server
+export const checkAvailableSymbols = async (): Promise<string[]> => {
+  try {
+    const response = await fetch(`${MT5_SERVER_URL}/symbols`);
+    if (response.ok) {
+      const data = await response.json();
+      return data.symbols?.map((s: any) => s.name) || [];
+    }
+  } catch (error) {
+    console.warn('Could not fetch available symbols from MT5 server');
+  }
+  return [];
+};
+
 export const fetchMultiTimeframeData = async (
-  symbol: string, 
+  symbol: string,
   candleCount: number = 50
 ): Promise<MultiTimeframeData> => {
-  try {    
+  try {
+    console.log(`🎯 fetchMultiTimeframeData called with symbol: "${symbol}", candleCount: ${candleCount}`);
+
     validateApiParams(symbol);
-    
+
     const cleanSymbol = symbol.trim().toUpperCase();
-    
-    console.log(`📊 Fetching multi-timeframe data for ${cleanSymbol} from MT5...`);
-    
-    // Define timeframe mappings for MT5
+
+    console.log(`📊 Processing symbol: "${symbol}" → cleaned: "${cleanSymbol}"`);
+    console.log(`🔗 MT5 Server URL: ${MT5_SERVER_URL}`);
+
+    // Define timeframe mappings for individual requests
     const timeframes = [
-      { key: "5min", interval: "M5", count: candleCount },
-      { key: "15min", interval: "M15", count: candleCount },
-      { key: "1h", interval: "H1", count: candleCount },
-      { key: "4h", interval: "H4", count: candleCount }
+      { key: "5min", mt5Timeframe: "M5" },
+      { key: "15min", mt5Timeframe: "M15" },
+      { key: "1h", mt5Timeframe: "H1" },
+      { key: "4h", mt5Timeframe: "H4" }
     ];
-    
-    // Fetch timeframes sequentially
-    const timeframeData: any = {};
-    let errors: string[] = [];
-    
-    for (let i = 0; i < timeframes.length; i++) {
-      const tf = timeframes[i];
+
+    // Fetch each timeframe individually
+    const timeframePromises = timeframes.map(async (tf) => {
       try {
-        console.log(`📊 Fetching ${tf.key} data for ${cleanSymbol}...`);
-        
-        // Small delay between requests to be gentle on MT5 server
-        if (i > 0) {
-          await new Promise(resolve => setTimeout(resolve, 200));
+        console.log(`📊 Fetching ${tf.key} (${tf.mt5Timeframe}) data for "${cleanSymbol}"...`);
+
+        const encodedSymbol = encodeURIComponent(cleanSymbol);
+        const url = `${MT5_SERVER_URL}/candles?symbol=${encodedSymbol}&timeframe=${tf.mt5Timeframe}&limit=${candleCount}`;
+
+        console.log(`🔍 Symbol encoding: "${cleanSymbol}" → "${encodedSymbol}"`);
+        console.log(`🔗 Request URL: ${url}`);
+
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        
-        timeframeData[tf.key] = await fetchCandlestickData(cleanSymbol, tf.interval, tf.count);
-        
+
+        const data = await response.json();
+        console.log(`📄 Response for ${tf.key}:`, data);
+
+        // Handle MT5 server errors
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        // Validate and extract candles - handle both direct array and wrapped formats
+        let candles;
+        if (Array.isArray(data)) {
+          // Direct array response
+          candles = data;
+          console.log(`📋 Direct array response detected for ${tf.key}`);
+        } else if (data.candles && Array.isArray(data.candles)) {
+          // Wrapped in candles property
+          candles = data.candles;
+          console.log(`📋 Wrapped response detected for ${tf.key}`);
+        } else {
+          throw new Error(`Invalid response format for ${cleanSymbol} on ${tf.mt5Timeframe} timeframe. Expected array or object with candles property.`);
+        }
+
+        if (!candles || candles.length === 0) {
+          throw new Error(`No candlestick data available for ${cleanSymbol} on ${tf.mt5Timeframe} timeframe. Symbol may not exist in MT5 terminal.`);
+        }
+
+        console.log(`✅ Successfully fetched ${candles.length} ${tf.key} candles for ${cleanSymbol}`);
+
+        return {
+          timeframe: tf.key,
+          candles: candles
+        };
+
       } catch (error: any) {
-        console.warn(`⚠️ Failed to fetch ${tf.interval} data: ${error.message}`);
-        errors.push(`${tf.key}: ${error.message}`);
-        
-        // Generate fallback data for this timeframe
-        timeframeData[tf.key] = generateMockCandles(tf.count, getBasePrice(cleanSymbol));
+        console.error(`❌ Failed to fetch ${tf.key} data for ${cleanSymbol}: ${error.message}`);
+        console.warn(`💡 Try these common symbol alternatives: ${cleanSymbol}m, ${cleanSymbol.replace('m', '')}, ${cleanSymbol.replace('M', '')}`);
+
+        // Return empty candles when MT5 server is unavailable
+        return {
+          timeframe: tf.key,
+          candles: []
+        };
+      }
+    });
+
+    // Wait for all timeframe requests to complete
+    const results = await Promise.all(timeframePromises);
+
+    // Combine results into the expected format
+    const timeframeData: any = {};
+    let successfulTimeframes = 0;
+    let totalCandles = 0;
+
+    for (const result of results) {
+      timeframeData[result.timeframe] = result.candles;
+      if (result.candles && Array.isArray(result.candles) && result.candles.length > 0) {
+        successfulTimeframes++;
+        totalCandles += result.candles.length;
+        console.log(`✅ ${result.timeframe}: ${result.candles.length} candles loaded successfully`);
+      } else {
+        console.warn(`⚠️ ${result.timeframe}: No candles available`);
       }
     }
-    
-    // Check if we have at least some real data
-    const successfulTimeframes = Object.keys(timeframeData).filter(key => 
-      timeframeData[key].length > 0 && !errors.some(e => e.startsWith(key))
-    );
-    
-    if (successfulTimeframes.length === 0) {
-      console.warn(`⚠️ All timeframes failed for ${cleanSymbol}, using demo data`);
-      throw new Error(`Failed to fetch any real data for ${cleanSymbol}. MT5 server may be unavailable.`);
+
+    // Require at least one timeframe with real data for trading analysis
+    if (successfulTimeframes === 0) {
+      throw new Error(`❌ No real market data available for ${cleanSymbol} from MT5 server. Cannot generate trading signal without real data. Please check symbol availability in your MT5 terminal.`);
     }
-    
-    // Log success/failure summary
-    if (errors.length > 0) {
-      console.warn(`⚠️ Some timeframes failed for ${cleanSymbol}:`, errors);
-    }
-    
-    console.log(`✅ Multi-timeframe data ready for ${cleanSymbol}:`, {
-      '5min': timeframeData['5min'].length,
-      '15min': timeframeData['15min'].length,
-      '1h': timeframeData['1h'].length,
-      '4h': timeframeData['4h'].length,
-      'real_data_timeframes': successfulTimeframes.length,
-      'fallback_timeframes': errors.length
+
+    console.log(`✅ MARKET DATA FETCH COMPLETED FOR ${cleanSymbol}:`);
+    console.log(`📊 Successful timeframes: ${successfulTimeframes}/4`);
+    console.log(`📈 Total candles loaded: ${totalCandles}`);
+    console.log(`📋 Timeframe breakdown:`, {
+      '5min': timeframeData['5min']?.length || 0,
+      '15min': timeframeData['15min']?.length || 0,
+      '1h': timeframeData['1h']?.length || 0,
+      '4h': timeframeData['4h']?.length || 0
     });
-    
+    console.log(`🎯 STATUS: ${successfulTimeframes > 0 ? 'READY FOR TRADING ANALYSIS' : 'INSUFFICIENT DATA'}`);
+
     return {
       symbol: cleanSymbol,
       timeframes: timeframeData
     };
-    
+
   } catch (error) {
     console.error('❌ Error fetching multi-timeframe data from MT5:', error);
-    throw new Error(`Failed to fetch MT5 market data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+
+    // Throw the error to inform user that real data is required
+    throw new Error(`Failed to fetch real market data for ${symbol}. ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 };
 
 // Helper function to get realistic base prices
 const getBasePrice = (symbol: string): number => {
   const cleanSymbol = symbol.toUpperCase();
-  
-  if (cleanSymbol.includes('XAU')) return 2000; // Gold
-  if (cleanSymbol.includes('BTC')) return 45000; // Bitcoin
-  if (cleanSymbol.includes('ETH')) return 3000; // Ethereum
+
+  if (cleanSymbol.includes('XAUUSD') || cleanSymbol.includes('XAU')) return 2600; // Gold
+  if (cleanSymbol.includes('BTCUSD') || cleanSymbol.includes('BTC')) return 65000; // Bitcoin
+  if (cleanSymbol.includes('ETHUSD') || cleanSymbol.includes('ETH')) return 3500; // Ethereum
   if (cleanSymbol.includes('EUR') || cleanSymbol.includes('GBP') || cleanSymbol.includes('AUD')) return 1.1; // Major forex
   if (cleanSymbol.includes('JPY')) return 150; // USD/JPY
-  if (cleanSymbol.includes('SPX')) return 4500; // S&P 500
-  if (cleanSymbol.includes('NDX')) return 15000; // NASDAQ
-  if (cleanSymbol.includes('DJI')) return 35000; // Dow Jones
-  
+  if (cleanSymbol.includes('US500') || cleanSymbol.includes('SPX')) return 5800; // S&P 500
+  if (cleanSymbol.includes('NAS100') || cleanSymbol.includes('NDX')) return 20000; // NASDAQ
+  if (cleanSymbol.includes('US30') || cleanSymbol.includes('DJI')) return 43000; // Dow Jones
+
   return 100; // Default
 };
 
-// Generate mock candles (fallback when MT5 server is unavailable)
-const generateMockCandles = (count: number, basePrice: number = 100): CandleData[] => {
-  const candles: CandleData[] = [];
-  let currentPrice = basePrice;
-  
-  for (let i = 0; i < count; i++) {
-    const change = (Math.random() - 0.5) * (basePrice * 0.02); // 2% max change
-    const open = currentPrice;
-    const close = currentPrice + change;
-    const high = Math.max(open, close) + Math.random() * (basePrice * 0.01);
-    const low = Math.min(open, close) - Math.random() * (basePrice * 0.01);
-    
-    candles.push({
-      datetime: new Date(Date.now() - (count - i) * 5 * 60 * 1000).toISOString(), // 5 min intervals
-      open: Number(open.toFixed(basePrice > 100 ? 2 : 4)),
-      high: Number(high.toFixed(basePrice > 100 ? 2 : 4)),
-      low: Number(low.toFixed(basePrice > 100 ? 2 : 4)),
-      close: Number(close.toFixed(basePrice > 100 ? 2 : 4)),
-      volume: Math.floor(Math.random() * 10000) + 1000
-    });
-    
-    currentPrice = close;
-  }
-  
-  return candles;
-};
-
-// Generate complete mock multi-timeframe data
-export const generateMockMultiTimeframeData = (symbol: string): MultiTimeframeData => {
-  const cleanSymbol = symbol.toUpperCase();
-  const basePrice = getBasePrice(cleanSymbol);
-  
-  console.log(`📊 Generating demo data for ${cleanSymbol} with base price ${basePrice}`);
-  
-  return {
-    symbol: cleanSymbol,
-    timeframes: {
-      "5min": generateMockCandles(50, basePrice),
-      "15min": generateMockCandles(50, basePrice),
-      "1h": generateMockCandles(50, basePrice),
-      "4h": generateMockCandles(50, basePrice)
-    }
-  };
-};
 
 // Test MT5 server connection
 export const testApiConnection = async (): Promise<boolean> => {
   try {
-    console.log(`🔍 Testing MT5 server connection at ${MT5_SERVER_URL}...`);
-    
-    // Test with a simple health check or basic symbol request
+    console.log(`🔍 Testing MT5 Flask server connection at ${MT5_SERVER_URL}...`);
+
+    // Test with the health endpoint
     const response = await fetch(`${MT5_SERVER_URL}/health`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json'
-      }
+      },
+      // Add timeout
+      signal: AbortSignal.timeout(5000)
     });
-    
+
     if (!response.ok) {
-      // If health endpoint doesn't exist, try a simple candle request
-      const testResponse = await fetch(`${MT5_SERVER_URL}/candles?symbol=EURUSD&timeframe=M1&limit=1`);
-      if (!testResponse.ok) {
-        throw new Error(`MT5 server returned HTTP ${testResponse.status}`);
-      }
+      throw new Error(`MT5 server returned HTTP ${response.status}: ${response.statusText}`);
     }
-    
-    console.log(`✅ MT5 server connection successful`);
+
+    const healthData = await response.json();
+
+    if (healthData.status !== 'healthy') {
+      throw new Error(`MT5 server health check failed: ${healthData.message || 'Unknown error'}`);
+    }
+
+    console.log(`✅ MT5 Flask server connection successful - MT5 Connected: ${healthData.mt5_connected}`);
     return true;
-    
-  } catch (error) {
-    console.error(`❌ MT5 server connection test failed:`, error);
+
+  } catch (error: any) {
+    console.error('❌ MT5 Flask server connection test failed:', error);
+
+    // Provide specific error messages based on error type
+    if (error.name === 'AbortError') {
+      console.warn('⚠️ Connection test timed out (5s) - MT5 server may be offline');
+    } else if (error.message?.includes('Failed to fetch')) {
+      console.warn('⚠️ Network error - MT5 server is not running or unreachable');
+      console.info('💡 To start MT5 server: python mt5_server.py');
+    } else if (error.code === 'ECONNREFUSED') {
+      console.warn('⚠️ Connection refused - MT5 server is not running on port 5000');
+    } else {
+      console.warn('⚠️ MT5 server appears to be offline or unreachable:', error.message);
+    }
+
     return false;
   }
 };

@@ -47,7 +47,53 @@
 }
 
 /* Mobile-first responsive design improvements */
+* {
+  /* Prevent text selection on UI elements for better mobile UX */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth scrolling for mobile */
+html {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Touch manipulation for better mobile interactions */
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Improve button tap targets */
+button, a, [role="button"] {
+  min-height: 44px; /* iOS recommended minimum touch target */
+  min-width: 44px;
+}
+
+/* Better focus states for mobile */
+@media (hover: none) and (pointer: coarse) {
+  .hover\:scale-105:hover {
+    transform: none;
+  }
+
+  .active\:scale-95:active {
+    transform: scale(0.95);
+  }
+
+  .active\:bg-white\/20:active {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .active\:bg-white\/30:active {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* Improved mobile typography */
 @media (max-width: 640px) {
+  body {
+    font-size: 16px; /* Prevent zoom on iOS */
+    line-height: 1.5;
+  }
+
   .container {
     padding-left: 1rem;
     padding-right: 1rem;

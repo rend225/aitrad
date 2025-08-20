@@ -243,60 +243,59 @@ const LandingPage: React.FC = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <section className="relative py-12 sm:py-16 lg:py-20 px-3 sm:px-6 lg:px-8 overflow-hidden min-h-[90vh] flex items-center">
         {/* Background Effects */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
-        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl"></div>
-        
-        <div className="max-w-7xl mx-auto relative">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center space-x-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-6 py-3 mb-8">
-              <Star className="h-5 w-5 text-yellow-400" />
-              <span className="text-blue-400 font-semibold">Trusted by 10,000+ Traders Worldwide</span>
+        <div className="absolute top-1/4 left-1/4 w-48 h-48 sm:w-72 sm:h-72 bg-blue-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 sm:w-72 sm:h-72 bg-purple-500/20 rounded-full blur-3xl"></div>
+
+        <div className="max-w-7xl mx-auto relative w-full">
+          <div className="text-center">
+            <div className="inline-flex items-center space-x-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-3 py-2 sm:px-6 sm:py-3 mb-6 sm:mb-8">
+              <Star className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400" />
+              <span className="text-blue-400 font-semibold text-xs sm:text-sm">Trusted by 10,000+ Traders</span>
             </div>
-            
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-4 sm:mb-6 leading-tight px-2">
+              <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent block">
                 AI-Powered
               </span>
-              <br />
-              Trading Signals
+              <span className="block mt-2">Trading Signals</span>
             </h1>
-            
-            <p className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed">
+
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-6 sm:mb-8 max-w-4xl mx-auto leading-relaxed px-4">
               {t('landing.hero.subtitle')}
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            <div className="flex flex-col gap-3 sm:gap-4 justify-center mb-8 sm:mb-12 px-4">
               <Link
                 to="/register"
-                className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all transform hover:scale-105 flex items-center justify-center space-x-2 shadow-2xl"
+                className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-base sm:text-lg font-semibold transition-all transform active:scale-95 hover:scale-105 flex items-center justify-center space-x-2 shadow-2xl touch-manipulation"
               >
                 <span>{t('landing.hero.startTrial')}</span>
-                <ArrowRight className={`h-5 w-5 group-hover:translate-x-1 transition-transform ${isRTL ? 'rotate-180' : ''}`} />
+                <ArrowRight className={`h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform ${isRTL ? 'rotate-180' : ''}`} />
               </Link>
               <Link
                 to="/plans"
-                className="border-2 border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all flex items-center justify-center space-x-2"
+                className="border-2 border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-base sm:text-lg font-semibold transition-all flex items-center justify-center space-x-2 touch-manipulation active:scale-95"
               >
-                <Play className="h-5 w-5" />
+                <Play className="h-4 w-4 sm:h-5 sm:w-5" />
                 <span>Watch Demo</span>
               </Link>
             </div>
 
             {/* Trust Indicators */}
-            <div className="flex flex-wrap justify-center items-center gap-8 text-gray-400 text-sm">
+            <div className="flex flex-col sm:flex-row flex-wrap justify-center items-center gap-4 sm:gap-8 text-gray-400 text-xs sm:text-sm px-4">
               <div className="flex items-center space-x-2">
-                <Shield className="h-4 w-4 text-green-400" />
+                <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
                 <span>Bank-Level Security</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Award className="h-4 w-4 text-yellow-400" />
+                <Award className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-400" />
                 <span>Award-Winning Platform</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Clock className="h-4 w-4 text-blue-400" />
+                <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-blue-400" />
                 <span>Real-Time Signals</span>
               </div>
             </div>
@@ -305,18 +304,18 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-black/20">
+      <section className="py-10 sm:py-16 px-3 sm:px-6 lg:px-8 bg-black/20">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
             {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl mb-4 mx-auto">
-                  <div className="text-white">
+              <div key={index} className="text-center bg-white/5 rounded-xl p-4 sm:p-6 border border-white/10 hover:border-white/20 transition-all duration-300">
+                <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl sm:rounded-2xl mb-3 sm:mb-4 mx-auto">
+                  <div className="text-white scale-75 sm:scale-100">
                     {stat.icon}
                   </div>
                 </div>
-                <div className="text-3xl sm:text-4xl font-bold text-white mb-2">{stat.value}</div>
-                <div className="text-gray-400 font-medium">{stat.label}</div>
+                <div className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-white mb-1 sm:mb-2">{stat.value}</div>
+                <div className="text-gray-400 font-medium text-xs sm:text-sm lg:text-base">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -340,79 +339,84 @@ const LandingPage: React.FC = () => {
           </div>
 
           {!loading && featuredSignals.length > 0 && (
-            <div className="relative">
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center space-x-4">
-                    <div className={`px-4 py-2 rounded-full text-sm font-medium border flex items-center space-x-2 ${getSignalTypeColor(featuredSignals[currentSignalIndex].type)}`}>
-                      {getSignalTypeIcon(featuredSignals[currentSignalIndex].type)}
-                      <span className="uppercase">{featuredSignals[currentSignalIndex].type}</span>
+            <div className="relative px-2 sm:px-0">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border border-white/20">
+                {/* Mobile-optimized header */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                    <div className="flex items-center space-x-2 sm:space-x-4">
+                      <div className={`px-3 py-1 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium border flex items-center space-x-1 sm:space-x-2 ${getSignalTypeColor(featuredSignals[currentSignalIndex].type)}`}>
+                        {getSignalTypeIcon(featuredSignals[currentSignalIndex].type)}
+                        <span className="uppercase">{featuredSignals[currentSignalIndex].type}</span>
+                      </div>
+                      <div className="text-xl sm:text-2xl font-bold text-white">
+                        {featuredSignals[currentSignalIndex].pair}
+                      </div>
                     </div>
-                    <div className="text-2xl font-bold text-white">
-                      {featuredSignals[currentSignalIndex].pair}
-                    </div>
-                    <div className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-sm font-semibold">
+                    <div className="bg-green-500/20 text-green-400 px-2 py-1 sm:px-3 rounded-full text-xs sm:text-sm font-semibold self-start">
                       +{featuredSignals[currentSignalIndex].profitPips} pips
                     </div>
                   </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={prevSignal}
-                      className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all"
-                    >
-                      <ChevronLeft className="h-5 w-5" />
-                    </button>
-                    <span className="text-gray-400 text-sm">
+
+                  <div className="flex items-center justify-between sm:justify-end space-x-2">
+                    <span className="text-gray-400 text-xs sm:text-sm">
                       {currentSignalIndex + 1} / {featuredSignals.length}
                     </span>
-                    <button
-                      onClick={nextSignal}
-                      className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all"
-                    >
-                      <ChevronRight className="h-5 w-5" />
-                    </button>
+                    <div className="flex items-center space-x-1 sm:space-x-2">
+                      <button
+                        onClick={prevSignal}
+                        className="p-2 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/30 text-white transition-all touch-manipulation"
+                      >
+                        <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+                      </button>
+                      <button
+                        onClick={nextSignal}
+                        className="p-2 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/30 text-white transition-all touch-manipulation"
+                      >
+                        <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                  <div className="bg-black/20 rounded-lg p-4">
-                    <p className="text-gray-400 text-sm mb-1">Entry Price</p>
-                    <p className="text-white font-bold text-lg">{featuredSignals[currentSignalIndex].entry}</p>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6">
+                  <div className="bg-black/20 rounded-lg p-3 sm:p-4">
+                    <p className="text-gray-400 text-xs sm:text-sm mb-1">Entry Price</p>
+                    <p className="text-white font-bold text-sm sm:text-base lg:text-lg">{featuredSignals[currentSignalIndex].entry}</p>
                   </div>
-                  
+
                   {featuredSignals[currentSignalIndex].stopLoss && (
-                    <div className="bg-black/20 rounded-lg p-4">
-                      <p className="text-gray-400 text-sm mb-1">Stop Loss</p>
-                      <p className="text-red-400 font-bold text-lg">{featuredSignals[currentSignalIndex].stopLoss}</p>
+                    <div className="bg-black/20 rounded-lg p-3 sm:p-4">
+                      <p className="text-gray-400 text-xs sm:text-sm mb-1">Stop Loss</p>
+                      <p className="text-red-400 font-bold text-sm sm:text-base lg:text-lg">{featuredSignals[currentSignalIndex].stopLoss}</p>
                     </div>
                   )}
-                  
+
                   {featuredSignals[currentSignalIndex].takeProfit1 && (
-                    <div className="bg-black/20 rounded-lg p-4">
-                      <p className="text-gray-400 text-sm mb-1">Take Profit</p>
-                      <p className="text-green-400 font-bold text-lg">{featuredSignals[currentSignalIndex].takeProfit1}</p>
+                    <div className="bg-black/20 rounded-lg p-3 sm:p-4">
+                      <p className="text-gray-400 text-xs sm:text-sm mb-1">Take Profit</p>
+                      <p className="text-green-400 font-bold text-sm sm:text-base lg:text-lg">{featuredSignals[currentSignalIndex].takeProfit1}</p>
                     </div>
                   )}
-                  
-                  <div className="bg-black/20 rounded-lg p-4">
-                    <p className="text-gray-400 text-sm mb-1">Probability</p>
-                    <p className="text-blue-400 font-bold text-lg">{featuredSignals[currentSignalIndex].probability}%</p>
+
+                  <div className="bg-black/20 rounded-lg p-3 sm:p-4">
+                    <p className="text-gray-400 text-xs sm:text-sm mb-1">Probability</p>
+                    <p className="text-blue-400 font-bold text-sm sm:text-base lg:text-lg">{featuredSignals[currentSignalIndex].probability}%</p>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-sm text-gray-400">
-                  <div className="flex items-center space-x-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 text-xs sm:text-sm text-gray-400">
+                  <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4">
                     <div className="flex items-center space-x-2">
-                      <Calendar className="h-4 w-4" />
+                      <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
                       <span>{new Date(featuredSignals[currentSignalIndex].date).toLocaleDateString()}</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <BarChart3 className="h-4 w-4" />
+                      <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
                       <span>{featuredSignals[currentSignalIndex].school}</span>
                     </div>
                   </div>
-                  <div className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-semibold">
+                  <div className="bg-green-500/20 text-green-400 px-2 py-1 sm:px-3 rounded-full text-xs font-semibold self-start sm:self-auto">
                     PROFITABLE
                   </div>
                 </div>
@@ -447,24 +451,24 @@ const LandingPage: React.FC = () => {
             </p>
           </div>
           
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {features.map((feature, index) => (
-              <div 
+              <div
                 key={index}
-                className="group bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/20 transition-all hover:scale-105"
+                className="group bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border border-white/20 hover:bg-white/20 transition-all hover:scale-105 active:scale-95"
               >
-                <div className="bg-gradient-to-r from-blue-500 to-purple-600 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <div className="text-white">
+                <div className="bg-gradient-to-r from-blue-500 to-purple-600 w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform">
+                  <div className="text-white scale-75 sm:scale-100">
                     {feature.icon}
                   </div>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4">
+                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-3 sm:mb-4">
                   {feature.title}
                 </h3>
-                <p className="text-gray-300 mb-4 leading-relaxed">
+                <p className="text-gray-300 mb-3 sm:mb-4 leading-relaxed text-sm sm:text-base">
                   {feature.description}
                 </p>
-                <div className="text-blue-400 font-semibold">
+                <div className="text-blue-400 font-semibold text-sm sm:text-base">
                   {feature.stats}
                 </div>
               </div>
@@ -474,33 +478,33 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-12 sm:py-16 lg:py-20 px-3 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-4 sm:mb-6">
               What Our Traders Say
             </h2>
-            <p className="text-xl text-gray-300">
+            <p className="text-base sm:text-lg lg:text-xl text-gray-300">
               Join thousands of successful traders who trust AI Trader
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-                <div className="flex items-center mb-4">
+              <div key={index} className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border border-white/20 hover:border-white/30 transition-all">
+                <div className="flex items-center mb-3 sm:mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                    <Star key={i} className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-300 mb-6 leading-relaxed">
+                <p className="text-gray-300 mb-4 sm:mb-6 leading-relaxed text-sm sm:text-base">
                   "{testimonial.content}"
                 </p>
                 <div className="flex items-center space-x-3">
-                  <div className="text-2xl">{testimonial.avatar}</div>
+                  <div className="text-xl sm:text-2xl">{testimonial.avatar}</div>
                   <div>
-                    <div className="text-white font-semibold">{testimonial.name}</div>
-                    <div className="text-gray-400 text-sm">{testimonial.role}</div>
+                    <div className="text-white font-semibold text-sm sm:text-base">{testimonial.name}</div>
+                    <div className="text-gray-400 text-xs sm:text-sm">{testimonial.role}</div>
                   </div>
                 </div>
               </div>
@@ -510,30 +514,30 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-black/20">
+      <section className="py-12 sm:py-16 lg:py-20 px-3 sm:px-6 lg:px-8 bg-black/20">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-4 sm:mb-6">
               {t('landing.pricing.title')}
             </h2>
-            <p className="text-xl text-gray-300">
+            <p className="text-base sm:text-lg lg:text-xl text-gray-300">
               {t('landing.pricing.subtitle')}
             </p>
           </div>
-          
-          <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto">
             {plans.map((plan, index) => (
-              <div 
+              <div
                 key={index}
-                className={`relative bg-white/10 backdrop-blur-sm rounded-2xl p-8 border transition-all hover:scale-105 ${
-                  plan.popular 
-                    ? 'border-blue-500 ring-2 ring-blue-500/50 shadow-2xl shadow-blue-500/20' 
+                className={`relative bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border transition-all hover:scale-105 active:scale-95 ${
+                  plan.popular
+                    ? 'border-blue-500 ring-2 ring-blue-500/50 shadow-2xl shadow-blue-500/20'
                     : 'border-white/20 hover:border-white/40'
                 }`}
               >
                 {plan.badge && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <div className={`px-6 py-2 rounded-full text-sm font-semibold text-white ${
+                  <div className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2">
+                    <div className={`px-3 py-1 sm:px-6 sm:py-2 rounded-full text-xs sm:text-sm font-semibold text-white ${
                       plan.popular ? 'bg-gradient-to-r from-blue-500 to-purple-500' : 'bg-gradient-to-r from-green-500 to-emerald-500'
                     }`}>
                       {plan.badge}
@@ -541,25 +545,25 @@ const LandingPage: React.FC = () => {
                   </div>
                 )}
 
-                <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-white mb-4">{plan.name}</h3>
-                  <div className="mb-4">
-                    <div className="flex items-baseline justify-center space-x-2">
-                      <span className="text-5xl font-bold text-white">{plan.price}</span>
-                      <span className="text-gray-400">/month</span>
+                <div className="text-center mb-6 sm:mb-8">
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-3 sm:mb-4">{plan.name}</h3>
+                  <div className="mb-3 sm:mb-4">
+                    <div className="flex items-baseline justify-center space-x-1 sm:space-x-2">
+                      <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white">{plan.price}</span>
+                      <span className="text-gray-400 text-sm sm:text-base">/month</span>
                     </div>
                     {plan.originalPrice && (
-                      <div className="text-gray-400 line-through text-lg mt-1">
+                      <div className="text-gray-400 line-through text-sm sm:text-base lg:text-lg mt-1">
                         {plan.originalPrice}/month
                       </div>
                     )}
                   </div>
                 </div>
 
-                <ul className="space-y-4 mb-8">
+                <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
                   {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center text-gray-300">
-                      <CheckCircle className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" />
+                    <li key={featureIndex} className="flex items-center text-gray-300 text-sm sm:text-base">
+                      <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-400 mr-2 sm:mr-3 flex-shrink-0" />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -567,7 +571,7 @@ const LandingPage: React.FC = () => {
 
                 <Link
                   to="/register"
-                  className={`w-full py-4 px-6 rounded-xl font-semibold transition-all text-center block ${
+                  className={`w-full py-3 sm:py-4 px-4 sm:px-6 rounded-xl font-semibold transition-all text-center block touch-manipulation active:scale-95 text-sm sm:text-base ${
                     plan.popular
                       ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg'
                       : 'bg-white/10 hover:bg-white/20 text-white border border-white/30'
@@ -579,23 +583,23 @@ const LandingPage: React.FC = () => {
             ))}
           </div>
 
-          <div className="text-center mt-12">
-            <p className="text-gray-400 mb-6">All plans include:</p>
-            <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-300">
+          <div className="text-center mt-8 sm:mt-12">
+            <p className="text-gray-400 mb-4 sm:mb-6 text-sm sm:text-base">All plans include:</p>
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-gray-300">
               <div className="flex items-center space-x-2">
-                <CheckCircle className="h-4 w-4 text-green-400" />
+                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
                 <span>No setup fees</span>
               </div>
               <div className="flex items-center space-x-2">
-                <CheckCircle className="h-4 w-4 text-green-400" />
+                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
                 <span>Cancel anytime</span>
               </div>
               <div className="flex items-center space-x-2">
-                <CheckCircle className="h-4 w-4 text-green-400" />
+                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
                 <span>24/7 support</span>
               </div>
               <div className="flex items-center space-x-2">
-                <CheckCircle className="h-4 w-4 text-green-400" />
+                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
                 <span>Money-back guarantee</span>
               </div>
             </div>
@@ -613,26 +617,26 @@ const LandingPage: React.FC = () => {
       </div>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-12 sm:py-16 lg:py-20 px-3 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-sm rounded-3xl p-12 border border-blue-500/30">
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+          <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 border border-blue-500/30">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-4 sm:mb-6">
               {t('landing.cta.title')}
             </h2>
-            <p className="text-xl text-gray-300 mb-8">
+            <p className="text-base sm:text-lg lg:text-xl text-gray-300 mb-6 sm:mb-8">
               {t('landing.cta.subtitle')}
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col gap-3 sm:gap-4 justify-center">
               <Link
                 to="/register"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all transform hover:scale-105 inline-flex items-center justify-center space-x-2"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-base sm:text-lg font-semibold transition-all transform hover:scale-105 active:scale-95 inline-flex items-center justify-center space-x-2 touch-manipulation"
               >
                 <span>{t('landing.cta.startTrial')}</span>
-                <ArrowRight className={`h-5 w-5 ${isRTL ? 'rotate-180' : ''}`} />
+                <ArrowRight className={`h-4 w-4 sm:h-5 sm:w-5 ${isRTL ? 'rotate-180' : ''}`} />
               </Link>
               <Link
                 to="/plans"
-                className="border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 rounded-xl text-lg font-semibold transition-all"
+                className="border-2 border-white/30 text-white hover:bg-white/10 px-6 sm:px-8 py-3 sm:py-4 rounded-xl text-base sm:text-lg font-semibold transition-all touch-manipulation active:scale-95"
               >
                 View All Plans
               </Link>
