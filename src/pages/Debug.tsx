@@ -1,6 +1,7 @@
 import React from 'react';
 import FirebaseTest from '../components/FirebaseTest';
 import FirebaseSetupHelper from '../components/FirebaseSetupHelper';
+import EmailVerificationTroubleshoot from '../components/EmailVerificationTroubleshoot';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
@@ -31,6 +32,12 @@ const Debug: React.FC = () => {
         <div className="mt-8">
           <h2 className="text-2xl font-bold text-white mb-4">Firebase Setup</h2>
           <FirebaseSetupHelper />
+        </div>
+
+        {/* Email Verification Troubleshooting */}
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold text-white mb-4">Email Verification</h2>
+          <EmailVerificationTroubleshoot />
         </div>
 
         {/* Additional Debug Information */}
