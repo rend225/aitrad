@@ -251,7 +251,7 @@ export const fetchMultiTimeframeData = async (
         console.error(`❌ Failed to fetch ${tf.key} data for ${cleanSymbol}: ${error.message}`);
         console.warn(`💡 Try these common symbol alternatives: ${cleanSymbol}m, ${cleanSymbol.replace('m', '')}, ${cleanSymbol.replace('M', '')}`);
 
-        // Return empty candles instead of mock data
+        // Return empty candles when MT5 server is unavailable
         return {
           timeframe: tf.key,
           candles: []
@@ -302,7 +302,7 @@ export const fetchMultiTimeframeData = async (
   } catch (error) {
     console.error('❌ Error fetching multi-timeframe data from MT5:', error);
 
-    // Don't use mock data - throw the error to inform user that real data is required
+    // Throw the error to inform user that real data is required
     throw new Error(`Failed to fetch real market data for ${symbol}. ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 };
