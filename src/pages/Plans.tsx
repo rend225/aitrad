@@ -84,10 +84,9 @@ const Plans: React.FC = () => {
     // Set a timeout to prevent infinite loading
     const timeout = setTimeout(() => {
       if (loading) {
-        console.warn('⚠️ Plans loading timeout, using fallback data');
-        setPlans(fallbackPlans);
+        console.warn('⚠️ Plans loading timeout');
         setLoading(false);
-        setPaymentError('Connection timeout. Showing standard plans.');
+        setPaymentError('Connection timeout. Failed to load pricing plans. Please refresh the page or contact support.');
       }
     }, 10000); // 10 second timeout
 
@@ -134,74 +133,6 @@ const Plans: React.FC = () => {
     }
   };
 
-  // Fallback plans data in case Firestore fails
-  const fallbackPlans: Plan[] = [
-    {
-      id: 'free',
-      name: 'Free',
-      price: 0,
-      recommendations_per_day: 5,
-      features: [
-        '5 AI Trading analyses per month',
-        'Basic market insights',
-        'Email support',
-        'Community access'
-      ],
-      popular: false,
-      paypal_plan_id: null
-    },
-    {
-      id: 'basic',
-      name: 'Basic',
-      price: 29,
-      recommendations_per_day: 50,
-      features: [
-        '50 AI Trading analyses per month',
-        'Advanced market insights',
-        'Real-time alerts',
-        'Priority email support',
-        'Historical data access'
-      ],
-      popular: false,
-      paypal_plan_id: 'P-3RX65613XN908640NM3DIWUA'
-    },
-    {
-      id: 'pro',
-      name: 'Pro',
-      price: 79,
-      recommendations_per_day: 100,
-      features: [
-        '100 AI Trading analyses per month',
-        'Premium market insights',
-        'Real-time signals',
-        'Priority support',
-        'Advanced analytics',
-        'Custom alerts',
-        'Portfolio tracking'
-      ],
-      popular: true,
-      paypal_plan_id: 'P-0CX65613XN908640NM3DIWUB'
-    },
-    {
-      id: 'elite',
-      name: 'Elite',
-      price: 199,
-      recommendations_per_day: 200,
-      features: [
-        '200 AI Trading analyses per month',
-        'VIP market insights',
-        'Real-time trading signals',
-        '24/7 VIP support',
-        'Advanced analytics',
-        'Custom strategies',
-        'Telegram integration',
-        'MetaTrader integration',
-        'API access'
-      ],
-      popular: false,
-      paypal_plan_id: 'P-1DX65613XN908640NM3DIWUC'
-    }
-  ];
 
   const loadPlans = async () => {
     try {
@@ -209,22 +140,20 @@ const Plans: React.FC = () => {
       const plansData = await getPlans();
 
       if (plansData.length === 0) {
-        console.warn('⚠️ No plans found in Firestore, using fallback data');
-        setPlans(fallbackPlans);
-      } else {
-        setPlans(plansData);
-        console.log('✅ Plans loaded from Firestore:', plansData.length);
+        throw new Error('No plans found in Firestore. Please configure plans in the admin dashboard.');
       }
 
+      setPlans(plansData);
+      console.log('✅ Plans loaded from Firestore:', plansData.length);
+
       // Update config status with actual plan support info
-      const currentPlans = plansData.length > 0 ? plansData : fallbackPlans;
-      const validPlans = currentPlans.filter(p => hasValidPayPalPlan(p));
+      const validPlans = plansData.filter(p => hasValidPayPalPlan(p));
       setConfigStatus(prev => ({
         ...prev,
         validPlans: validPlans.map(p => p.id)
       }));
 
-      console.log('📊 Final plans loaded:', currentPlans.map(p => ({
+      console.log('📊 Plans loaded:', plansData.map(p => ({
         id: p.id,
         name: p.name,
         price: p.price,
@@ -234,9 +163,7 @@ const Plans: React.FC = () => {
 
     } catch (error) {
       console.error('❌ Error loading plans from Firestore:', error);
-      console.log('🔄 Using fallback plans data...');
-      setPlans(fallbackPlans);
-      setPaymentError('Could not connect to pricing database. Showing standard plans. Some features may be limited.');
+      setPaymentError('Failed to load pricing plans. Please ensure plans are configured in Firestore or contact support.');
     } finally {
       setLoading(false);
     }
