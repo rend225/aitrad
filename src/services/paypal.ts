@@ -187,12 +187,8 @@ export const verifyPayPalPayment = async (subscriptionId: string): Promise<any> 
     validatePayPalConfig();
     
     // Note: This would typically be done on the backend for security
-    // For demo purposes, we'll return a mock response
-    return {
-      id: subscriptionId,
-      status: 'ACTIVE',
-      plan_id: 'mock-plan-id'
-    };
+    // Actual PayPal subscription validation would be implemented here
+    throw new Error('PayPal subscription validation not implemented. This should be handled on the backend for security.');
   } catch (error) {
     console.error('PayPal payment verification failed:', error);
     throw error;
