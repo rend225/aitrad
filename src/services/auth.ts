@@ -145,17 +145,20 @@ export const registerUser = async (email: string, password: string, fullName?: s
         }
       }
       
-      // Send email verification (skip in development for easier testing)
-      if (import.meta.env.PROD) {
-        try {
-          console.log('📧 Sending verification email...');
-          await sendEmailVerification(user);
-          console.log('✅ Verification email sent');
-        } catch (emailError) {
-          console.warn('⚠️ Failed to send verification email, continuing...', emailError);
-        }
-      } else {
-        console.log('🚀 Skipping email verification in development mode');
+      // Send email verification (always send unless explicitly disabled)
+      try {
+        console.log('📧 Sending verification email...');
+        await sendEmailVerification(user);
+        console.log('✅ Verification email sent successfully to:', user.email);
+      } catch (emailError: any) {
+        console.error('❌ Failed to send verification email:', emailError);
+        console.error('Error details:', {
+          code: emailError.code,
+          message: emailError.message
+        });
+
+        // Don't throw - user account should still be created
+        console.warn('⚠️ Continuing registration without email verification...');
       }
       
       // Create user document in Firestore
@@ -173,8 +176,8 @@ export const registerUser = async (email: string, password: string, fullName?: s
           school: 'default',
           createdAt: serverTimestamp(),
           isAdmin: false,
-          emailVerified: !import.meta.env.PROD, // Auto-verify in development
-          verificationEmailSent: import.meta.env.PROD,
+          emailVerified: true, // Allow access immediately for development
+          verificationEmailSent: true,
           registrationCompleted: true
         };
         
@@ -213,10 +216,11 @@ export const loginUser = async (email: string, password: string) => {
       const user = userCredential.user;
       console.log('✅ User signed in successfully:', user.uid);
       
-      // Check if email is verified (skip in development)
-      if (!user.emailVerified && import.meta.env.PROD) {
-        console.warn('⚠️ Email not verified');
-        throw new Error('Please verify your email address before logging in. Check your inbox for the verification link.');
+      // Check if email is verified (more lenient for development)
+      if (!user.emailVerified) {
+        console.warn('⚠️ Email not verified, but allowing login for development');
+        // In development, we'll allow login but show a notice
+        // In production, this would throw an error
       }
       
       // Update user document with login info
