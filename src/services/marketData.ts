@@ -137,8 +137,21 @@ export const fetchCandlestickData = async (
     return processedCandles;
     
   } catch (error: any) {
-    console.error(`❌ Error fetching MT5 data: ${error.message}`);
-    throw error;
+    console.error(`❌ Error fetching ${interval} data for ${cleanSymbol}:`, error);
+
+    // Provide specific error messages and fallbacks
+    if (error.name === 'AbortError') {
+      console.warn(`⚠️ Request timeout for ${cleanSymbol} ${interval} data`);
+      throw new Error(`Request timeout - MT5 server may be slow or offline`);
+    } else if (error.message?.includes('Failed to fetch')) {
+      console.warn(`⚠️ Network error fetching ${cleanSymbol} data - MT5 server offline`);
+      throw new Error(`MT5 server is not running. Please start the server: python mt5_server.py`);
+    } else if (error.message?.includes('ECONNREFUSED')) {
+      console.warn(`⚠️ Connection refused for ${cleanSymbol} data`);
+      throw new Error(`Cannot connect to MT5 server on port 5000`);
+    } else {
+      throw new Error(`Failed to fetch candlestick data: ${error.message}`);
+    }
   }
 };
 
@@ -383,8 +396,21 @@ export const testApiConnection = async (): Promise<boolean> => {
     console.log(`✅ MT5 Flask server connection successful - MT5 Connected: ${healthData.mt5_connected}`);
     return true;
 
-  } catch (error) {
-    console.error(`❌ MT5 Flask server connection test failed:`, error);
+  } catch (error: any) {
+    console.error('❌ MT5 Flask server connection test failed:', error);
+
+    // Provide specific error messages based on error type
+    if (error.name === 'AbortError') {
+      console.warn('⚠️ Connection test timed out (5s) - MT5 server may be offline');
+    } else if (error.message?.includes('Failed to fetch')) {
+      console.warn('⚠️ Network error - MT5 server is not running or unreachable');
+      console.info('💡 To start MT5 server: python mt5_server.py');
+    } else if (error.code === 'ECONNREFUSED') {
+      console.warn('⚠️ Connection refused - MT5 server is not running on port 5000');
+    } else {
+      console.warn('⚠️ MT5 server appears to be offline or unreachable:', error.message);
+    }
+
     return false;
   }
 };
